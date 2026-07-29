@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useState } from "react";
 import DataManagers from "./DataManagers";
 import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
@@ -52,7 +52,8 @@ type WorkflowTask={id:number;reference:string;title:string;assignee:string;dueDa
 type ClientFile={id:number;reference:string;customerEmail:string;fileName:string;size:number;category:string;createdAt:string};
 type DatabaseOverview={engine:string;status:string;totalTables:number;totalRecords:number;tables:Array<{table:string;label:string;count:number}>;storage:{structured:string;files:string;migrations:string}};
 
-export default function AdminDashboard({displayName,module="overview"}:{displayName:string;module?:string}) {
+export default function AdminDashboard({displayName,module:initialModule="overview"}:{displayName:string;module?:string}) {
+  const [module,setModule]=useState(initialModule);
   const [pages,setPages]=useState<PageRow[]>([]);
   const [leads,setLeads]=useState<Lead[]>([]);
   const [projects,setProjects]=useState<Project[]>([]);
@@ -85,6 +86,23 @@ export default function AdminDashboard({displayName,module="overview"}:{displayN
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
+  useEffect(()=>{
+    const syncFromUrl=()=>{
+      const requested=new URLSearchParams(window.location.search).get("module")||"overview";
+      setModule(adminModules.some(([key])=>key===requested)?requested:"overview");
+    };
+    window.addEventListener("popstate",syncFromUrl);
+    return()=>window.removeEventListener("popstate",syncFromUrl);
+  },[]);
+
+  function navigateModule(key:string,event:MouseEvent<HTMLAnchorElement>){
+    if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+    event.preventDefault();
+    const href=key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`;
+    window.history.pushState({module:key},"",href);
+    setModule(key);
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
 
   async function submit(event:FormEvent<HTMLFormElement>,url:string,success:string){
     event.preventDefault();const form=event.currentTarget;const body=Object.fromEntries(new FormData(form));
@@ -108,11 +126,11 @@ export default function AdminDashboard({displayName,module="overview"}:{displayN
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} key={key}>{icon} <span>{label}</span></a>)}</nav>
+      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}>{icon} <span>{label}</span></a>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
-      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href="/admin?module=pages">＋ Quick create</a></div></header>
+      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a></div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
       <section className="admin-stats" id="overview">
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
