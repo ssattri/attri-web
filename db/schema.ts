@@ -73,6 +73,8 @@ export const products = sqliteTable("products", {
   metaTitle: text("meta_title").notNull().default(""),
   metaKeywords: text("meta_keywords").notNull().default(""),
   metaDescription: text("meta_description").notNull().default(""),
+  serviceType: text("service_type").notNull().default(""),
+  fulfillmentMode: text("fulfillment_mode").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
