@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import DataManagers from "./DataManagers";
 
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};
 type Lead={id:number;name:string;email:string;phone:string;service:string;status:string;createdAt:string};
@@ -72,7 +73,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   return <div className="admin-shell">
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#database">◫ <span>Database</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a><a href="#operations">⚙ <span>Operations</span></a><a href="#vault">⌘ <span>File vault</span></a></nav>
+      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#database">◫ <span>Database</span></a><a href="#data-managers">⌗ <span>Data Managers</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a><a href="#operations">⚙ <span>Operations</span></a><a href="#vault">⌘ <span>File vault</span></a></nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
@@ -90,6 +91,8 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         <div className="database-summary"><article><span>Database engine</span><strong>{database?.engine||"Cloud database"}</strong><small>Durable structured business data</small></article><article><span>Data tables</span><strong>{database?.totalTables??"—"}</strong><small>Integrated operational modules</small></article><article><span>Total records</span><strong>{database?.totalRecords??"—"}</strong><small>Across the complete platform</small></article><article><span>Document storage</span><strong>{database?.storage.files||"R2"}</strong><small>Protected client files and media</small></article></div>
         <div className="database-tables">{database?.tables.map(x=><article key={x.table}><div><span></span><b>{x.label}</b><small>{x.table}</small></div><strong>{x.count}</strong></article>)}</div>
       </section>
+
+      <DataManagers/>
 
       <section className="admin-panel" id="pages">
         <div className="panel-title"><div><p>CONTENT MANAGEMENT</p><h2>Website pages</h2></div><span>{pages.length} records</span></div>
@@ -181,7 +184,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Data Managers","Live Gateway","Notifications","Analytics"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Notifications","Analytics","SEO Manager"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
