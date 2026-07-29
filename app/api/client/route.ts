@@ -1,8 +1,13 @@
 import{getChatGPTUser}from"../../chatgpt-auth";async function db(){return(await import("cloudflare:workers")).env.DB}
 async function user(){return await getChatGPTUser()}
-async function init(){const d=await db();await d.prepare(`CREATE TABLE IF NOT EXISTS support_tickets (id INTEGER PRIMARY KEY AUTOINCREMENT,reference TEXT NOT NULL UNIQUE,customer_email TEXT NOT NULL,subject TEXT NOT NULL,category TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'open',priority TEXT NOT NULL DEFAULT 'normal',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run()}
+async function init(){const d=await db();await d.batch([
+ d.prepare(`CREATE TABLE IF NOT EXISTS support_tickets (id INTEGER PRIMARY KEY AUTOINCREMENT,reference TEXT NOT NULL UNIQUE,customer_email TEXT NOT NULL,subject TEXT NOT NULL,category TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'open',priority TEXT NOT NULL DEFAULT 'normal',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+ d.prepare(`CREATE TABLE IF NOT EXISTS customer_profiles (id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT NOT NULL UNIQUE,full_name TEXT NOT NULL,phone TEXT NOT NULL DEFAULT '',company TEXT NOT NULL DEFAULT '',address TEXT NOT NULL DEFAULT '',city TEXT NOT NULL DEFAULT '',state TEXT NOT NULL DEFAULT '',pincode TEXT NOT NULL DEFAULT '',gstin TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'active',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`)
+])}
 export async function GET(){
  const u=await user();if(!u)return Response.json({error:"Unauthorized"},{status:401});await init();const d=await db();const email=u.email.toLowerCase();
+ await d.prepare(`INSERT INTO customer_profiles (email,full_name,status) VALUES (?,?, 'active')
+  ON CONFLICT(email) DO UPDATE SET full_name=excluded.full_name,updated_at=CURRENT_TIMESTAMP`).bind(email,u.fullName||u.displayName).run();
  const url=new URL("http://client");const [appointments,orders,enrollments,tickets,invoices,reports,certificates,payments,files]=await Promise.all([
   d.prepare("SELECT reference,service,consultation_mode AS consultationMode,preferred_date AS preferredDate,preferred_time AS preferredTime,status,created_at AS createdAt FROM appointments WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
   d.prepare("SELECT reference,subtotal,status,payment_status AS paymentStatus,created_at AS createdAt FROM orders WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
