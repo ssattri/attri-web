@@ -5,6 +5,38 @@ import DataManagers from "./DataManagers";
 import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
 
+export const adminModules = [
+  ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
+  ["seo-manager","SEO Manager","↗"],["database","Database","◫"],["data-managers","Data Managers","⌗"],
+  ["permissions","Team Access","♙"],["pages","Pages & CMS","▤"],["projects","Projects","◇"],
+  ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["commerce","Orders & Store","□"],
+  ["learning","Courses & LMS","△"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
+  ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
+  ["vault","File Vault","⌘"]
+] as const;
+
+const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
+  overview:{eyebrow:"OPERATIONS / OVERVIEW",title:"Business command centre"},
+  analytics:{eyebrow:"INSIGHTS / ANALYTICS",title:"Performance analytics"},
+  notifications:{eyebrow:"COMMUNICATIONS",title:"Notification centre"},
+  "seo-manager":{eyebrow:"MARKETING / SEARCH",title:"SEO manager"},
+  database:{eyebrow:"INFRASTRUCTURE",title:"Database centre"},
+  "data-managers":{eyebrow:"MASTER DATA",title:"Data managers"},
+  permissions:{eyebrow:"SECURITY / TEAM",title:"Roles & permissions"},
+  pages:{eyebrow:"CONTENT / CMS",title:"Website pages"},
+  projects:{eyebrow:"DELIVERY / PORTFOLIO",title:"Project management"},
+  leads:{eyebrow:"SALES / CRM",title:"Leads & enquiries"},
+  appointments:{eyebrow:"CONSULTATION DESK",title:"Appointments"},
+  commerce:{eyebrow:"COMMERCE",title:"Orders & store"},
+  learning:{eyebrow:"ATTRI ACADEMY",title:"Courses & students"},
+  support:{eyebrow:"CLIENT SUCCESS",title:"Support tickets"},
+  finance:{eyebrow:"FINANCE",title:"Invoices & receivables"},
+  reports:{eyebrow:"CONSULTATION INTELLIGENCE",title:"Client reports"},
+  operations:{eyebrow:"ENTERPRISE OPERATIONS",title:"Certificates & payments"},
+  automation:{eyebrow:"AUTOMATION",title:"Workflows & follow-ups"},
+  vault:{eyebrow:"SECURE STORAGE",title:"Client file vault"}
+};
+
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};
 type Lead={id:number;name:string;email:string;phone:string;service:string;status:string;createdAt:string};
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
@@ -20,7 +52,7 @@ type WorkflowTask={id:number;reference:string;title:string;assignee:string;dueDa
 type ClientFile={id:number;reference:string;customerEmail:string;fileName:string;size:number;category:string;createdAt:string};
 type DatabaseOverview={engine:string;status:string;totalTables:number;totalRecords:number;tables:Array<{table:string;label:string;count:number}>;storage:{structured:string;files:string;migrations:string}};
 
-export default function AdminDashboard({displayName}:{displayName:string}) {
+export default function AdminDashboard({displayName,module="overview"}:{displayName:string;module?:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
   const [leads,setLeads]=useState<Lead[]>([]);
   const [projects,setProjects]=useState<Project[]>([]);
@@ -72,14 +104,15 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
     event.preventDefault();const form=event.currentTarget;const response=await fetch("/api/admin/operations",{method:"POST",body:new FormData(form)});const data=await response.json();setMessage(response.ok?`File ${data.reference} shared securely.`:data.error);if(response.ok){form.reset();await refresh()}
   }
 
-  return <div className="admin-shell">
+  const current=moduleTitles[module]||moduleTitles.overview;
+  return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#analytics">⌁ <span>Analytics</span></a><a href="#notifications">✦ <span>Notifications</span></a><a href="#seo-manager">↗ <span>SEO Manager</span></a><a href="#database">◫ <span>Database</span></a><a href="#data-managers">⌗ <span>Data Managers</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a><a href="#operations">⚙ <span>Operations</span></a><a href="#vault">⌘ <span>File vault</span></a></nav>
+      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin/${key}`} key={key}>{icon} <span>{label}</span></a>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
-      <header><div><p>OPERATIONS / OVERVIEW</p><h1>Good morning, {displayName.split(" ")[0]}.</h1></div><div><a href="/" target="_blank">View website ↗</a><button onClick={()=>document.querySelector("#pages")?.scrollIntoView()}>＋ Quick create</button></div></header>
+      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href="/admin/pages">＋ Quick create</a></div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
       <section className="admin-stats" id="overview">
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
@@ -189,7 +222,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Campaigns","Report Exports","Customer Messaging"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="module-roadmap" id="roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Campaigns","Report Exports","Customer Messaging"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
