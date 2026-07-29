@@ -1,0 +1,3 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import OnboardingClient from"./OnboardingClient";
+export const dynamic="force-dynamic";export default async function Onboarding({searchParams}:{searchParams:Promise<{role?:string}>}){const{role}=await searchParams;const selected=role==="consultant"?"consultant":"user";return <ProtectedOnboarding role={selected}/>}
+async function ProtectedOnboarding({role}:{role:"user"|"consultant"}){await requireChatGPTUser(`/client/onboarding?role=${role}`);return <OnboardingClient role={role}/>}

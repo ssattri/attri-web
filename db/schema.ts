@@ -228,6 +228,7 @@ export const customerProfiles = sqliteTable("customer_profiles", {
   pincode: text("pincode").notNull().default(""),
   gstin: text("gstin").notNull().default(""),
   status: text("status").notNull().default("active"),
+  accountType: text("account_type").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });

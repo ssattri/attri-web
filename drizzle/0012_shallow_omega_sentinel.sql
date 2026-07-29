@@ -1,0 +1,1 @@
+ALTER TABLE `customer_profiles` ADD `account_type` text DEFAULT '' NOT NULL;
