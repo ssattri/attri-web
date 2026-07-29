@@ -27,7 +27,10 @@ async function init(){
 export async function GET(){
   await init();const database=await db();
   const rows=await database.prepare("SELECT id,name,slug,category,description,price,stock,image_url AS imageUrl FROM products WHERE status='active' ORDER BY id DESC").all();
-  return Response.json({products:rows.results});
+  let courses:{results:unknown[]}={results:[]};
+  try{courses=await database.prepare("SELECT id,title AS name,slug,'Courses' AS category,description,price,999 AS stock,image_url AS imageUrl FROM courses WHERE status='published' AND show_in_shop=1 ORDER BY id DESC").all()}
+  catch{/* Courses are initialized by the academy workflow. */}
+  return Response.json({products:rows.results,courses:courses.results});
 }
 export async function POST(request:Request){
   const body=await request.json() as {name?:string;email?:string;phone?:string;address?:string;city?:string;state?:string;pincode?:string;items?:Array<{id:number;quantity:number}>};

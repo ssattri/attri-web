@@ -61,6 +61,7 @@ export const products = sqliteTable("products", {
   price: integer("price").notNull(),
   stock: integer("stock").notNull().default(0),
   status: text("status").notNull().default("active"),
+  imageUrl: text("image_url").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -93,6 +94,10 @@ export const courses = sqliteTable("courses", {
   price: integer("price").notNull().default(0),
   lessons: integer("lessons").notNull().default(0),
   status: text("status").notNull().default("published"),
+  imageUrl: text("image_url").notNull().default(""),
+  instructor: text("instructor").notNull().default("Attri Academy Faculty"),
+  certificate: integer("certificate").notNull().default(1),
+  showInShop: integer("show_in_shop").notNull().default(1),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
