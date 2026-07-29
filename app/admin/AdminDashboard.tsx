@@ -15,6 +15,7 @@ type Certificate={id:number;reference:string;studentName:string;studentEmail:str
 type Payment={id:number;reference:string;customerName:string;customerEmail:string;purpose:string;gateway:string;transactionId:string;amount:number;status:string};
 type WorkflowTask={id:number;reference:string;title:string;assignee:string;dueDate:string;priority:string;status:string};
 type ClientFile={id:number;reference:string;customerEmail:string;fileName:string;size:number;category:string;createdAt:string};
+type DatabaseOverview={engine:string;status:string;totalTables:number;totalRecords:number;tables:Array<{table:string;label:string;count:number}>;storage:{structured:string;files:string;migrations:string}};
 
 export default function AdminDashboard({displayName}:{displayName:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
@@ -30,13 +31,14 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   const [payments,setPayments]=useState<Payment[]>([]);
   const [tasks,setTasks]=useState<WorkflowTask[]>([]);
   const [files,setFiles]=useState<ClientFile[]>([]);
+  const [database,setDatabase]=useState<DatabaseOverview|null>(null);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
 
   async function refresh() {
     setBusy(true);
-    const [p,l,r,a,c,e,t,f,o]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning"),fetch("/api/admin/support"),fetch("/api/admin/finance"),fetch("/api/admin/operations")]);
-    const [pd,ld,rd,ad,cd,ed,td,fd,od]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json(),f.json(),o.json()]);
+    const [p,l,r,a,c,e,t,f,o,d]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning"),fetch("/api/admin/support"),fetch("/api/admin/finance"),fetch("/api/admin/operations"),fetch("/api/admin/database")]);
+    const [pd,ld,rd,ad,cd,ed,td,fd,od,dd]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json(),f.json(),o.json(),d.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
     if(a.ok)setAppointments(ad.appointments);
     if(c.ok)setOrders(cd.orders);
@@ -44,6 +46,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
     if(t.ok)setTickets(td.tickets);
     if(f.ok){setInvoices(fd.invoices);setReports(fd.reports)}
     if(o.ok){setCertificates(od.certificates);setPayments(od.payments);setTasks(od.tasks);setFiles(od.files)}
+    if(d.ok)setDatabase(dd);
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
@@ -69,7 +72,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   return <div className="admin-shell">
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a><a href="#operations">⚙ <span>Operations</span></a><a href="#vault">⌘ <span>File vault</span></a></nav>
+      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#database">◫ <span>Database</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a><a href="#operations">⚙ <span>Operations</span></a><a href="#vault">⌘ <span>File vault</span></a></nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
@@ -80,6 +83,12 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         <article><span>Published pages</span><strong>{pages.filter(x=>x.status==="published").length}</strong><small>{pages.length} CMS records</small></article>
         <article><span>Active projects</span><strong>{projects.filter(x=>["active","featured"].includes(x.status)).length}</strong><small>{projects.length} total projects</small></article>
         <article><span>Appointments</span><strong>{appointments.filter(x=>x.status==="pending").length}</strong><small>{appointments.length} total requests</small></article>
+      </section>
+
+      <section className="admin-panel database-centre" id="database">
+        <div className="panel-title"><div><p>DATA INFRASTRUCTURE</p><h2>Enterprise database centre</h2></div><span>{database?.status||"connecting"}</span></div>
+        <div className="database-summary"><article><span>Database engine</span><strong>{database?.engine||"Cloud database"}</strong><small>Durable structured business data</small></article><article><span>Data tables</span><strong>{database?.totalTables??"—"}</strong><small>Integrated operational modules</small></article><article><span>Total records</span><strong>{database?.totalRecords??"—"}</strong><small>Across the complete platform</small></article><article><span>Document storage</span><strong>{database?.storage.files||"R2"}</strong><small>Protected client files and media</small></article></div>
+        <div className="database-tables">{database?.tables.map(x=><article key={x.table}><div><span></span><b>{x.label}</b><small>{x.table}</small></div><strong>{x.count}</strong></article>)}</div>
       </section>
 
       <section className="admin-panel" id="pages">
@@ -172,7 +181,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Notifications","Staff Roles","Analytics"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Data Managers","Live Gateway","Notifications","Analytics"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }

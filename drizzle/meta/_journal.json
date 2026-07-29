@@ -50,6 +50,13 @@
       "when": 1785305110505,
       "tag": "0006_high_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1785305607966,
+      "tag": "0007_lonely_sphinx",
+      "breakpoints": true
     }
   ]
 }
