@@ -224,6 +224,34 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 .gateway-readiness{background:#111827}.module-roadmap{border-radius:9px;background:#111827;box-shadow:0 4px 18px rgba(15,23,42,.12)}.module-roadmap article{border-color:rgba(255,255,255,.08)}.module-roadmap article>span{color:#f59e0b}
 @media(max-width:900px){.admin-shell{grid-template-columns:72px 1fr}.admin-sidebar{padding:0 9px 20px}.admin-logo{margin:0 -9px 12px;padding:0 16px}.admin-main{padding:0 18px 50px}.admin-main>header{margin:0 -18px 22px;padding:0 18px}.database-tables{grid-template-columns:repeat(3,1fr)}}
 
+/* Admin readability and independent dynamic sidebar scrolling */
+.admin-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;overflow:hidden}
+.admin-sidebar .admin-logo,.admin-sidebar .admin-profile{flex:0 0 auto}
+.admin-sidebar nav{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:smooth;padding-bottom:14px;scrollbar-width:thin;scrollbar-color:transparent transparent}
+.admin-sidebar nav:hover{scrollbar-color:rgba(245,158,11,.7) rgba(255,255,255,.055)}
+.admin-sidebar nav::-webkit-scrollbar{width:6px}
+.admin-sidebar nav::-webkit-scrollbar-track{background:transparent;border-radius:10px}
+.admin-sidebar nav::-webkit-scrollbar-thumb{background:transparent;border-radius:10px}
+.admin-sidebar nav:hover::-webkit-scrollbar-thumb{background:linear-gradient(#fbbf24,#f97316)}
+.admin-sidebar nav::-webkit-scrollbar-thumb:hover{background:#f59e0b}
+.admin-sidebar nav a{min-height:44px;font-size:15px}
+.admin-sidebar nav a span{font-size:11px!important;font-weight:500;line-height:1.35}
+.admin-sidebar nav::before{font-size:8px}
+.admin-logo b{font-size:16px}.admin-logo small{font-size:8px}.admin-profile b{font-size:11px}.admin-profile small{font-size:8px}
+.admin-main>header p,.panel-title p,.module-roadmap>div p{font-size:9px!important}.admin-main>header h1{font-size:23px!important}.admin-main>header a,.admin-main>header button{font-size:9px}
+.admin-stats span{font-size:10px}.admin-stats strong{font-size:33px!important}.admin-stats small{font-size:9px;line-height:1.5}
+.panel-title h2,.module-roadmap h2{font-size:21px!important}.panel-title>span{font-size:9px}
+.database-summary span,.growth-metrics span{font-size:9px}.database-summary strong,.growth-metrics strong{font-size:27px!important}.database-summary small,.growth-metrics small{font-size:9px;line-height:1.45}
+.database-tables b{font-size:10px}.database-tables small{font-size:8px}.database-tables strong{font-size:21px!important}
+.manager-tabs button{font-size:9px}.cms-layout form h3,.gateway-readiness h3{font-size:18px!important}.cms-layout label{font-size:10px;line-height:1.4}
+.cms-layout input,.cms-layout textarea,.cms-layout select,.portal-support input,.portal-support select,.portal-support textarea{font-size:12px;padding:12px}
+.cms-layout form button{font-size:10px;padding:13px}.form-message{font-size:10px}
+.record-list b,.table-row b,.appointment-table b{font-size:12px}.record-list small,.table-row small,.appointment-table small{font-size:9px;line-height:1.5}
+.record-list select,.appointment-table select,.table-row select{font-size:10px;padding:8px}.record-status,.portal-list article>span{font-size:9px!important}
+.table-head,.appointment-head{font-size:9px}.table-row time{font-size:10px}.empty-row{font-size:12px}
+.module-roadmap article b{font-size:11px}.module-roadmap article small{font-size:8px}.gateway-readiness b{font-size:12px}.gateway-readiness small,.gateway-note{font-size:9px}.gateway-readiness article>span{font-size:8px}
+@media(max-width:900px){.admin-sidebar nav a{min-height:46px}.admin-sidebar nav a span{display:none}.admin-sidebar nav{scrollbar-width:none}.admin-sidebar nav::-webkit-scrollbar{display:none}}
+
 @media (max-width: 900px) {
   .desktop-nav{display:none}.nav-wrap{height:75px}.nav-cta{font-size:0}.nav-cta span{font-size:18px}
   .hero{min-height:760px;height:100svh}.hero-content{padding-top:145px}.compass{width:210px;height:210px;right:-55px;top:47%;opacity:.35}
