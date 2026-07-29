@@ -44,7 +44,7 @@ type Lead={id:number;name:string;email:string;phone:string;service:string;status
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
 type Appointment={id:number;reference:string;name:string;phone:string;service:string;consultationMode:string;preferredDate:string;preferredTime:string;status:string};
 type Order={id:number;reference:string;customerName:string;phone:string;itemsJson:string;subtotal:number;status:string;paymentStatus:string;createdAt:string};
-type Product={id:number;name:string;slug:string;category:string;description:string;price:number;stock:number;status:string;imageUrl:string;createdAt:string};
+type Product={id:number;name:string;slug:string;category:string;description:string;price:number;stock:number;status:string;imageUrl:string;itemType:string;deliveryMode:string;specialPrice:number;specialFrom:string;specialTo:string;duration:string;classes:number;sortOrder:number;createdAt:string};
 type Enrollment={id:number;reference:string;studentName:string;email:string;phone:string;courseTitle:string;status:string;paymentStatus:string;progress:number};
 type Course={id:number;title:string;slug:string;category:string;level:string;mode:string;duration:string;description:string;price:number;lessons:number;status:string;imageUrl:string;instructor:string;certificate:number;showInShop:number;createdAt:string};
 type Ticket={id:number;reference:string;customerEmail:string;subject:string;category:string;status:string;priority:string;createdAt:string};
@@ -64,6 +64,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   const [appointments,setAppointments]=useState<Appointment[]>([]);
   const [orders,setOrders]=useState<Order[]>([]);
   const [products,setProducts]=useState<Product[]>([]);
+  const [editingProduct,setEditingProduct]=useState<Product|null>(null);
+  const [productType,setProductType]=useState("physical");
   const [enrollments,setEnrollments]=useState<Enrollment[]>([]);
   const [courses,setCourses]=useState<Course[]>([]);
   const [editingCourse,setEditingCourse]=useState<Course|null>(null);
@@ -130,6 +132,12 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     if(!window.confirm("Delete this product permanently?"))return;
     const response=await fetch(`/api/admin/commerce?id=${id}`,{method:"DELETE"});
     const data=await response.json();setMessage(response.ok?"Product deleted.":data.error||"Unable to delete product.");if(response.ok)await refresh();
+  }
+  async function submitProduct(event:FormEvent<HTMLFormElement>){
+    event.preventDefault();const form=event.currentTarget;const body=Object.fromEntries(new FormData(form));
+    const response=await fetch("/api/admin/commerce",{method:editingProduct?"PATCH":"POST",headers:{"content-type":"application/json"},body:JSON.stringify({...body,...(editingProduct?{id:editingProduct.id,kind:"product"}:{})})});
+    const data=await response.json();setMessage(response.ok?(editingProduct?"Product updated.":"Product created and catalogue updated."):(data.error||"Unable to save product."));
+    if(response.ok){form.reset();setEditingProduct(null);setProductType("physical");await refresh()}
   }
   async function submitCourse(event:FormEvent<HTMLFormElement>){
     event.preventDefault();const form=event.currentTarget;const body=Object.fromEntries(new FormData(form));
@@ -214,25 +222,33 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       </section>
 
       <section className="admin-panel split-module product-admin" id="products">
-        <div className="panel-title"><div><p>STORE CATALOGUE</p><h2>Products</h2></div><span>{products.length} products</span></div>
+        <div className="panel-title"><div><p>STORE CATALOGUE</p><h2>{editingProduct?"Edit product":"Products"}</h2></div><span>{products.length} products</span></div>
         <div className="cms-layout">
-          <form id="add-product" onSubmit={e=>submit(e,"/api/admin/commerce","Product created and catalogue updated.")}>
-            <h3>＋ Add product</h3>
-            <label>Product name<input name="name" required placeholder="e.g. Copper Vastu Pyramid"/></label>
-            <label>URL slug<input name="slug" placeholder="auto-created-from-name"/></label>
-            <label>Category<select name="category" defaultValue="Remedies"><option>Tools</option><option>Remedies</option><option>Yantras</option><option>Pyramids</option><option>Books</option><option>Software</option><option>Courses</option><option>Reports</option><option>Consultation</option><option>Digital Downloads</option></select></label>
-            <div className="product-form-row"><label>Price (₹)<input name="price" type="number" min="0" step="0.01" required/></label><label>Stock<input name="stock" type="number" min="0" defaultValue="0" required/></label></div>
-            <label>Product image URL<input name="imageUrl" type="url" placeholder="https://..."/></label>
-            <label>Description<textarea name="description" rows={4} required placeholder="Benefits, material, size and usage details"/></label>
-            <label>Visibility<select name="status" defaultValue="active"><option value="active">Published — live in shop</option><option value="draft">Draft — hidden</option></select></label>
-            <button>Publish product</button>
+          <form id="add-product" key={editingProduct?.id??"new"} onSubmit={submitProduct}>
+            <h3>{editingProduct?"Edit product":"＋ Add product"}</h3>
+            <label>Product name<input name="name" required defaultValue={editingProduct?.name} placeholder="e.g. Copper Vastu Pyramid"/></label>
+            <label>URL slug<input name="slug" defaultValue={editingProduct?.slug} placeholder="auto-created-from-name"/></label>
+            <div className="product-form-row">
+              <label>Item type<select name="itemType" value={productType} onChange={e=>setProductType(e.target.value)}><option value="physical">Physical product</option><option value="digital">Digital product</option><option value="course">Course</option><option value="service">Service</option></select></label>
+              <label>Category<select name="category" defaultValue={editingProduct?.category||"Remedies"}><option>Tools</option><option>Remedies</option><option>Yantras</option><option>Pyramids</option><option>Books</option><option>Software</option><option>Courses</option><option>Reports</option><option>Consultation</option><option>Digital Downloads</option></select></label>
+            </div>
+            <label>Delivery / course type<select name="deliveryMode" defaultValue={editingProduct?.deliveryMode||"Online"}><option>Online</option><option>Offline</option><option>Online + Offline</option></select></label>
+            <div className="product-form-row"><label>Regular price (₹)<input name="price" type="number" min="0" step="0.01" required defaultValue={editingProduct?editingProduct.price/100:""}/></label><label>Special price (₹)<input name="specialPrice" type="number" min="0" step="0.01" defaultValue={editingProduct?.specialPrice?editingProduct.specialPrice/100:0}/></label></div>
+            <div className="product-form-row"><label>Special price from<input name="specialFrom" type="date" defaultValue={editingProduct?.specialFrom}/></label><label>Special price to<input name="specialTo" type="date" defaultValue={editingProduct?.specialTo}/></label></div>
+            {productType==="course"&&<div className="course-only-fields"><div className="product-form-row"><label>Course duration<input name="duration" required defaultValue={editingProduct?.duration} placeholder="8 weeks"/></label><label>Classes<input name="classes" type="number" min="0" required defaultValue={editingProduct?.classes??0}/></label></div></div>}
+            <div className="product-form-row"><label>Stock / seats<input name="stock" type="number" min="0" defaultValue={editingProduct?.stock??0} required/></label><label>Display order<input name="sortOrder" type="number" defaultValue={editingProduct?.sortOrder??0} title="Lower numbers appear first"/></label></div>
+            <label>Product image URL<input name="imageUrl" type="url" defaultValue={editingProduct?.imageUrl} placeholder="https://..."/></label>
+            <label>Description<textarea name="description" rows={4} required defaultValue={editingProduct?.description} placeholder="Benefits, material, size and usage details"/></label>
+            <label>Status toggle<select name="status" defaultValue={editingProduct?.status||"active"}><option value="active">Published — live in shop</option><option value="draft">Draft — hidden</option></select></label>
+            <button>{editingProduct?"Save product changes":"Publish product"}</button>
+            {editingProduct&&<button type="button" className="secondary-form-action" onClick={()=>{setEditingProduct(null);setProductType("physical")}}>Cancel editing</button>}
           </form>
           <div className="product-admin-list">
             {products.length===0?<p className="empty-row">No products yet. Use Add Product to create your catalogue.</p>:products.map((x,i)=><article key={x.id}>
               <div className={`product-admin-thumb art-${i%6}`}>{x.imageUrl?<img src={x.imageUrl} alt=""/>:<b>◈</b>}</div>
-              <div className="product-admin-copy"><b>{x.name}</b><small>{x.category} · /{x.slug}</small><span>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.price/100)} · {x.stock} in stock</span></div>
+              <div className="product-admin-copy"><b>{x.name}</b><small>{x.category} · {x.itemType} · {x.deliveryMode} · order {x.sortOrder}</small><span>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.price/100)}{x.specialPrice?` → ${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.specialPrice/100)}`:""} · {x.stock} stock/seats{x.itemType==="course"?` · ${x.duration} · ${x.classes} classes`:""}</span></div>
               <select value={x.status} onChange={e=>update("/api/admin/commerce",x.id,e.target.value,"product")} aria-label={`Visibility for ${x.name}`}><option value="active">Published</option><option value="draft">Draft</option></select>
-              <button className="danger-action product-delete" onClick={()=>removeProduct(x.id)}>Delete</button>
+              <div className="course-row-actions"><button onClick={()=>{setEditingProduct(x);setProductType(x.itemType);window.scrollTo({top:0,behavior:"smooth"})}}>Edit</button><button className="danger-action product-delete" onClick={()=>removeProduct(x.id)}>Delete</button></div>
             </article>)}
           </div>
         </div>

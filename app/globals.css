@@ -299,7 +299,7 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 /* Store catalogue management */
 .product-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .product-admin-list{padding:16px 24px;display:grid;align-content:start}
-.product-admin-list article{display:grid;grid-template-columns:66px minmax(180px,1fr) 125px 62px;gap:15px;align-items:center;padding:14px 8px;border-bottom:1px solid #edf0f3}
+.product-admin-list article{display:grid;grid-template-columns:66px minmax(180px,1fr) 125px 110px;gap:15px;align-items:center;padding:14px 8px;border-bottom:1px solid #edf0f3}
 .product-admin-list article:hover{background:#fffbeb}
 .product-admin-thumb{width:66px;height:66px;display:grid;place-items:center;overflow:hidden;border-radius:7px;background:linear-gradient(145deg,#f4dfc2,#d59d6b)}
 .product-admin-thumb img,.product-art img{width:100%;height:100%;object-fit:cover;display:block}
@@ -310,6 +310,7 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 .product-delete{font-size:11px!important}
 .product-art img{position:absolute;inset:0}.product-art span{z-index:2;background:rgba(255,250,242,.88);padding:6px 8px;border-radius:3px}
 .product-grid footer button:disabled{opacity:.48;cursor:not-allowed}
+.course-only-fields{margin-top:14px;padding:12px;border:1px solid #f2c77f;border-radius:6px;background:#fffbeb}.course-only-fields label{margin-top:0}
 .shop-course-link{color:#b45222;font:600 8px "Poppins";text-transform:uppercase}
 .course-admin-list article{grid-template-columns:66px minmax(180px,1fr) 125px 110px}
 .course-row-actions{display:flex;gap:6px}.course-row-actions button{border:1px solid #dbe1e8;border-radius:5px;background:white;padding:8px 10px;font:11px "Poppins";cursor:pointer}.course-row-actions .danger-action{color:#b64d3c}

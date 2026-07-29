@@ -13,7 +13,9 @@ async function init(){
       payment_status TEXT NOT NULL DEFAULT 'pending',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`)
   ]);
   const columns=await database.prepare("PRAGMA table_info(products)").all<{name:string}>();
-  if(!columns.results.some(x=>x.name==="image_url"))await database.prepare("ALTER TABLE products ADD COLUMN image_url TEXT NOT NULL DEFAULT ''").run();
+  for(const [name,sql] of [
+    ["image_url","ALTER TABLE products ADD COLUMN image_url TEXT NOT NULL DEFAULT ''"],["item_type","ALTER TABLE products ADD COLUMN item_type TEXT NOT NULL DEFAULT 'physical'"],["delivery_mode","ALTER TABLE products ADD COLUMN delivery_mode TEXT NOT NULL DEFAULT 'Online'"],["special_price","ALTER TABLE products ADD COLUMN special_price INTEGER NOT NULL DEFAULT 0"],["special_from","ALTER TABLE products ADD COLUMN special_from TEXT NOT NULL DEFAULT ''"],["special_to","ALTER TABLE products ADD COLUMN special_to TEXT NOT NULL DEFAULT ''"],["duration","ALTER TABLE products ADD COLUMN duration TEXT NOT NULL DEFAULT ''"],["classes","ALTER TABLE products ADD COLUMN classes INTEGER NOT NULL DEFAULT 0"],["sort_order","ALTER TABLE products ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0"]
+  ])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
   const count=await database.prepare("SELECT COUNT(*) AS total FROM products").first<{total:number}>();
   if(!count?.total)await database.batch([
     database.prepare("INSERT INTO products (name,slug,category,description,price,stock) VALUES (?,?,?,?,?,?)").bind("Vastu Direction Compass","vastu-direction-compass","Tools","Precision direction compass for site and plan analysis.",249900,25),
@@ -26,7 +28,10 @@ async function init(){
 }
 export async function GET(){
   await init();const database=await db();
-  const rows=await database.prepare("SELECT id,name,slug,category,description,price,stock,image_url AS imageUrl FROM products WHERE status='active' ORDER BY id DESC").all();
+  const rows=await database.prepare(`SELECT id,name,slug,category,description,price AS regularPrice,
+    CASE WHEN special_price>0 AND (special_from='' OR date('now')>=special_from) AND (special_to='' OR date('now')<=special_to) THEN special_price ELSE price END AS price,
+    stock,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,duration,classes
+    FROM products WHERE status='active' ORDER BY sort_order,id DESC`).all();
   let courses:{results:unknown[]}={results:[]};
   try{courses=await database.prepare("SELECT id,title AS name,slug,'Courses' AS category,description,price,999 AS stock,image_url AS imageUrl FROM courses WHERE status='published' AND show_in_shop=1 ORDER BY id DESC").all()}
   catch{/* Courses are initialized by the academy workflow. */}

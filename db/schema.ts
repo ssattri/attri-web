@@ -62,6 +62,14 @@ export const products = sqliteTable("products", {
   stock: integer("stock").notNull().default(0),
   status: text("status").notNull().default("active"),
   imageUrl: text("image_url").notNull().default(""),
+  itemType: text("item_type").notNull().default("physical"),
+  deliveryMode: text("delivery_mode").notNull().default("Online"),
+  specialPrice: integer("special_price").notNull().default(0),
+  specialFrom: text("special_from").notNull().default(""),
+  specialTo: text("special_to").notNull().default(""),
+  duration: text("duration").notNull().default(""),
+  classes: integer("classes").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
