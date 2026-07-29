@@ -80,3 +80,32 @@ export const orders = sqliteTable("orders", {
   paymentStatus: text("payment_status").notNull().default("pending"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const courses = sqliteTable("courses", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  category: text("category").notNull(),
+  level: text("level").notNull().default("Beginner"),
+  mode: text("mode").notNull().default("Recorded"),
+  duration: text("duration").notNull().default(""),
+  description: text("description").notNull().default(""),
+  price: integer("price").notNull().default(0),
+  lessons: integer("lessons").notNull().default(0),
+  status: text("status").notNull().default("published"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const enrollments = sqliteTable("enrollments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  courseId: integer("course_id").notNull(),
+  studentName: text("student_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  experience: text("experience").notNull().default(""),
+  status: text("status").notNull().default("pending"),
+  paymentStatus: text("payment_status").notNull().default("pending"),
+  progress: integer("progress").notNull().default(0),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

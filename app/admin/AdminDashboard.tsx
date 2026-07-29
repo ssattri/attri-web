@@ -7,6 +7,7 @@ type Lead={id:number;name:string;email:string;phone:string;service:string;status
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
 type Appointment={id:number;reference:string;name:string;phone:string;service:string;consultationMode:string;preferredDate:string;preferredTime:string;status:string};
 type Order={id:number;reference:string;customerName:string;phone:string;itemsJson:string;subtotal:number;status:string;paymentStatus:string;createdAt:string};
+type Enrollment={id:number;reference:string;studentName:string;email:string;phone:string;courseTitle:string;status:string;paymentStatus:string;progress:number};
 
 export default function AdminDashboard({displayName}:{displayName:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
@@ -14,16 +15,18 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   const [projects,setProjects]=useState<Project[]>([]);
   const [appointments,setAppointments]=useState<Appointment[]>([]);
   const [orders,setOrders]=useState<Order[]>([]);
+  const [enrollments,setEnrollments]=useState<Enrollment[]>([]);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
 
   async function refresh() {
     setBusy(true);
-    const [p,l,r,a,c]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce")]);
-    const [pd,ld,rd,ad,cd]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json()]);
+    const [p,l,r,a,c,e]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning")]);
+    const [pd,ld,rd,ad,cd,ed]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
     if(a.ok)setAppointments(ad.appointments);
     if(c.ok)setOrders(cd.orders);
+    if(e.ok)setEnrollments(ed.enrollments);
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
@@ -98,7 +101,14 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Academy","Client Portal","Invoices","Reports","Automation","Payments"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="admin-panel split-module" id="learning">
+        <div className="panel-title"><div><p>ATTRI ACADEMY</p><h2>Courses & students</h2></div><span>{enrollments.length} enrollments</span></div>
+        <div className="cms-layout"><form onSubmit={e=>submit(e,"/api/admin/learning","Draft course created.")}><h3>Create course</h3><label>Course title<input name="title" required/></label><label>Category<select name="category"><option>Vastu Shastra</option><option>Architecture</option><option>Professional</option></select></label><label>Level<select name="level"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></label><label>Mode<select name="mode"><option>Recorded</option><option>Live</option><option>Live + Recorded</option></select></label><label>Duration<input name="duration" placeholder="8 weeks"/></label><label>Price (₹)<input name="price" type="number" min="0"/></label><label>Lessons<input name="lessons" type="number" min="0"/></label><label>Description<textarea name="description" rows={3}/></label><button>Create draft course</button></form>
+          <div className="record-list">{enrollments.length===0?<p className="empty-row">No enrollment requests yet.</p>:enrollments.map(x=><article key={x.id}><div><b>{x.studentName}</b><small>{x.courseTitle} · {x.reference}</small></div><select value={x.status} onChange={e=>update("/api/admin/learning",x.id,e.target.value)}><option>pending</option><option>confirmed</option><option>active</option><option>completed</option><option>cancelled</option></select></article>)}</div>
+        </div>
+      </section>
+
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Client Portal","Invoices","Reports","Certificates","Automation","Payments"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
