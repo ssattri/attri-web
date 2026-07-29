@@ -24,7 +24,7 @@ export default function VastuPage() {
     <main className="info-page">
       <header className="inner-nav">
         <a className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></a>
-        <nav><a href="/architecture">Architecture</a><a className="active" href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
+        <nav><a href="/about">About</a><a href="/architecture">Architecture</a><a className="active" href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
         <a className="nav-cta" href="/#contact">Book consultation <span>↗</span></a>
       </header>
 

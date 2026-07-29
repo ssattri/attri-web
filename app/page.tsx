@@ -33,6 +33,7 @@ export default function Home() {
           <span><strong>ATTRI</strong><small>ASSOCIATES</small></span>
         </a>
         <nav className="desktop-nav" aria-label="Primary navigation">
+          <a href="/about">About</a>
           <a href="/architecture">Architecture</a>
           <a href="/vastu-shastra">Vastu Shastra</a>
           <a href="#projects">Projects</a>
@@ -167,6 +168,35 @@ export default function Home() {
         <div className="quote-symbol">“</div>
         <blockquote>We do not merely design buildings.<br />We choreograph <em>energy, purpose and experience.</em></blockquote>
         <p>CE. S. S. Attri · Chartered Engineer & Scientific Vastu Expert</p>
+      </section>
+
+      <section className="testimonials section">
+        <div className="section-title-row">
+          <div><p className="section-kicker">Client experience</p><h2>Trust is built<br /><span>project by project.</span></h2></div>
+          <p>Clear advice, coordinated expertise and practical solutions define the experience we aim to deliver.</p>
+        </div>
+        <div className="testimonial-grid">
+          <article><div className="stars">★★★★★</div><blockquote>“The team connected Vastu recommendations with the actual architecture instead of treating them as separate decisions.”</blockquote><div><b>Residential consultation</b><span>Home planning · Delhi NCR</span></div></article>
+          <article><div className="stars">★★★★★</div><blockquote>“We received clear priorities, practical corrections and a report our project team could genuinely implement.”</blockquote><div><b>Industrial Vastu audit</b><span>Factory planning · Haryana</span></div></article>
+          <article><div className="stars">★★★★★</div><blockquote>“From planning to structure and services, having one coordinated team made every discussion more efficient.”</blockquote><div><b>Architecture client</b><span>Commercial project · North India</span></div></article>
+        </div>
+        <p className="testimonial-note">Illustrative presentation—replace with verified client reviews before public launch.</p>
+      </section>
+
+      <section className="home-faq section">
+        <div className="faq-intro">
+          <p className="section-kicker light">Questions, answered</p>
+          <h2>Before you<br /><span>begin.</span></h2>
+          <p>Not sure which service fits your project? Start here, or speak directly with our team.</p>
+          <a className="arrow-link" href="#contact">Ask a question <span>→</span></a>
+        </div>
+        <div className="faq-list">
+          <details open><summary>Can architecture and Vastu planning be done together?</summary><p>Yes. This is our preferred approach for new projects. Architects and Vastu experts collaborate from the first planning stage, reducing later revisions and compromises.</p></details>
+          <details><summary>Do you provide online Vastu consultations?</summary><p>Yes. You can share a dimensioned plan, north direction, photographs and project information. We then conduct the analysis, consultation and report delivery online.</p></details>
+          <details><summary>Do you undertake residential, commercial and industrial projects?</summary><p>Yes. Our multidisciplinary services cover homes, apartments, offices, retail, hospitality, factories, warehouses, healthcare and educational facilities.</p></details>
+          <details><summary>Can you review an existing architectural drawing?</summary><p>Yes. We can audit existing drawings for planning, circulation, structure coordination and Vastu alignment before construction or renovation.</p></details>
+          <details><summary>What will I receive after a consultation?</summary><p>The deliverables depend on the selected service and may include observations, marked plans, recommendations, remedies, drawings, reports and an implementation discussion.</p></details>
+        </div>
       </section>
 
       <section className="contact section" id="contact">
