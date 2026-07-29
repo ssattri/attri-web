@@ -15,6 +15,13 @@
       "when": 1785302970917,
       "tag": "0001_mighty_maginty",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785303626356,
+      "tag": "0002_kind_the_fury",
+      "breakpoints": true
     }
   ]
 }

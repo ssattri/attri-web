@@ -6,21 +6,24 @@ type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;up
 type Lead={id:number;name:string;email:string;phone:string;service:string;status:string;createdAt:string};
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
 type Appointment={id:number;reference:string;name:string;phone:string;service:string;consultationMode:string;preferredDate:string;preferredTime:string;status:string};
+type Order={id:number;reference:string;customerName:string;phone:string;itemsJson:string;subtotal:number;status:string;paymentStatus:string;createdAt:string};
 
 export default function AdminDashboard({displayName}:{displayName:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
   const [leads,setLeads]=useState<Lead[]>([]);
   const [projects,setProjects]=useState<Project[]>([]);
   const [appointments,setAppointments]=useState<Appointment[]>([]);
+  const [orders,setOrders]=useState<Order[]>([]);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
 
   async function refresh() {
     setBusy(true);
-    const [p,l,r,a]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments")]);
-    const [pd,ld,rd,ad]=await Promise.all([p.json(),l.json(),r.json(),a.json()]);
+    const [p,l,r,a,c]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce")]);
+    const [pd,ld,rd,ad,cd]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
     if(a.ok)setAppointments(ad.appointments);
+    if(c.ok)setOrders(cd.orders);
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
@@ -88,7 +91,14 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Commerce","Academy","Client Portal","Invoices","Reports","Automation"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="admin-panel appointment-admin" id="commerce">
+        <div className="panel-title"><div><p>COMMERCE</p><h2>Orders</h2></div><span>{orders.length} orders</span></div>
+        <div className="appointment-table order-table"><div className="appointment-head"><span>Customer</span><span>Order</span><span>Value</span><span>Status</span></div>
+          {orders.length===0?<p className="empty-row">No order requests yet.</p>:orders.map(x=><article key={x.id}><div><b>{x.customerName}</b><small>{x.phone}</small></div><div><b>{x.reference}</b><small>{JSON.parse(x.itemsJson).length} product line(s)</small></div><div><b>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.subtotal/100)}</b><small>{x.paymentStatus}</small></div><select value={x.status} onChange={e=>update("/api/admin/commerce",x.id,e.target.value)}><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>completed</option><option>cancelled</option></select></article>)}
+        </div>
+      </section>
+
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Academy","Client Portal","Invoices","Reports","Automation","Payments"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }

@@ -39,7 +39,7 @@ export default function Home() {
           <a href="#projects">Projects</a>
           <a href="#software">Software</a>
           <a href="#learn">Learn</a>
-          <a href="#shop">Shop</a>
+          <a href="/shop">Shop</a>
         </nav>
         <a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a>
       </header>
@@ -159,7 +159,7 @@ export default function Home() {
         </div>
         <div className="ecosystem-grid">
           <article><span>01</span><div className="eco-icon">◈</div><h3>Academy</h3><p>Live and recorded courses, assignments, certifications and practitioner learning paths.</p><a href="#contact">Explore courses →</a></article>
-          <article id="shop"><span>02</span><div className="eco-icon">✦</div><h3>Vastu Shop</h3><p>Curated remedies, tools, books, reports and digital resources with expert guidance.</p><a href="#contact">Visit the shop →</a></article>
+          <article id="shop"><span>02</span><div className="eco-icon">✦</div><h3>Vastu Shop</h3><p>Curated remedies, tools, books, reports and digital resources with expert guidance.</p><a href="/shop">Visit the shop →</a></article>
           <article><span>03</span><div className="eco-icon">⌁</div><h3>Calculators</h3><p>Direction, area, construction cost, material quantity and planning calculators.</p><a href="#contact">Use free tools →</a></article>
         </div>
       </section>

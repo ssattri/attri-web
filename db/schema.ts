@@ -51,3 +51,32 @@ export const appointments = sqliteTable("appointments", {
   paymentStatus: text("payment_status").notNull().default("not-required"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const products = sqliteTable("products", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  category: text("category").notNull(),
+  description: text("description").notNull().default(""),
+  price: integer("price").notNull(),
+  stock: integer("stock").notNull().default(0),
+  status: text("status").notNull().default("active"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const orders = sqliteTable("orders", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  customerName: text("customer_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pincode: text("pincode").notNull(),
+  itemsJson: text("items_json").notNull(),
+  subtotal: integer("subtotal").notNull(),
+  status: text("status").notNull().default("pending"),
+  paymentStatus: text("payment_status").notNull().default("pending"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
