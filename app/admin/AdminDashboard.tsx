@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import DataManagers from "./DataManagers";
 import GrowthCenter from "./GrowthCenter";
+import RolePermissions from "./RolePermissions";
 
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};
 type Lead={id:number;name:string;email:string;phone:string;service:string;status:string;createdAt:string};
@@ -88,6 +89,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
       </section>
 
       <GrowthCenter/>
+      <RolePermissions/>
 
       <section className="admin-panel database-centre" id="database">
         <div className="panel-title"><div><p>DATA INFRASTRUCTURE</p><h2>Enterprise database centre</h2></div><span>{database?.status||"connecting"}</span></div>
@@ -187,7 +189,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Team Permissions","Campaigns","Report Exports"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Campaigns","Report Exports","Customer Messaging"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
