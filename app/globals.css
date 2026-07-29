@@ -262,6 +262,26 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 .admin-module-analytics #analytics,.admin-module-database #database,.admin-module-permissions #permissions{display:block}
 .admin-main>section.admin-stats{margin-top:0}
 .admin-main>header p,.panel-title p,.module-roadmap>div p{font-size:11px!important}.admin-main>header h1{font-size:27px!important}.admin-main>header a,.admin-main>header button{font-size:11px;padding:12px 16px}
+
+/* Premium generated imagery across public pages and admin modules */
+.hero{background:linear-gradient(90deg,rgba(8,17,30,.97) 0%,rgba(13,23,39,.84) 45%,rgba(13,23,39,.12) 100%),url("/images/banners/home-hero.webp") center/cover no-repeat}
+.about-hero{background:linear-gradient(90deg,rgba(8,17,30,.97) 0%,rgba(12,23,38,.84) 45%,rgba(12,23,38,.12) 100%),url("/images/banners/about-hero.webp") center/cover no-repeat}
+.architecture-hero{background:linear-gradient(90deg,rgba(8,17,28,.97) 0%,rgba(14,22,34,.82) 44%,rgba(14,22,34,.1) 100%),url("/images/banners/architecture-hero.webp") center/cover no-repeat}
+.vastu-hero{background:linear-gradient(90deg,rgba(7,17,31,.97) 0%,rgba(9,22,39,.85) 44%,rgba(9,22,39,.1) 100%),url("/images/banners/vastu-hero.webp") center/cover no-repeat}
+.academy-hero{background:linear-gradient(90deg,rgba(7,15,27,.97) 0%,rgba(10,18,31,.84) 45%,rgba(10,18,31,.08) 100%),url("/images/banners/courses-hero.webp") center/cover no-repeat}
+.shop-hero{background:linear-gradient(90deg,rgba(7,17,31,.97) 0%,rgba(9,22,39,.83) 45%,rgba(9,22,39,.08) 100%),url("/images/banners/shop-hero.webp") center/cover no-repeat}
+.booking-hero{background:linear-gradient(90deg,rgba(8,18,31,.97) 0%,rgba(12,23,38,.84) 45%,rgba(12,23,38,.1) 100%),url("/images/banners/consultation-hero.webp") center/cover no-repeat}
+.info-hero,.academy-hero,.shop-hero,.booking-hero{background-position:center;background-size:cover}
+.info-hero-copy,.academy-hero>p,.academy-hero>h1,.academy-hero>span,.academy-hero>div,.shop-hero>p,.shop-hero>h1,.shop-hero>span{position:relative;z-index:2}
+.info-hero::after,.academy-hero::before,.shop-hero::before,.booking-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,13,24,.12),rgba(6,13,24,.35));pointer-events:none}
+
+.admin-main>header{background-color:rgba(255,255,255,.97);background-position:right center;background-size:420px 100%;background-repeat:no-repeat}
+.admin-module-overview .admin-main>header,.admin-module-projects .admin-main>header,.admin-module-database .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/architecture-hero.webp")}
+.admin-module-analytics .admin-main>header,.admin-module-seo-manager .admin-main>header,.admin-module-notifications .admin-main>header,.admin-module-leads .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/home-hero.webp")}
+.admin-module-data-managers .admin-main>header,.admin-module-permissions .admin-main>header,.admin-module-pages .admin-main>header,.admin-module-support .admin-main>header,.admin-module-automation .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/about-hero.webp")}
+.admin-module-appointments .admin-main>header,.admin-module-finance .admin-main>header,.admin-module-reports .admin-main>header,.admin-module-operations .admin-main>header,.admin-module-vault .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/consultation-hero.webp")}
+.admin-module-commerce .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/shop-hero.webp")}
+.admin-module-learning .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/courses-hero.webp")}
 .admin-stats span{font-size:12px}.admin-stats strong{font-size:37px!important}.admin-stats small{font-size:11px}
 .panel-title{min-height:76px}.panel-title h2,.module-roadmap h2{font-size:25px!important}.panel-title>span{font-size:11px;padding:7px 11px}
 .database-summary span,.growth-metrics span{font-size:11px}.database-summary strong,.growth-metrics strong{font-size:30px!important}.database-summary small,.growth-metrics small{font-size:11px}
