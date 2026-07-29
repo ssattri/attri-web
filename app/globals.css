@@ -258,7 +258,7 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 .admin-sidebar nav::before{font-size:10px}.admin-logo b{font-size:18px}.admin-logo small{font-size:10px}.admin-profile b{font-size:13px}.admin-profile small{font-size:10px}
 .admin-header-action{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f59e0b,#f97316)!important;color:#111827!important;border:0;border-radius:7px;padding:11px 16px;font-weight:600;box-shadow:0 8px 18px rgba(245,158,11,.18)}
 .admin-main>section{display:none}
-.admin-module-overview #overview,.admin-module-overview #roadmap,.admin-module-analytics #analytics,.admin-module-notifications #notifications,.admin-module-seo-manager #seo-manager,.admin-module-database #database,.admin-module-data-managers #data-managers,.admin-module-permissions #permissions,.admin-module-pages #pages,.admin-module-projects #projects,.admin-module-leads #leads,.admin-module-appointments #appointments,.admin-module-commerce #commerce,.admin-module-learning #learning,.admin-module-support #support,.admin-module-finance #finance,.admin-module-reports #reports,.admin-module-operations #operations,.admin-module-automation #automation,.admin-module-vault #vault{display:grid}
+.admin-module-overview #overview,.admin-module-overview #roadmap,.admin-module-analytics #analytics,.admin-module-notifications #notifications,.admin-module-seo-manager #seo-manager,.admin-module-database #database,.admin-module-data-managers #data-managers,.admin-module-permissions #permissions,.admin-module-pages #pages,.admin-module-projects #projects,.admin-module-leads #leads,.admin-module-appointments #appointments,.admin-module-products #products,.admin-module-commerce #commerce,.admin-module-learning #learning,.admin-module-support #support,.admin-module-finance #finance,.admin-module-reports #reports,.admin-module-operations #operations,.admin-module-automation #automation,.admin-module-vault #vault{display:grid}
 .admin-module-analytics #analytics,.admin-module-database #database,.admin-module-permissions #permissions{display:block}
 .admin-main>section.admin-stats{margin-top:0}
 .admin-main>header p,.panel-title p,.module-roadmap>div p{font-size:11px!important}.admin-main>header h1{font-size:27px!important}.admin-main>header a,.admin-main>header button{font-size:11px;padding:12px 16px}
@@ -280,7 +280,7 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 .admin-module-analytics .admin-main>header,.admin-module-seo-manager .admin-main>header,.admin-module-notifications .admin-main>header,.admin-module-leads .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/home-hero.webp")}
 .admin-module-data-managers .admin-main>header,.admin-module-permissions .admin-main>header,.admin-module-pages .admin-main>header,.admin-module-support .admin-main>header,.admin-module-automation .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/about-hero.webp")}
 .admin-module-appointments .admin-main>header,.admin-module-finance .admin-main>header,.admin-module-reports .admin-main>header,.admin-module-operations .admin-main>header,.admin-module-vault .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/consultation-hero.webp")}
-.admin-module-commerce .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/shop-hero.webp")}
+.admin-module-commerce .admin-main>header,.admin-module-products .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/shop-hero.webp")}
 .admin-module-learning .admin-main>header{background-image:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.98) 54%,rgba(255,255,255,.72) 100%),url("/images/banners/courses-hero.webp")}
 .admin-stats span{font-size:12px}.admin-stats strong{font-size:37px!important}.admin-stats small{font-size:11px}
 .panel-title{min-height:76px}.panel-title h2,.module-roadmap h2{font-size:25px!important}.panel-title>span{font-size:11px;padding:7px 11px}
@@ -295,6 +295,23 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:8px}
 .module-roadmap article b{font-size:13px}.module-roadmap article small{font-size:10px}.gateway-readiness b{font-size:14px}.gateway-readiness small,.gateway-note{font-size:11px}.gateway-readiness article>span{font-size:10px}
 @media(max-width:900px){.admin-sidebar nav a{min-height:49px;font-size:17px}.admin-main>header h1{font-size:23px!important}.panel-title h2{font-size:21px!important}.record-list b,.table-row b,.appointment-table b{font-size:13px}.record-list small,.table-row small,.appointment-table small{font-size:10px}}
 .permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:20px;background:#f8fafc}.permission-grid>article{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:20px}.permission-grid header{display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:14px}.permission-grid header b,.permission-grid header small{display:block}.permission-grid header b{font-size:15px}.permission-grid header small{font-size:11px;color:#64748b}.permission-grid header>span{font-size:10px;color:#047857}.permission-grid article>div{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.permission-grid label{display:flex;align-items:center;gap:9px;font-size:12px}.permission-grid input{accent-color:#f59e0b;width:17px;height:17px}@media(max-width:900px){.permission-grid{grid-template-columns:1fr}}
+
+/* Store catalogue management */
+.product-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.product-admin-list{padding:16px 24px;display:grid;align-content:start}
+.product-admin-list article{display:grid;grid-template-columns:66px minmax(180px,1fr) 125px 62px;gap:15px;align-items:center;padding:14px 8px;border-bottom:1px solid #edf0f3}
+.product-admin-list article:hover{background:#fffbeb}
+.product-admin-thumb{width:66px;height:66px;display:grid;place-items:center;overflow:hidden;border-radius:7px;background:linear-gradient(145deg,#f4dfc2,#d59d6b)}
+.product-admin-thumb img,.product-art img{width:100%;height:100%;object-fit:cover;display:block}
+.product-admin-thumb b{font:500 26px "Playfair Display";color:#52293e}
+.product-admin-copy b,.product-admin-copy small,.product-admin-copy span{display:block}
+.product-admin-copy b{font-size:14px;color:#334155}.product-admin-copy small{font-size:10px;color:#8b95a4;margin-top:4px}.product-admin-copy span{font-size:11px;color:#b45309;margin-top:7px}
+.product-admin-list select{border:1px solid #dbe1e8;border-radius:5px;background:#f8fafc;color:#475569;padding:10px;font:12px "Poppins"}
+.product-delete{font-size:11px!important}
+.product-art img{position:absolute;inset:0}.product-art span{z-index:2;background:rgba(255,250,242,.88);padding:6px 8px;border-radius:3px}
+.product-grid footer button:disabled{opacity:.48;cursor:not-allowed}
+@media(max-width:1050px){.product-admin-list article{grid-template-columns:58px 1fr 110px}.product-admin-thumb{width:58px;height:58px}.product-delete{grid-column:2;justify-self:start}}
+@media(max-width:560px){.product-form-row{grid-template-columns:1fr}.product-admin-list{padding:10px}.product-admin-list article{grid-template-columns:52px 1fr}.product-admin-thumb{width:52px;height:52px}.product-admin-list select,.product-delete{grid-column:2}}
 
 @media (max-width: 900px) {
   .desktop-nav{display:none}.nav-wrap{height:75px}.nav-cta{font-size:0}.nav-cta span{font-size:18px}

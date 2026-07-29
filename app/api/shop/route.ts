@@ -12,6 +12,8 @@ async function init(){
       pincode TEXT NOT NULL,items_json TEXT NOT NULL,subtotal INTEGER NOT NULL,status TEXT NOT NULL DEFAULT 'pending',
       payment_status TEXT NOT NULL DEFAULT 'pending',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`)
   ]);
+  const columns=await database.prepare("PRAGMA table_info(products)").all<{name:string}>();
+  if(!columns.results.some(x=>x.name==="image_url"))await database.prepare("ALTER TABLE products ADD COLUMN image_url TEXT NOT NULL DEFAULT ''").run();
   const count=await database.prepare("SELECT COUNT(*) AS total FROM products").first<{total:number}>();
   if(!count?.total)await database.batch([
     database.prepare("INSERT INTO products (name,slug,category,description,price,stock) VALUES (?,?,?,?,?,?)").bind("Vastu Direction Compass","vastu-direction-compass","Tools","Precision direction compass for site and plan analysis.",249900,25),
@@ -24,7 +26,7 @@ async function init(){
 }
 export async function GET(){
   await init();const database=await db();
-  const rows=await database.prepare("SELECT id,name,slug,category,description,price,stock FROM products WHERE status='active' ORDER BY id").all();
+  const rows=await database.prepare("SELECT id,name,slug,category,description,price,stock,image_url AS imageUrl FROM products WHERE status='active' ORDER BY id DESC").all();
   return Response.json({products:rows.results});
 }
 export async function POST(request:Request){

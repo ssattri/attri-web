@@ -9,7 +9,7 @@ export const adminModules = [
   ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
   ["seo-manager","SEO Manager","↗"],["database","Database","◫"],["data-managers","Data Managers","⌗"],
   ["permissions","Team Access","♙"],["pages","Pages & CMS","▤"],["projects","Projects","◇"],
-  ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["commerce","Orders & Store","□"],
+  ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["commerce","Orders","□"],
   ["learning","Courses & LMS","△"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
   ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
   ["vault","File Vault","⌘"]
@@ -27,7 +27,8 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   projects:{eyebrow:"DELIVERY / PORTFOLIO",title:"Project management"},
   leads:{eyebrow:"SALES / CRM",title:"Leads & enquiries"},
   appointments:{eyebrow:"CONSULTATION DESK",title:"Appointments"},
-  commerce:{eyebrow:"COMMERCE",title:"Orders & store"},
+  products:{eyebrow:"STORE / CATALOGUE",title:"Product catalogue"},
+  commerce:{eyebrow:"COMMERCE",title:"Customer orders"},
   learning:{eyebrow:"ATTRI ACADEMY",title:"Courses & students"},
   support:{eyebrow:"CLIENT SUCCESS",title:"Support tickets"},
   finance:{eyebrow:"FINANCE",title:"Invoices & receivables"},
@@ -42,6 +43,7 @@ type Lead={id:number;name:string;email:string;phone:string;service:string;status
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
 type Appointment={id:number;reference:string;name:string;phone:string;service:string;consultationMode:string;preferredDate:string;preferredTime:string;status:string};
 type Order={id:number;reference:string;customerName:string;phone:string;itemsJson:string;subtotal:number;status:string;paymentStatus:string;createdAt:string};
+type Product={id:number;name:string;slug:string;category:string;description:string;price:number;stock:number;status:string;imageUrl:string;createdAt:string};
 type Enrollment={id:number;reference:string;studentName:string;email:string;phone:string;courseTitle:string;status:string;paymentStatus:string;progress:number};
 type Ticket={id:number;reference:string;customerEmail:string;subject:string;category:string;status:string;priority:string;createdAt:string};
 type Invoice={id:number;number:string;customerName:string;customerEmail:string;description:string;amount:number;taxRate:number;status:string;dueDate:string};
@@ -59,6 +61,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   const [projects,setProjects]=useState<Project[]>([]);
   const [appointments,setAppointments]=useState<Appointment[]>([]);
   const [orders,setOrders]=useState<Order[]>([]);
+  const [products,setProducts]=useState<Product[]>([]);
   const [enrollments,setEnrollments]=useState<Enrollment[]>([]);
   const [tickets,setTickets]=useState<Ticket[]>([]);
   const [invoices,setInvoices]=useState<Invoice[]>([]);
@@ -77,7 +80,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     const [pd,ld,rd,ad,cd,ed,td,fd,od,dd]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json(),f.json(),o.json(),d.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
     if(a.ok)setAppointments(ad.appointments);
-    if(c.ok)setOrders(cd.orders);
+    if(c.ok){setOrders(cd.orders);setProducts(cd.products)}
     if(e.ok)setEnrollments(ed.enrollments);
     if(t.ok)setTickets(td.tickets);
     if(f.ok){setInvoices(fd.invoices);setReports(fd.reports)}
@@ -119,6 +122,11 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     const response=await fetch(`/api/cms/pages?id=${id}`,{method:"DELETE"});
     setMessage(response.ok?"Page deleted.":"Unable to delete page.");if(response.ok)await refresh();
   }
+  async function removeProduct(id:number){
+    if(!window.confirm("Delete this product permanently?"))return;
+    const response=await fetch(`/api/admin/commerce?id=${id}`,{method:"DELETE"});
+    const data=await response.json();setMessage(response.ok?"Product deleted.":data.error||"Unable to delete product.");if(response.ok)await refresh();
+  }
   async function uploadFile(event:FormEvent<HTMLFormElement>){
     event.preventDefault();const form=event.currentTarget;const response=await fetch("/api/admin/operations",{method:"POST",body:new FormData(form)});const data=await response.json();setMessage(response.ok?`File ${data.reference} shared securely.`:data.error);if(response.ok){form.reset();await refresh()}
   }
@@ -131,7 +139,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
-      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a></div></header>
+      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href={module==="products"?"/admin?module=products#add-product":"/admin?module=pages"} onClick={event=>navigateModule(module==="products"?"products":"pages",event)}>＋ {module==="products"?"Add product":"Quick create"}</a></div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
       <section className="admin-stats" id="overview">
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
@@ -187,6 +195,31 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         <div className="panel-title"><div><p>COMMERCE</p><h2>Orders</h2></div><span>{orders.length} orders</span></div>
         <div className="appointment-table order-table"><div className="appointment-head"><span>Customer</span><span>Order</span><span>Value</span><span>Status</span></div>
           {orders.length===0?<p className="empty-row">No order requests yet.</p>:orders.map(x=><article key={x.id}><div><b>{x.customerName}</b><small>{x.phone}</small></div><div><b>{x.reference}</b><small>{JSON.parse(x.itemsJson).length} product line(s)</small></div><div><b>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.subtotal/100)}</b><small>{x.paymentStatus}</small></div><select value={x.status} onChange={e=>update("/api/admin/commerce",x.id,e.target.value)}><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>completed</option><option>cancelled</option></select></article>)}
+        </div>
+      </section>
+
+      <section className="admin-panel split-module product-admin" id="products">
+        <div className="panel-title"><div><p>STORE CATALOGUE</p><h2>Products</h2></div><span>{products.length} products</span></div>
+        <div className="cms-layout">
+          <form id="add-product" onSubmit={e=>submit(e,"/api/admin/commerce","Product created and catalogue updated.")}>
+            <h3>＋ Add product</h3>
+            <label>Product name<input name="name" required placeholder="e.g. Copper Vastu Pyramid"/></label>
+            <label>URL slug<input name="slug" placeholder="auto-created-from-name"/></label>
+            <label>Category<select name="category" defaultValue="Remedies"><option>Tools</option><option>Remedies</option><option>Yantras</option><option>Pyramids</option><option>Books</option><option>Software</option><option>Courses</option><option>Reports</option><option>Consultation</option><option>Digital Downloads</option></select></label>
+            <div className="product-form-row"><label>Price (₹)<input name="price" type="number" min="0" step="0.01" required/></label><label>Stock<input name="stock" type="number" min="0" defaultValue="0" required/></label></div>
+            <label>Product image URL<input name="imageUrl" type="url" placeholder="https://..."/></label>
+            <label>Description<textarea name="description" rows={4} required placeholder="Benefits, material, size and usage details"/></label>
+            <label>Visibility<select name="status" defaultValue="active"><option value="active">Published — live in shop</option><option value="draft">Draft — hidden</option></select></label>
+            <button>Publish product</button>
+          </form>
+          <div className="product-admin-list">
+            {products.length===0?<p className="empty-row">No products yet. Use Add Product to create your catalogue.</p>:products.map((x,i)=><article key={x.id}>
+              <div className={`product-admin-thumb art-${i%6}`}>{x.imageUrl?<img src={x.imageUrl} alt=""/>:<b>◈</b>}</div>
+              <div className="product-admin-copy"><b>{x.name}</b><small>{x.category} · /{x.slug}</small><span>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.price/100)} · {x.stock} in stock</span></div>
+              <select value={x.status} onChange={e=>update("/api/admin/commerce",x.id,e.target.value,"product")} aria-label={`Visibility for ${x.name}`}><option value="active">Published</option><option value="draft">Draft</option></select>
+              <button className="danger-action product-delete" onClick={()=>removeProduct(x.id)}>Delete</button>
+            </article>)}
+          </div>
         </div>
       </section>
 
