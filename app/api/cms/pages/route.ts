@@ -61,3 +61,28 @@ export async function POST(request: Request) {
     return Response.json({ error: "A page with this slug already exists" }, { status: 409 });
   }
 }
+
+export async function PATCH(request: Request) {
+  const user = await authorize();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const body = (await request.json()) as { id?: number; status?: string };
+  if (!body.id || !["draft", "published", "archived"].includes(body.status ?? "")) {
+    return Response.json({ error: "Valid page and status are required" }, { status: 400 });
+  }
+  await ensureSchema();
+  const db = await getDatabase();
+  await db.prepare("UPDATE cms_pages SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+    .bind(body.status, body.id).run();
+  return Response.json({ success: true });
+}
+
+export async function DELETE(request: Request) {
+  const user = await authorize();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const id = Number(new URL(request.url).searchParams.get("id"));
+  if (!id) return Response.json({ error: "Page id is required" }, { status: 400 });
+  await ensureSchema();
+  const db = await getDatabase();
+  await db.prepare("DELETE FROM cms_pages WHERE id = ?").bind(id).run();
+  return Response.json({ success: true });
+}
