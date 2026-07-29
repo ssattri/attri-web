@@ -108,11 +108,11 @@ export default function AdminDashboard({displayName,module="overview"}:{displayN
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin/${key}`} key={key}>{icon} <span>{label}</span></a>)}</nav>
+      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} key={key}>{icon} <span>{label}</span></a>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
-      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href="/admin/pages">＋ Quick create</a></div></header>
+      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a><a className="admin-header-action" href="/admin?module=pages">＋ Quick create</a></div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
       <section className="admin-stats" id="overview">
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
