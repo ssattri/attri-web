@@ -91,6 +91,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       const requested=new URLSearchParams(window.location.search).get("module")||"overview";
       setModule(adminModules.some(([key])=>key===requested)?requested:"overview");
     };
+    syncFromUrl();
     window.addEventListener("popstate",syncFromUrl);
     return()=>window.removeEventListener("popstate",syncFromUrl);
   },[]);

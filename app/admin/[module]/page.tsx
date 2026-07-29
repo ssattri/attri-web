@@ -1,10 +1,10 @@
 import { notFound, redirect } from "next/navigation";
-import { adminModules } from "../AdminDashboard";
 
 export const dynamic = "force-dynamic";
+const modules=["overview","analytics","notifications","seo-manager","database","data-managers","permissions","pages","projects","leads","appointments","commerce","learning","support","finance","reports","operations","automation","vault"];
 
 export default async function AdminModulePage({params}:{params:Promise<{module:string}>}) {
   const {module}=await params;
-  if(!adminModules.some(([key])=>key===module)) notFound();
+  if(!modules.includes(module)) notFound();
   redirect(module==="overview"?"/admin":`/admin?module=${encodeURIComponent(module)}`);
 }
