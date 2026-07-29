@@ -5,19 +5,22 @@ import { FormEvent, useEffect, useState } from "react";
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};
 type Lead={id:number;name:string;email:string;phone:string;service:string;status:string;createdAt:string};
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
+type Appointment={id:number;reference:string;name:string;phone:string;service:string;consultationMode:string;preferredDate:string;preferredTime:string;status:string};
 
 export default function AdminDashboard({displayName}:{displayName:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
   const [leads,setLeads]=useState<Lead[]>([]);
   const [projects,setProjects]=useState<Project[]>([]);
+  const [appointments,setAppointments]=useState<Appointment[]>([]);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
 
   async function refresh() {
     setBusy(true);
-    const [p,l,r]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects")]);
-    const [pd,ld,rd]=await Promise.all([p.json(),l.json(),r.json()]);
+    const [p,l,r,a]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments")]);
+    const [pd,ld,rd,ad]=await Promise.all([p.json(),l.json(),r.json(),a.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
+    if(a.ok)setAppointments(ad.appointments);
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
@@ -50,7 +53,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
         <article><span>Published pages</span><strong>{pages.filter(x=>x.status==="published").length}</strong><small>{pages.length} CMS records</small></article>
         <article><span>Active projects</span><strong>{projects.filter(x=>["active","featured"].includes(x.status)).length}</strong><small>{projects.length} total projects</small></article>
-        <article><span>Operations</span><strong>{busy?"…":"Live"}</strong><small>Persistent database connected</small></article>
+        <article><span>Appointments</span><strong>{appointments.filter(x=>x.status==="pending").length}</strong><small>{appointments.length} total requests</small></article>
       </section>
 
       <section className="admin-panel" id="pages">
@@ -77,7 +80,15 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Appointments","Commerce","Academy","Client Portal","Invoices","Reports"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="admin-panel appointment-admin" id="appointments">
+        <div className="panel-title"><div><p>CONSULTATION DESK</p><h2>Appointments</h2></div><span>{appointments.length} requests</span></div>
+        <div className="appointment-table">
+          <div className="appointment-head"><span>Client</span><span>Consultation</span><span>Preferred schedule</span><span>Status</span></div>
+          {appointments.length===0?<p className="empty-row">No consultation requests yet.</p>:appointments.map(x=><article key={x.id}><div><b>{x.name}</b><small>{x.reference} · {x.phone}</small></div><div><b>{x.service}</b><small>{x.consultationMode}</small></div><div><b>{x.preferredDate}</b><small>{x.preferredTime}</small></div><select value={x.status} onChange={e=>update("/api/appointments",x.id,e.target.value)}><option>pending</option><option>confirmed</option><option>completed</option><option>cancelled</option></select></article>)}
+        </div>
+      </section>
+
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Commerce","Academy","Client Portal","Invoices","Reports","Automation"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }

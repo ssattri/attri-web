@@ -34,3 +34,20 @@ export const projects = sqliteTable("projects", {
   description: text("description").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const appointments = sqliteTable("appointments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  service: text("service").notNull(),
+  consultationMode: text("consultation_mode").notNull(),
+  preferredDate: text("preferred_date").notNull(),
+  preferredTime: text("preferred_time").notNull(),
+  projectType: text("project_type").notNull().default(""),
+  message: text("message").notNull().default(""),
+  status: text("status").notNull().default("pending"),
+  paymentStatus: text("payment_status").notNull().default("not-required"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

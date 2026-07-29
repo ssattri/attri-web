@@ -41,7 +41,7 @@ export default function Home() {
           <a href="#learn">Learn</a>
           <a href="#shop">Shop</a>
         </nav>
-        <a className="nav-cta" href="#contact">Book consultation <span>↗</span></a>
+        <a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a>
       </header>
 
       <section className="hero" id="top">
@@ -56,7 +56,7 @@ export default function Home() {
             science to create places that perform beautifully.
           </p>
           <div className="hero-actions">
-            <a className="button gold" href="#contact">Begin your project <span>↗</span></a>
+            <a className="button gold" href="/book-consultation">Begin your project <span>↗</span></a>
             <a className="text-link" href="#projects"><span className="play">▶</span> Explore our work</a>
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function Home() {
         </div>
         <div className="contact-panel">
           <p>Tell us what you are planning. Our team will recommend the right consultation and next step.</p>
-          <a className="button gold" href="mailto:attriassociates99@gmail.com">Book a consultation <span>↗</span></a>
+          <a className="button gold" href="/book-consultation">Book a consultation <span>↗</span></a>
           <div className="contact-meta"><span>Architecture</span><span>Vastu</span><span>Engineering</span><span>Interiors</span></div>
         </div>
       </section>
