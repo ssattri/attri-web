@@ -147,3 +147,50 @@ export const clientReports = sqliteTable("client_reports", {
   status: text("status").notNull().default("draft"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const certificates = sqliteTable("certificates", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  studentName: text("student_name").notNull(),
+  studentEmail: text("student_email").notNull(),
+  courseTitle: text("course_title").notNull(),
+  issuedDate: text("issued_date").notNull(),
+  status: text("status").notNull().default("issued"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const paymentRecords = sqliteTable("payment_records", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  purpose: text("purpose").notNull(),
+  gateway: text("gateway").notNull(),
+  transactionId: text("transaction_id").notNull().default(""),
+  amount: integer("amount").notNull(),
+  status: text("status").notNull().default("pending"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const workflowTasks = sqliteTable("workflow_tasks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  title: text("title").notNull(),
+  assignee: text("assignee").notNull(),
+  dueDate: text("due_date").notNull(),
+  priority: text("priority").notNull().default("normal"),
+  status: text("status").notNull().default("pending"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const clientFiles = sqliteTable("client_files", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  customerEmail: text("customer_email").notNull(),
+  fileName: text("file_name").notNull(),
+  objectKey: text("object_key").notNull().unique(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  category: text("category").notNull().default("Project file"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

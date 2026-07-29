@@ -43,6 +43,13 @@
       "when": 1785304663793,
       "tag": "0005_amusing_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1785305110505,
+      "tag": "0006_high_golden_guardian",
+      "breakpoints": true
     }
   ]
 }

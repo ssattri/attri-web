@@ -11,6 +11,10 @@ type Enrollment={id:number;reference:string;studentName:string;email:string;phon
 type Ticket={id:number;reference:string;customerEmail:string;subject:string;category:string;status:string;priority:string;createdAt:string};
 type Invoice={id:number;number:string;customerName:string;customerEmail:string;description:string;amount:number;taxRate:number;status:string;dueDate:string};
 type ClientReport={id:number;reference:string;customerEmail:string;title:string;reportType:string;summary:string;status:string;createdAt:string};
+type Certificate={id:number;reference:string;studentName:string;studentEmail:string;courseTitle:string;issuedDate:string;status:string};
+type Payment={id:number;reference:string;customerName:string;customerEmail:string;purpose:string;gateway:string;transactionId:string;amount:number;status:string};
+type WorkflowTask={id:number;reference:string;title:string;assignee:string;dueDate:string;priority:string;status:string};
+type ClientFile={id:number;reference:string;customerEmail:string;fileName:string;size:number;category:string;createdAt:string};
 
 export default function AdminDashboard({displayName}:{displayName:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
@@ -22,19 +26,24 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   const [tickets,setTickets]=useState<Ticket[]>([]);
   const [invoices,setInvoices]=useState<Invoice[]>([]);
   const [reports,setReports]=useState<ClientReport[]>([]);
+  const [certificates,setCertificates]=useState<Certificate[]>([]);
+  const [payments,setPayments]=useState<Payment[]>([]);
+  const [tasks,setTasks]=useState<WorkflowTask[]>([]);
+  const [files,setFiles]=useState<ClientFile[]>([]);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
 
   async function refresh() {
     setBusy(true);
-    const [p,l,r,a,c,e,t,f]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning"),fetch("/api/admin/support"),fetch("/api/admin/finance")]);
-    const [pd,ld,rd,ad,cd,ed,td,fd]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json(),f.json()]);
+    const [p,l,r,a,c,e,t,f,o]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning"),fetch("/api/admin/support"),fetch("/api/admin/finance"),fetch("/api/admin/operations")]);
+    const [pd,ld,rd,ad,cd,ed,td,fd,od]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json(),f.json(),o.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
     if(a.ok)setAppointments(ad.appointments);
     if(c.ok)setOrders(cd.orders);
     if(e.ok)setEnrollments(ed.enrollments);
     if(t.ok)setTickets(td.tickets);
     if(f.ok){setInvoices(fd.invoices);setReports(fd.reports)}
+    if(o.ok){setCertificates(od.certificates);setPayments(od.payments);setTasks(od.tasks);setFiles(od.files)}
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
@@ -53,11 +62,14 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
     const response=await fetch(`/api/cms/pages?id=${id}`,{method:"DELETE"});
     setMessage(response.ok?"Page deleted.":"Unable to delete page.");if(response.ok)await refresh();
   }
+  async function uploadFile(event:FormEvent<HTMLFormElement>){
+    event.preventDefault();const form=event.currentTarget;const response=await fetch("/api/admin/operations",{method:"POST",body:new FormData(form)});const data=await response.json();setMessage(response.ok?`File ${data.reference} shared securely.`:data.error);if(response.ok){form.reset();await refresh()}
+  }
 
   return <div className="admin-shell">
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a></nav>
+      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a><a href="#operations">⚙ <span>Operations</span></a><a href="#vault">⌘ <span>File vault</span></a></nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
@@ -137,7 +149,30 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Certificates","Automation","Payments","File Vault"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="admin-panel split-module" id="operations">
+        <div className="panel-title"><div><p>ENTERPRISE OPERATIONS</p><h2>Certificates & payments</h2></div><span>{certificates.length+payments.length} records</span></div>
+        <div className="cms-layout operations-grid">
+          <form onSubmit={e=>submit(e,"/api/admin/operations","Certificate issued.")}><input type="hidden" name="kind" value="certificate"/><h3>Issue certificate</h3><label>Student name<input name="studentName" required/></label><label>Student email<input name="studentEmail" type="email" required/></label><label>Course title<input name="courseTitle" required/></label><label>Issue date<input name="issuedDate" type="date" required/></label><button>Issue certificate</button></form>
+          <form onSubmit={e=>submit(e,"/api/admin/operations","Payment recorded.")}><input type="hidden" name="kind" value="payment"/><h3>Record payment</h3><label>Customer name<input name="customerName" required/></label><label>Customer email<input name="customerEmail" type="email" required/></label><label>Purpose<input name="purpose" required/></label><label>Gateway<select name="gateway"><option>Razorpay</option><option>Stripe</option><option>PayPal</option><option>UPI</option><option>Bank Transfer</option><option>Cash</option></select></label><label>Transaction ID<input name="transactionId"/></label><label>Amount (₹)<input name="amount" type="number" min="1" required/></label><label>Status<select name="status"><option>pending</option><option>successful</option><option>failed</option><option>refunded</option></select></label><button>Save payment</button></form>
+        </div>
+        <div className="operations-lists"><div className="record-list"><h3>Certificates</h3>{certificates.length===0?<p className="empty-row">No certificates yet.</p>:certificates.map(x=><article key={x.id}><div><b>{x.studentName}</b><small>{x.courseTitle} · {x.reference}</small></div><select value={x.status} onChange={e=>update("/api/admin/operations",x.id,e.target.value,"certificate")}><option>issued</option><option>revoked</option></select></article>)}</div><div className="record-list"><h3>Payment records</h3>{payments.length===0?<p className="empty-row">No payments yet.</p>:payments.map(x=><article key={x.id}><div><b>{x.reference} · {new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.amount/100)}</b><small>{x.customerName} · {x.gateway}</small></div><select value={x.status} onChange={e=>update("/api/admin/operations",x.id,e.target.value,"payment")}><option>pending</option><option>successful</option><option>failed</option><option>refunded</option></select></article>)}</div></div>
+      </section>
+
+      <section className="admin-panel split-module" id="automation">
+        <div className="panel-title"><div><p>WORKFLOW AUTOMATION</p><h2>Tasks & follow-ups</h2></div><span>{tasks.filter(x=>x.status!=="completed").length} open</span></div>
+        <div className="cms-layout"><form onSubmit={e=>submit(e,"/api/admin/operations","Workflow task created.")}><input type="hidden" name="kind" value="task"/><h3>Create task</h3><label>Task title<input name="title" required placeholder="Call client or deliver report"/></label><label>Assign to<select name="assignee"><option>Vastu Expert</option><option>Architect</option><option>Engineer</option><option>Sales Team</option><option>Accounts</option></select></label><label>Due date<input name="dueDate" type="date" required/></label><label>Priority<select name="priority"><option>normal</option><option>high</option><option>urgent</option></select></label><button>Create workflow task</button></form>
+          <div className="record-list">{tasks.length===0?<p className="empty-row">No workflow tasks yet.</p>:tasks.map(x=><article key={x.id}><div><b>{x.title}</b><small>{x.assignee} · due {x.dueDate} · {x.priority}</small></div><select value={x.status} onChange={e=>update("/api/admin/operations",x.id,e.target.value,"task")}><option>pending</option><option>in-progress</option><option>completed</option><option>cancelled</option></select></article>)}</div>
+        </div>
+      </section>
+
+      <section className="admin-panel split-module" id="vault">
+        <div className="panel-title"><div><p>SECURE DOCUMENT STORAGE</p><h2>Client file vault</h2></div><span>{files.length} files</span></div>
+        <div className="cms-layout"><form onSubmit={uploadFile}><h3>Share a protected file</h3><label>Client email<input name="customerEmail" type="email" required/></label><label>Category<select name="category"><option>Project Drawing</option><option>Vastu Report</option><option>Invoice</option><option>Contract</option><option>Site Photograph</option><option>Other</option></select></label><label>File (maximum 20 MB)<input name="file" type="file" required/></label><button>Upload to client vault</button></form>
+          <div className="record-list">{files.length===0?<p className="empty-row">No client files uploaded yet.</p>:files.map(x=><article key={x.id}><div><b>{x.fileName}</b><small>{x.customerEmail} · {x.category} · {(x.size/1024/1024).toFixed(2)} MB</small></div><span className="record-status">secured</span></article>)}</div>
+        </div>
+      </section>
+
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Notifications","Staff Roles","Analytics"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
