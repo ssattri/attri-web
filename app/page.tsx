@@ -33,12 +33,12 @@ export default function Home() {
           <span><strong>ATTRI</strong><small>ASSOCIATES</small></span>
         </a>
         <nav className="desktop-nav" aria-label="Primary navigation">
-          <a href="#expertise">Expertise</a>
+          <a href="/architecture">Architecture</a>
+          <a href="/vastu-shastra">Vastu Shastra</a>
           <a href="#projects">Projects</a>
           <a href="#software">Software</a>
           <a href="#learn">Learn</a>
           <a href="#shop">Shop</a>
-          <a href="#about">Studio</a>
         </nav>
         <a className="nav-cta" href="#contact">Book consultation <span>↗</span></a>
       </header>
