@@ -1,0 +1,13 @@
+import{getChatGPTUser}from"../../chatgpt-auth";async function db(){return(await import("cloudflare:workers")).env.DB}
+async function user(){return await getChatGPTUser()}
+async function init(){const d=await db();await d.prepare(`CREATE TABLE IF NOT EXISTS support_tickets (id INTEGER PRIMARY KEY AUTOINCREMENT,reference TEXT NOT NULL UNIQUE,customer_email TEXT NOT NULL,subject TEXT NOT NULL,category TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'open',priority TEXT NOT NULL DEFAULT 'normal',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run()}
+export async function GET(){
+ const u=await user();if(!u)return Response.json({error:"Unauthorized"},{status:401});await init();const d=await db();const email=u.email.toLowerCase();
+ const [appointments,orders,enrollments,tickets]=await Promise.all([
+  d.prepare("SELECT reference,service,consultation_mode AS consultationMode,preferred_date AS preferredDate,preferred_time AS preferredTime,status,created_at AS createdAt FROM appointments WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
+  d.prepare("SELECT reference,subtotal,status,payment_status AS paymentStatus,created_at AS createdAt FROM orders WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
+  d.prepare("SELECT e.reference,c.title AS courseTitle,e.status,e.payment_status AS paymentStatus,e.progress,e.created_at AS createdAt FROM enrollments e JOIN courses c ON c.id=e.course_id WHERE lower(e.email)=? ORDER BY e.created_at DESC").bind(email).all(),
+  d.prepare("SELECT reference,subject,category,status,priority,created_at AS createdAt FROM support_tickets WHERE lower(customer_email)=? ORDER BY created_at DESC").bind(email).all()
+ ]);return Response.json({profile:{name:u.displayName,email:u.email},appointments:appointments.results,orders:orders.results,enrollments:enrollments.results,tickets:tickets.results})
+}
+export async function POST(request:Request){const u=await user();if(!u)return Response.json({error:"Unauthorized"},{status:401});const b=await request.json()as Record<string,string>;if(!b.subject||!b.category||!b.message)return Response.json({error:"Complete all ticket fields."},{status:400});await init();const d=await db();const reference=`SUP-${Date.now().toString(36).toUpperCase()}`;await d.prepare("INSERT INTO support_tickets (reference,customer_email,subject,category,message,priority) VALUES (?,?,?,?,?,?)").bind(reference,u.email,b.subject.trim(),b.category,b.message.trim(),b.priority||"normal").run();return Response.json({success:true,reference},{status:201})}

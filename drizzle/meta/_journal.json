@@ -29,6 +29,13 @@
       "when": 1785303947275,
       "tag": "0003_left_dagger",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1785304398534,
+      "tag": "0004_military_thing",
+      "breakpoints": true
     }
   ]
 }

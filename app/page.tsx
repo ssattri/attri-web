@@ -41,7 +41,7 @@ export default function Home() {
           <a href="/courses">Courses</a>
           <a href="/shop">Shop</a>
         </nav>
-        <a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a>
+        <div className="nav-actions"><a href="/client">Client login</a><a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a></div>
       </header>
 
       <section className="hero" id="top">
