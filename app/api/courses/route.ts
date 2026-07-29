@@ -9,7 +9,10 @@ async function init(){
   ["image_url","ALTER TABLE courses ADD COLUMN image_url TEXT NOT NULL DEFAULT ''"],
   ["instructor","ALTER TABLE courses ADD COLUMN instructor TEXT NOT NULL DEFAULT 'Attri Academy Faculty'"],
   ["certificate","ALTER TABLE courses ADD COLUMN certificate INTEGER NOT NULL DEFAULT 1"],
-  ["show_in_shop","ALTER TABLE courses ADD COLUMN show_in_shop INTEGER NOT NULL DEFAULT 1"]
+  ["show_in_shop","ALTER TABLE courses ADD COLUMN show_in_shop INTEGER NOT NULL DEFAULT 1"],
+  ["meta_title","ALTER TABLE courses ADD COLUMN meta_title TEXT NOT NULL DEFAULT ''"],
+  ["meta_keywords","ALTER TABLE courses ADD COLUMN meta_keywords TEXT NOT NULL DEFAULT ''"],
+  ["meta_description","ALTER TABLE courses ADD COLUMN meta_description TEXT NOT NULL DEFAULT ''"]
  ])if(!columns.results.some(x=>x.name===name))await d.prepare(sql).run();
  const c=await d.prepare("SELECT COUNT(*) AS total FROM courses").first<{total:number}>();if(!c?.total)await d.batch([
   d.prepare("INSERT INTO courses (title,slug,category,level,mode,duration,description,price,lessons) VALUES (?,?,?,?,?,?,?,?,?)").bind("Scientific Vastu Foundations","scientific-vastu-foundations","Vastu Shastra","Beginner","Recorded","8 weeks","Understand directions, elements, zones and practical residential analysis.",1499900,32),

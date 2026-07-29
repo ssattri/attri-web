@@ -1,0 +1,3 @@
+import{notFound}from"next/navigation";import{requireChatGPTUser}from"../../../../chatgpt-auth";import ProductEditor from"../../ProductEditor";
+export const dynamic="force-dynamic";
+export default async function EditProduct({params}:{params:Promise<{id:string}>}){const{id}=await params;const productId=Number(id);if(!Number.isInteger(productId)||productId<1)notFound();const user=await requireChatGPTUser(`/admin/products/${id}/edit`);if(user.email.toLowerCase()!=="attriassociates99@gmail.com")return <main className="admin-denied"><h1>Access restricted</h1><a href="/">Return home</a></main>;return <ProductEditor id={productId}/>}

@@ -70,6 +70,9 @@ export const products = sqliteTable("products", {
   duration: text("duration").notNull().default(""),
   classes: integer("classes").notNull().default(0),
   sortOrder: integer("sort_order").notNull().default(0),
+  metaTitle: text("meta_title").notNull().default(""),
+  metaKeywords: text("meta_keywords").notNull().default(""),
+  metaDescription: text("meta_description").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -106,6 +109,9 @@ export const courses = sqliteTable("courses", {
   instructor: text("instructor").notNull().default("Attri Academy Faculty"),
   certificate: integer("certificate").notNull().default(1),
   showInShop: integer("show_in_shop").notNull().default(1),
+  metaTitle: text("meta_title").notNull().default(""),
+  metaKeywords: text("meta_keywords").notNull().default(""),
+  metaDescription: text("meta_description").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 

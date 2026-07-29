@@ -16,7 +16,10 @@ async function ensureProducts(database:Awaited<ReturnType<typeof db>>){
     ["special_to","ALTER TABLE products ADD COLUMN special_to TEXT NOT NULL DEFAULT ''"],
     ["duration","ALTER TABLE products ADD COLUMN duration TEXT NOT NULL DEFAULT ''"],
     ["classes","ALTER TABLE products ADD COLUMN classes INTEGER NOT NULL DEFAULT 0"],
-    ["sort_order","ALTER TABLE products ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0"]
+    ["sort_order","ALTER TABLE products ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0"],
+    ["meta_title","ALTER TABLE products ADD COLUMN meta_title TEXT NOT NULL DEFAULT ''"],
+    ["meta_keywords","ALTER TABLE products ADD COLUMN meta_keywords TEXT NOT NULL DEFAULT ''"],
+    ["meta_description","ALTER TABLE products ADD COLUMN meta_description TEXT NOT NULL DEFAULT ''"]
   ])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
 }
 function slugify(value:string){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80)}
@@ -25,26 +28,26 @@ export async function GET(){
   const database=await db();
   await ensureProducts(database);
   const orders=await database.prepare("SELECT id,reference,customer_name AS customerName,phone,items_json AS itemsJson,subtotal,status,payment_status AS paymentStatus,created_at AS createdAt FROM orders ORDER BY created_at DESC LIMIT 200").all();
-  const products=await database.prepare("SELECT id,name,slug,category,description,price,stock,status,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,special_price AS specialPrice,special_from AS specialFrom,special_to AS specialTo,duration,classes,sort_order AS sortOrder,created_at AS createdAt FROM products ORDER BY sort_order,id DESC").all();
+  const products=await database.prepare("SELECT id,name,slug,category,description,price,stock,status,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,special_price AS specialPrice,special_from AS specialFrom,special_to AS specialTo,duration,classes,sort_order AS sortOrder,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,created_at AS createdAt FROM products ORDER BY sort_order,id DESC").all();
   return Response.json({orders:orders.results,products:products.results});
 }
 export async function POST(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
-  const body=await request.json() as {name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;status?:string;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number};
+  const body=await request.json() as {name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;status?:string;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string};
   const name=body.name?.trim()??"",slug=slugify(body.slug?.trim()||name),category=body.category?.trim()??"";
   const price=Math.round(Number(body.price)*100),specialPrice=Math.round(Number(body.specialPrice||0)*100),stock=Math.max(0,Math.floor(Number(body.stock))),classes=Math.max(0,Math.floor(Number(body.classes||0))),sortOrder=Math.floor(Number(body.sortOrder||0));
   if(!name||!slug||!category||!Number.isFinite(price)||price<0||!Number.isFinite(specialPrice)||specialPrice<0||!Number.isFinite(stock)||!Number.isFinite(classes)||!Number.isFinite(sortOrder))return Response.json({error:"Complete the product name, category, valid pricing, stock and order."},{status:400});
   if(specialPrice>0&&specialPrice>=price)return Response.json({error:"Special price must be lower than the regular price."},{status:400});
   const status=body.status==="draft"?"draft":"active";const database=await db();await ensureProducts(database);
   try{
-    const result=await database.prepare("INSERT INTO products (name,slug,category,description,price,stock,status,image_url,item_type,delivery_mode,special_price,special_from,special_to,duration,classes,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
-      .bind(name,slug,category,body.description?.trim()??"",price,stock,status,body.imageUrl?.trim()??"",["physical","digital","course","service"].includes(body.itemType??"")?body.itemType:"physical",body.deliveryMode==="Offline"?"Offline":body.deliveryMode==="Online + Offline"?"Online + Offline":"Online",specialPrice,body.specialFrom||"",body.specialTo||"",body.itemType==="course"?body.duration||"":"",body.itemType==="course"?classes:0,sortOrder).run();
+    const result=await database.prepare("INSERT INTO products (name,slug,category,description,price,stock,status,image_url,item_type,delivery_mode,special_price,special_from,special_to,duration,classes,sort_order,meta_title,meta_keywords,meta_description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+      .bind(name,slug,category,body.description?.trim()??"",price,stock,status,body.imageUrl?.trim()??"",["physical","digital","course","service"].includes(body.itemType??"")?body.itemType:"physical",body.deliveryMode==="Offline"?"Offline":body.deliveryMode==="Online + Offline"?"Online + Offline":"Online",specialPrice,body.specialFrom||"",body.specialTo||"",body.itemType==="course"?body.duration||"":"",body.itemType==="course"?classes:0,sortOrder,body.metaTitle?.trim()||name,body.metaKeywords?.trim()||"",body.metaDescription?.trim()||body.description?.trim()||"").run();
     return Response.json({success:true,id:result.meta.last_row_id},{status:201});
   }catch{return Response.json({error:"That product URL slug already exists. Please use a different slug."},{status:409})}
 }
 export async function PATCH(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
-  const body=await request.json() as {id?:number;kind?:string;status?:string;name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number};
+  const body=await request.json() as {id?:number;kind?:string;status?:string;name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string};
   if(!body.id)return Response.json({error:"A record is required."},{status:400});
   const database=await db();
   if(body.kind==="product"){
@@ -54,8 +57,8 @@ export async function PATCH(request:Request){
       if(!body.category||!Number.isFinite(price)||price<0||!Number.isFinite(specialPrice)||specialPrice<0||!Number.isFinite(stock)||!Number.isFinite(classes)||!Number.isFinite(sortOrder))return Response.json({error:"Enter valid product pricing, stock and order."},{status:400});
       if(specialPrice>0&&specialPrice>=price)return Response.json({error:"Special price must be lower than the regular price."},{status:400});
       const itemType=["physical","digital","course","service"].includes(body.itemType??"")?body.itemType:"physical";
-      try{await database.prepare("UPDATE products SET name=?,slug=?,category=?,description=?,price=?,stock=?,status=?,image_url=?,item_type=?,delivery_mode=?,special_price=?,special_from=?,special_to=?,duration=?,classes=?,sort_order=? WHERE id=?")
-        .bind(body.name.trim(),slugify(body.slug||body.name),body.category.trim(),body.description?.trim()??"",price,stock,body.status==="draft"?"draft":"active",body.imageUrl?.trim()??"",itemType,body.deliveryMode==="Offline"?"Offline":body.deliveryMode==="Online + Offline"?"Online + Offline":"Online",specialPrice,body.specialFrom||"",body.specialTo||"",itemType==="course"?body.duration||"":"",itemType==="course"?classes:0,sortOrder,body.id).run()}
+      try{await database.prepare("UPDATE products SET name=?,slug=?,category=?,description=?,price=?,stock=?,status=?,image_url=?,item_type=?,delivery_mode=?,special_price=?,special_from=?,special_to=?,duration=?,classes=?,sort_order=?,meta_title=?,meta_keywords=?,meta_description=? WHERE id=?")
+        .bind(body.name.trim(),slugify(body.slug||body.name),body.category.trim(),body.description?.trim()??"",price,stock,body.status==="draft"?"draft":"active",body.imageUrl?.trim()??"",itemType,body.deliveryMode==="Offline"?"Offline":body.deliveryMode==="Online + Offline"?"Online + Offline":"Online",specialPrice,body.specialFrom||"",body.specialTo||"",itemType==="course"?body.duration||"":"",itemType==="course"?classes:0,sortOrder,body.metaTitle?.trim()||body.name.trim(),body.metaKeywords?.trim()||"",body.metaDescription?.trim()||body.description?.trim()||"",body.id).run()}
       catch{return Response.json({error:"That product URL slug already exists."},{status:409})}
     }else{
       if(!["active","draft"].includes(body.status??""))return Response.json({error:"Invalid product status."},{status:400});
