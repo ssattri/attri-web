@@ -121,3 +121,29 @@ export const supportTickets = sqliteTable("support_tickets", {
   priority: text("priority").notNull().default("normal"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const invoices = sqliteTable("invoices", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  number: text("number").notNull().unique(),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  description: text("description").notNull(),
+  amount: integer("amount").notNull(),
+  taxRate: integer("tax_rate").notNull().default(0),
+  status: text("status").notNull().default("issued"),
+  dueDate: text("due_date").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const clientReports = sqliteTable("client_reports", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  customerEmail: text("customer_email").notNull(),
+  title: text("title").notNull(),
+  reportType: text("report_type").notNull(),
+  summary: text("summary").notNull(),
+  findings: text("findings").notNull().default(""),
+  recommendations: text("recommendations").notNull().default(""),
+  status: text("status").notNull().default("draft"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

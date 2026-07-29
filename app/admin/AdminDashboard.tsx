@@ -9,6 +9,8 @@ type Appointment={id:number;reference:string;name:string;phone:string;service:st
 type Order={id:number;reference:string;customerName:string;phone:string;itemsJson:string;subtotal:number;status:string;paymentStatus:string;createdAt:string};
 type Enrollment={id:number;reference:string;studentName:string;email:string;phone:string;courseTitle:string;status:string;paymentStatus:string;progress:number};
 type Ticket={id:number;reference:string;customerEmail:string;subject:string;category:string;status:string;priority:string;createdAt:string};
+type Invoice={id:number;number:string;customerName:string;customerEmail:string;description:string;amount:number;taxRate:number;status:string;dueDate:string};
+type ClientReport={id:number;reference:string;customerEmail:string;title:string;reportType:string;summary:string;status:string;createdAt:string};
 
 export default function AdminDashboard({displayName}:{displayName:string}) {
   const [pages,setPages]=useState<PageRow[]>([]);
@@ -18,18 +20,21 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   const [orders,setOrders]=useState<Order[]>([]);
   const [enrollments,setEnrollments]=useState<Enrollment[]>([]);
   const [tickets,setTickets]=useState<Ticket[]>([]);
+  const [invoices,setInvoices]=useState<Invoice[]>([]);
+  const [reports,setReports]=useState<ClientReport[]>([]);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
 
   async function refresh() {
     setBusy(true);
-    const [p,l,r,a,c,e,t]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning"),fetch("/api/admin/support")]);
-    const [pd,ld,rd,ad,cd,ed,td]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json()]);
+    const [p,l,r,a,c,e,t,f]=await Promise.all([fetch("/api/cms/pages"),fetch("/api/admin/leads"),fetch("/api/admin/projects"),fetch("/api/appointments"),fetch("/api/admin/commerce"),fetch("/api/admin/learning"),fetch("/api/admin/support"),fetch("/api/admin/finance")]);
+    const [pd,ld,rd,ad,cd,ed,td,fd]=await Promise.all([p.json(),l.json(),r.json(),a.json(),c.json(),e.json(),t.json(),f.json()]);
     if(p.ok)setPages(pd.pages); if(l.ok)setLeads(ld.leads); if(r.ok)setProjects(rd.projects);
     if(a.ok)setAppointments(ad.appointments);
     if(c.ok)setOrders(cd.orders);
     if(e.ok)setEnrollments(ed.enrollments);
     if(t.ok)setTickets(td.tickets);
+    if(f.ok){setInvoices(fd.invoices);setReports(fd.reports)}
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
@@ -39,8 +44,8 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
     const response=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
     const data=await response.json();setMessage(response.ok?success:data.error);if(response.ok){form.reset();await refresh()}
   }
-  async function update(url:string,id:number,status:string){
-    const response=await fetch(url,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({id,status})});
+  async function update(url:string,id:number,status:string,kind?:string){
+    const response=await fetch(url,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({id,status,...(kind?{kind}:{})})});
     const data=await response.json();setMessage(response.ok?"Status updated.":data.error);if(response.ok)await refresh();
   }
   async function removePage(id:number){
@@ -52,7 +57,7 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
   return <div className="admin-shell">
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#reports">▥ <span>Reports</span></a></nav>
+      <nav><a className="selected" href="#overview">⌂ <span>Overview</span></a><a href="#pages">▤ <span>Pages & CMS</span></a><a href="#projects">◇ <span>Projects</span></a><a href="#leads">◎ <span>Leads & CRM</span></a><a href="#appointments">◷ <span>Appointments</span></a><a href="#commerce">□ <span>Orders & Store</span></a><a href="#learning">△ <span>Courses & LMS</span></a><a href="#finance">₹ <span>Invoices</span></a><a href="#reports">▥ <span>Reports</span></a></nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
@@ -118,7 +123,21 @@ export default function AdminDashboard({displayName}:{displayName:string}) {
         </div>
       </section>
 
-      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Invoices","Reports","Certificates","Automation","Payments","Files"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
+      <section className="admin-panel split-module" id="finance">
+        <div className="panel-title"><div><p>FINANCE DESK</p><h2>Invoices & receivables</h2></div><span>{invoices.length} invoices</span></div>
+        <div className="cms-layout"><form onSubmit={e=>submit(e,"/api/admin/finance","Invoice issued.")}><input type="hidden" name="kind" value="invoice"/><h3>Issue invoice</h3><label>Client name<input name="customerName" required/></label><label>Client email<input name="customerEmail" type="email" required/></label><label>Description<input name="description" required placeholder="Consultation or project milestone"/></label><label>Amount (₹)<input name="amount" type="number" min="1" required/></label><label>GST rate (%)<input name="taxRate" type="number" min="0" max="28" defaultValue="18"/></label><label>Due date<input name="dueDate" type="date" required/></label><button>Issue invoice</button></form>
+          <div className="record-list">{invoices.length===0?<p className="empty-row">No invoices issued yet.</p>:invoices.map(x=><article key={x.id}><div><b>{x.number} · {new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.amount/100)}</b><small>{x.customerName} · due {x.dueDate}</small></div><select value={x.status} onChange={e=>update("/api/admin/finance",x.id,e.target.value,"invoice")}><option>issued</option><option>paid</option><option>overdue</option><option>cancelled</option></select></article>)}</div>
+        </div>
+      </section>
+
+      <section className="admin-panel split-module" id="reports">
+        <div className="panel-title"><div><p>CONSULTATION INTELLIGENCE</p><h2>Client reports</h2></div><span>{reports.length} reports</span></div>
+        <div className="cms-layout"><form onSubmit={e=>submit(e,"/api/admin/finance","Client report created.")}><input type="hidden" name="kind" value="report"/><h3>Create report</h3><label>Client email<input name="customerEmail" type="email" required/></label><label>Report title<input name="title" required/></label><label>Report type<select name="reportType"><option>Vastu Audit</option><option>Architecture Review</option><option>Site Analysis</option><option>Remedy Plan</option><option>Project Report</option></select></label><label>Executive summary<textarea name="summary" required rows={3}/></label><label>Key findings<textarea name="findings" rows={3}/></label><label>Recommendations<textarea name="recommendations" rows={3}/></label><button>Create draft report</button></form>
+          <div className="record-list">{reports.length===0?<p className="empty-row">No reports created yet.</p>:reports.map(x=><article key={x.id}><div><b>{x.title}</b><small>{x.reference} · {x.customerEmail}</small></div><select value={x.status} onChange={e=>update("/api/admin/finance",x.id,e.target.value,"report")}><option>draft</option><option>published</option><option>archived</option></select></article>)}</div>
+        </div>
+      </section>
+
+      <section className="module-roadmap"><div><p>NEXT MODULES</p><h2>Enterprise operations roadmap</h2></div>{["Certificates","Automation","Payments","File Vault"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
