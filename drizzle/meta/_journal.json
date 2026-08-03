@@ -225,6 +225,13 @@
       "when": 1785762913673,
       "tag": "0031_silent_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "6",
+      "when": 1785763405865,
+      "tag": "0032_stiff_songbird",
+      "breakpoints": true
     }
   ]
 }

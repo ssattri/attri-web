@@ -104,6 +104,13 @@ export const consultationMessages = sqliteTable("consultation_messages", {
   message: text("message").notNull(), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const consultationChangeRequests = sqliteTable("consultation_change_requests", {
+  id: integer("id").primaryKey({ autoIncrement: true }), sessionId: integer("session_id").notNull(), requestType: text("request_type").notNull(),
+  requestedBy: text("requested_by").notNull(), proposedDate: text("proposed_date").notNull().default(""), proposedTime: text("proposed_time").notNull().default(""),
+  reason: text("reason").notNull().default(""), status: text("status").notNull().default("pending"), reviewedBy: text("reviewed_by").notNull().default(""),
+  reviewNote: text("review_note").notNull().default(""), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`), updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const consultantAvailabilityOverrides = sqliteTable("consultant_availability_overrides", {
   id: integer("id").primaryKey({ autoIncrement: true }), consultantId: integer("consultant_id").notNull(), date: text("date").notNull(),
   availableFrom: text("available_from").notNull().default(""), availableTo: text("available_to").notNull().default(""),
