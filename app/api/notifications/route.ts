@@ -1,4 +1,4 @@
-import { getChatGPTUser } from "../../chatgpt-auth";
+import { getPortalUser } from "../../auth";
 
 async function database(){ return (await import("cloudflare:workers")).env.DB; }
 
@@ -12,7 +12,7 @@ async function initialise(){
 }
 
 export async function GET(){
-  const user=await getChatGPTUser(); if(!user)return Response.json({error:"Unauthorized"},{status:401});
+  const user=await getPortalUser(); if(!user)return Response.json({error:"Unauthorized"},{status:401});
   await initialise(); const d=await database(); const email=user.email.toLowerCase();
   const profile=await d.prepare("SELECT account_type AS accountType FROM customer_profiles WHERE lower(email)=?").bind(email).first<{accountType:string}>();
   const role=profile?.accountType; if(!["user","consultant"].includes(role??""))return Response.json({error:"Complete account setup."},{status:403});
@@ -21,7 +21,7 @@ export async function GET(){
 }
 
 export async function PATCH(request:Request){
-  const user=await getChatGPTUser(); if(!user)return Response.json({error:"Unauthorized"},{status:401});
+  const user=await getPortalUser(); if(!user)return Response.json({error:"Unauthorized"},{status:401});
   await initialise(); const d=await database(); const body=await request.json() as {id?:number;all?:boolean};
   if(body.all){
     const profile=await d.prepare("SELECT account_type AS accountType FROM customer_profiles WHERE lower(email)=?").bind(user.email.toLowerCase()).first<{accountType:string}>();

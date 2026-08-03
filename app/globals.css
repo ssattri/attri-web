@@ -31,7 +31,7 @@ a { color: inherit; text-decoration: none; }
 .desktop-nav a:hover { opacity: 1; color: #e2c47f; }
 .nav-cta { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; border-bottom: 1px solid var(--gold); padding-bottom: 7px; }
 .nav-cta span { color: #ffad59; margin-left: 6px; }
-.nav-actions{display:flex;align-items:center;gap:22px}.nav-actions>a:first-child{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.6)}
+.nav-actions{display:flex;align-items:center;gap:16px}.client-login-icon{display:grid;place-items:center;width:39px;height:39px;border:1px solid rgba(255,255,255,.42);border-radius:50%;color:#fff;transition:.25s}.client-login-icon:hover{border-color:#f49338;background:#f49338;color:#21152f;transform:translateY(-2px)}.client-login-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
 .hero {
   min-height: 820px; height: 100vh; max-height: 980px; position: relative; overflow: hidden; color: #fff;

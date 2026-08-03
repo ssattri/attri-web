@@ -260,6 +260,24 @@ export const customerProfiles = sqliteTable("customer_profiles", {
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const authAccounts = sqliteTable("auth_accounts", {
+  email: text("email").primaryKey(),
+  fullName: text("full_name").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  passwordSalt: text("password_salt").notNull(),
+  accountType: text("account_type").notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const authSessions = sqliteTable("auth_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  email: text("email").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const portalNotifications = sqliteTable("portal_notifications", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),

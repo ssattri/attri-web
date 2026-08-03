@@ -1,7 +1,7 @@
-import { getChatGPTUser } from "../../../chatgpt-auth";
+import { getPortalUser } from "../../../auth";
 
 async function db() { return (await import("cloudflare:workers")).env.DB; }
-async function allowed() { const user = await getChatGPTUser(); return user?.email.toLowerCase() === "attriassociates99@gmail.com"; }
+async function allowed() { const user = await getPortalUser(); return user?.email.toLowerCase() === "attriassociates99@gmail.com"; }
 async function init() {
   const database = await db();
   await database.prepare(`CREATE TABLE IF NOT EXISTS projects (

@@ -41,7 +41,7 @@ export default function Home() {
           <a href="/courses">Courses</a>
           <a href="/shop">Shop</a>
         </nav>
-        <div className="nav-actions"><a href="/client/login">Client login</a><a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a></div>
+        <div className="nav-actions"><a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a><a className="client-login-icon" href="/client/login" aria-label="User and consultant login" title="Account login"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5Zm-7.25 8.5c.55-4.1 3-6.25 7.25-6.25s6.7 2.15 7.25 6.25"/></svg></a></div>
       </header>
 
       <section className="hero" id="top">

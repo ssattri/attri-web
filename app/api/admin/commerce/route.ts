@@ -1,6 +1,6 @@
-import {getChatGPTUser} from "../../../chatgpt-auth";
+import {getPortalUser} from "../../../auth";
 async function db(){return(await import("cloudflare:workers")).env.DB}
-async function allowed(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function allowed(){return(await getPortalUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 async function ensureProducts(database:Awaited<ReturnType<typeof db>>){
   await database.prepare(`CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,slug TEXT NOT NULL UNIQUE,category TEXT NOT NULL,

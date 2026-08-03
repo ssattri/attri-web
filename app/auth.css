@@ -1,0 +1,27 @@
+.native-login-card{padding:34px 42px;max-height:94vh;overflow:auto}
+.login-mode-tabs{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:#f3eee8;border-radius:9px}
+.login-mode-tabs button{padding:11px;border:0;border-radius:7px;background:transparent;color:#766b70;font:600 12px "Poppins";cursor:pointer}
+.login-mode-tabs button.active{background:#fff;color:#21152f;box-shadow:0 3px 12px rgba(33,21,47,.08)}
+.native-login-heading{margin-top:24px}
+.native-login-heading p{margin:0;color:#c65f22;font-size:12px;letter-spacing:.16em}
+.native-login-heading h2{margin:8px 0 8px;font:500 36px "Playfair Display";color:#172033}
+.native-login-heading span{color:#64748b;font-size:13px;line-height:1.65}
+.login-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:21px 0}
+.login-role-grid button{position:relative;display:grid;gap:3px;min-height:104px;padding:15px;border:1px solid #ded5cb;border-radius:9px;background:#fff;text-align:left;color:#5d5459;cursor:pointer;transition:.2s}
+.login-role-grid button:hover,.login-role-grid button.active{border-color:#ed7a22;background:#fff7ed;box-shadow:inset 0 0 0 1px #ed7a22}
+.login-role-grid button>span{position:absolute;right:12px;top:10px;color:#c9b9ad;font:500 17px "Playfair Display"}
+.login-role-grid button>b{color:#21152f;font-size:14px}
+.login-role-grid button>small{max-width:170px;font-size:12px;line-height:1.55}
+.native-login-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.native-login-form label{color:#5f555b;font-size:12px;font-weight:600}
+.native-login-form label:has(input[type="email"]),.native-login-form label:has(input[type="password"]),.native-login-form .terms-check,.native-login-form .registration-error,.native-login-submit{grid-column:1/-1}
+.native-login-form input{display:block;width:100%;margin-top:6px;padding:12px 13px;border:1px solid #d9cfc3;border-radius:6px;background:#fff;font:12px "Poppins";outline:none}
+.native-login-form input:focus{border-color:#ed7a22;box-shadow:0 0 0 3px rgba(237,122,34,.1)}
+.native-login-form .terms-check{display:flex;align-items:flex-start;gap:9px;font-weight:400}
+.native-login-form .terms-check input{width:auto;margin-top:2px}
+.native-login-submit{padding:14px;border:0;border-radius:6px;background:#ed7a22;color:#21152f;font:600 12px "Poppins";text-transform:uppercase;letter-spacing:.07em;cursor:pointer}
+.native-login-submit:disabled{opacity:.55;cursor:wait}
+.native-login-security{margin:14px 0 4px;text-align:center;color:#8d8290;font-size:12px}
+.native-login-card .access-back{display:block;margin-top:14px;text-align:center;color:#9c4b27;font-size:12px}
+@media(max-width:850px){.client-access-page{min-height:auto}.native-login-card{max-height:none;margin:28px auto 60px;padding:28px}}
+@media(max-width:520px){.login-role-grid,.native-login-form{grid-template-columns:1fr}.native-login-form label,.native-login-form .terms-check,.native-login-form .registration-error,.native-login-submit{grid-column:1}.native-login-card{padding:24px}.native-login-heading h2{font-size:31px}}

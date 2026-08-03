@@ -1,5 +1,5 @@
-import{getChatGPTUser}from"../../chatgpt-auth";async function db(){return(await import("cloudflare:workers")).env.DB}
-async function user(){return await getChatGPTUser()}
+import{getPortalUser}from"../../auth";async function db(){return(await import("cloudflare:workers")).env.DB}
+async function user(){return await getPortalUser()}
 async function init(){const d=await db();await d.batch([
  d.prepare(`CREATE TABLE IF NOT EXISTS support_tickets (id INTEGER PRIMARY KEY AUTOINCREMENT,reference TEXT NOT NULL UNIQUE,customer_email TEXT NOT NULL,subject TEXT NOT NULL,category TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'open',priority TEXT NOT NULL DEFAULT 'normal',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
  d.prepare(`CREATE TABLE IF NOT EXISTS customer_profiles (id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT NOT NULL UNIQUE,full_name TEXT NOT NULL,phone TEXT NOT NULL DEFAULT '',company TEXT NOT NULL DEFAULT '',address TEXT NOT NULL DEFAULT '',city TEXT NOT NULL DEFAULT '',state TEXT NOT NULL DEFAULT '',pincode TEXT NOT NULL DEFAULT '',gstin TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'active',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`)

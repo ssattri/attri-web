@@ -1,6 +1,6 @@
-import{getChatGPTUser}from"../../../chatgpt-auth";
+import{getPortalUser}from"../../../auth";
 async function db(){return(await import("cloudflare:workers")).env.DB}
-async function ok(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function ok(){return(await getPortalUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 async function ensureCourses(d:Awaited<ReturnType<typeof db>>){
   await d.prepare(`CREATE TABLE IF NOT EXISTS courses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,slug TEXT NOT NULL UNIQUE,category TEXT NOT NULL,

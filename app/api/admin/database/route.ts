@@ -1,6 +1,6 @@
-import{getChatGPTUser}from"../../../chatgpt-auth";
+import{getPortalUser}from"../../../auth";
 async function db(){return(await import("cloudflare:workers")).env.DB}
-async function owner(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function owner(){return(await getPortalUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 const core=[
  ["cms_pages","CMS Pages"],["leads","CRM Leads"],["customer_profiles","Customers"],["projects","Projects"],["project_milestones","Milestones"],
  ["appointments","Appointments"],["products","Products"],["orders","Orders"],["courses","Courses"],["enrollments","Enrollments"],
