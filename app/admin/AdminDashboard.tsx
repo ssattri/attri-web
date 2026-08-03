@@ -8,16 +8,18 @@ import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import SettingsCenter from "./SettingsCenter";
 import MediaManager from "./MediaManager";
-import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig } from "lucide-react";
+import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig, CircleHelp } from "lucide-react";
 import CategoryManager from "./CategoryManager";
+import CmsPagesManager from "./CmsPagesManager";
+import FaqManager from "./FaqManager";
 
-const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
+const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
 export const adminNavigationGroups = [
   {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
   {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
   {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
-  {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
+  {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["faqs","FAQ Manager","?"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
   {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
 ] as const;
 
@@ -32,6 +34,7 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   "data-managers":{eyebrow:"MASTER DATA",title:"Data managers"},
   permissions:{eyebrow:"SECURITY / TEAM",title:"Roles & permissions"},
   pages:{eyebrow:"CONTENT / CMS",title:"Website pages"},
+  faqs:{eyebrow:"CONTENT / SUPPORT",title:"FAQ manager"},
   projects:{eyebrow:"DELIVERY / PORTFOLIO",title:"Project management"},
   leads:{eyebrow:"SALES / CRM",title:"Leads & enquiries"},
   appointments:{eyebrow:"CONSULTATION DESK",title:"Appointments"},
@@ -187,7 +190,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
 
       <DataManagers/>
 
-      <section className="admin-panel" id="pages">
+      <section className="admin-panel legacy-cms-pages" id="legacy-pages">
         <div className="panel-title"><div><p>CONTENT MANAGEMENT</p><h2>Website pages</h2></div><span>{pages.length} records</span></div>
         <div className="cms-layout">
           <form onSubmit={e=>submit(e,"/api/cms/pages","Draft page created.")}><h3>Create a draft page</h3><label>Page title<input name="title" required placeholder="e.g. Interior Design"/></label><label>URL slug<input name="slug" required placeholder="interior-design"/></label><label>Short description<textarea name="excerpt" rows={4} placeholder="Summary for cards and search results"/></label><button>Create draft page</button></form>
@@ -196,6 +199,9 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
           </div>
         </div>
       </section>
+
+      <CmsPagesManager/>
+      <FaqManager/>
 
       <section className="admin-panel split-module" id="leads">
         <div className="panel-title"><div><p>CRM</p><h2>Leads & enquiries</h2></div><span>{leads.length} records</span></div>

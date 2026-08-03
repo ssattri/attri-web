@@ -3,7 +3,7 @@ const modules=[
  ["overview","Overview","Dashboard"],["analytics","Analytics","Dashboard"],["notifications","Notifications","Dashboard"],
  ["leads","Leads & CRM","Customers & Delivery"],["appointments","Appointments","Customers & Delivery"],["projects","Projects","Customers & Delivery"],["reports","Reports","Customers & Delivery"],["support","Support Tickets","Customers & Delivery"],
  ["products","Products","Store & Academy"],["product-categories","Product Categories","Store & Academy"],["commerce","Orders","Store & Academy"],["courses","Courses","Store & Academy"],["course-categories","Course Categories","Store & Academy"],["learning","Students & LMS","Store & Academy"],["finance","Invoices","Store & Academy"],
- ["pages","Pages & CMS","Content & Marketing"],["media","Media Manager","Content & Marketing"],["seo-manager","SEO Manager","Content & Marketing"],
+ ["pages","Pages & CMS","Content & Marketing"],["faqs","FAQ Manager","Content & Marketing"],["media","Media Manager","Content & Marketing"],["seo-manager","SEO Manager","Content & Marketing"],
  ["operations","Operations","System & Administration"],["automation","Workflows","System & Administration"],["data-managers","Data Managers","System & Administration"],["database","Database","System & Administration"],["vault","File Vault","System & Administration"],["permissions","Team Access","System & Administration"],["settings","Settings & Integrations","System & Administration"]
 ] as const;
 const moduleKeys=modules.map(x=>x[0]);
