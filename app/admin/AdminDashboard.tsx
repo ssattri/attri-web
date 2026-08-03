@@ -4,6 +4,7 @@ import { FormEvent, MouseEvent, useEffect, useState } from "react";
 import DataManagers from "./DataManagers";
 import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
+import NotificationCenter from "./NotificationCenter";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
@@ -147,7 +148,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
     </aside>
     <main className="admin-main">
-      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><a href="/" target="_blank">View website ↗</a>{module==="products"?<a className="admin-header-action" href="/admin/products/new">＋ Add product</a>:module==="courses"?<a className="admin-header-action" href="/admin/courses/new">＋ Add course</a>:<a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a>}</div></header>
+      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><NotificationCenter compact/><a href="/" target="_blank">View website ↗</a>{module==="products"?<a className="admin-header-action" href="/admin/products/new">＋ Add product</a>:module==="courses"?<a className="admin-header-action" href="/admin/courses/new">＋ Add course</a>:<a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a>}</div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
       <section className="admin-stats" id="overview">
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
@@ -158,6 +159,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
 
       <GrowthCenter/>
       <RolePermissions/>
+
+      <NotificationCenter/>
 
       <section className="admin-panel database-centre" id="database">
         <div className="panel-title"><div><p>DATA INFRASTRUCTURE</p><h2>Enterprise database centre</h2></div><span>{database?.status||"connecting"}</span></div>

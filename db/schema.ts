@@ -233,6 +233,41 @@ export const customerProfiles = sqliteTable("customer_profiles", {
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const portalNotifications = sqliteTable("portal_notifications", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  audience: text("audience").notNull().default("all"),
+  recipientEmail: text("recipient_email").notNull().default(""),
+  severity: text("severity").notNull().default("info"),
+  actionUrl: text("action_url").notNull().default(""),
+  status: text("status").notNull().default("published"),
+  expiresAt: text("expires_at").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const notificationReads = sqliteTable("notification_reads", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  notificationId: integer("notification_id").notNull(),
+  userEmail: text("user_email").notNull(),
+  readAt: text("read_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const subscriptions = sqliteTable("subscriptions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  customerEmail: text("customer_email").notNull(),
+  accountType: text("account_type").notNull(),
+  planName: text("plan_name").notNull(),
+  billingCycle: text("billing_cycle").notNull().default("monthly"),
+  amount: integer("amount").notNull().default(0),
+  status: text("status").notNull().default("pending"),
+  startsAt: text("starts_at").notNull().default(""),
+  endsAt: text("ends_at").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const staffMembers = sqliteTable("staff_members", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
