@@ -9,15 +9,15 @@ import OrdersManager from "./OrdersManager";
 import SettingsCenter from "./SettingsCenter";
 import MediaManager from "./MediaManager";
 
-export const adminModules = [
-  ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
-  ["seo-manager","SEO Manager","↗"],["database","Database","◫"],["data-managers","Data Managers","⌗"],
-  ["permissions","Team Access","♙"],["pages","Pages & CMS","▤"],["projects","Projects","◇"],
-  ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["commerce","Orders","□"],
-  ["courses","Courses","△"],["learning","Students & LMS","♢"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
-  ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
-  ["media","Media Manager","▧"],["vault","File Vault","⌘"],["settings","Settings & Integrations","⚿"]
+export const adminNavigationGroups = [
+  {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
+  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
+  {label:"Store & Academy",items:[["products","Products","＋"],["commerce","Orders","□"],["courses","Courses","△"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
+  {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
+  {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
 ] as const;
+
+export const adminModules = adminNavigationGroups.flatMap(group=>group.items);
 
 const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   overview:{eyebrow:"OPERATIONS / OVERVIEW",title:"Business command centre"},
@@ -149,8 +149,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}>{icon} <span>{label}</span></a>)}</nav>
-      <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small><a href="/account/security">Account security</a><a href="/api/auth/logout">Sign out</a></div></div>
+      <nav>{adminNavigationGroups.map(group=><section className="admin-nav-group" key={group.label}><p>{group.label}</p>{group.items.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}>{icon} <span>{label}</span></a>)}</section>)}</nav>
+      <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div className="admin-profile-details"><b>{displayName}</b><small>Super Administrator</small><div className="admin-account-actions"><a href="/account/security" title="Account security">⚿ <span>Security</span></a><a className="admin-signout" href="/api/auth/logout" title="Sign out">↪ <span>Sign out</span></a></div></div></div>
     </aside>
     <main className="admin-main">
       <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><NotificationCenter compact/><a href="/" target="_blank">View website ↗</a>{module==="products"?<a className="admin-header-action" href="/admin/products/new">＋ Add product</a>:module==="courses"?<a className="admin-header-action" href="/admin/courses/new">＋ Add course</a>:<a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a>}</div></header>
