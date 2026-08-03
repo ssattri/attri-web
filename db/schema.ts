@@ -549,3 +549,19 @@ export const integrationSecrets = sqliteTable("integration_secrets", {
   updatedBy: text("updated_by").notNull(),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const mediaAssets = sqliteTable("media_assets", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  fileName: text("file_name").notNull(),
+  objectKey: text("object_key").notNull().unique(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  title: text("title").notNull().default(""),
+  altText: text("alt_text").notNull().default(""),
+  folder: text("folder").notNull().default("General"),
+  uploadedBy: text("uploaded_by").notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
