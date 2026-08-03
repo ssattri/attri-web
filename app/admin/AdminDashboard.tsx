@@ -12,6 +12,7 @@ import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, Briefc
 import CategoryManager from "./CategoryManager";
 import CmsPagesManager from "./CmsPagesManager";
 import FaqManager from "./FaqManager";
+import ProjectManager from "./ProjectManager";
 
 const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
@@ -210,12 +211,13 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         </div>
       </section>
 
-      <section className="admin-panel split-module" id="projects">
+      <section className="admin-panel split-module legacy-project-manager" id="legacy-projects">
         <div className="panel-title"><div><p>PORTFOLIO</p><h2>Project management</h2></div><span>{projects.length} records</span></div>
         <div className="cms-layout"><form onSubmit={e=>submit(e,"/api/admin/projects","Project created.")}><h3>Add project</h3><label>Project title<input name="title" required/></label><label>Category<select name="category"><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Hospitality</option><option>Healthcare</option><option>Educational</option></select></label><label>Location<input name="location"/></label><label>Description<textarea name="description" rows={4}/></label><button>Create project</button></form>
           <div className="record-list">{projects.length===0?<p className="empty-row">No projects yet.</p>:projects.map(x=><article key={x.id}><div><b>{x.title}</b><small>{x.category} · {x.location||"Location pending"}</small></div><select value={x.status} onChange={e=>update("/api/admin/projects",x.id,e.target.value)}><option>draft</option><option>active</option><option>completed</option><option>featured</option></select></article>)}</div>
         </div>
       </section>
+      <ProjectManager/>
 
       <section className="admin-panel appointment-admin" id="appointments">
         <div className="panel-title"><div><p>CONSULTATION DESK</p><h2>Appointments</h2></div><span>{appointments.length} requests</span></div>

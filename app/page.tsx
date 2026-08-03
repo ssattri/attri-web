@@ -98,7 +98,7 @@ export default function Home() {
       <section className="projects section" id="projects">
         <div className="section-title-row">
           <div><p className="section-kicker">Selected work</p><h2>Designed for impact.<br /><span>Built for life.</span></h2></div>
-          <a className="arrow-link" href="#contact">View all projects <span>→</span></a>
+          <a className="arrow-link" href="/projects">View all projects <span>→</span></a>
         </div>
         <div className="project-grid">
           {projects.map((project, index) => (

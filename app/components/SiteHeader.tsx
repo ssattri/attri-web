@@ -4,7 +4,7 @@ const navigation=[
  {href:"/about",label:"About",children:[["/about","Our Story"],["/about#expertise","Our Expertise"],["/about#values","Values & Approach"],["/#testimonials","Testimonials"],["/#faq","FAQs"]]},
  {href:"/architecture",label:"Architecture",children:[["/architecture","Architecture Planning"],["/architecture#disciplines","Structural Design"],["/architecture#process","2D & 3D Design"],["/architecture#disciplines","Interior & Landscape"]]},
  {href:"/vastu-shastra",label:"Vastu Shastra",children:[["/vastu-shastra","Scientific Vastu"],["/vastu-shastra#principles","Vastu Principles"],["/vastu-shastra#dosha","Dosha & Remedies"],["/book-consultation","Vastu Consultation"]]},
- {href:"/#projects",label:"Projects",children:[["/#projects","Residential"],["/#projects","Commercial"],["/#projects","Industrial"],["/#projects","Institutional"]]},
+ {href:"/projects",label:"Projects",children:[["/projects","All Projects"],["/projects","Residential"],["/projects","Commercial"],["/projects","Industrial"]]},
  {href:"/#software",label:"Software",children:[["/#software","Vastu Software"],["/consultant/workspace","Cloud Compass"],["/#software","Floor Planner"],["/#software","Request Demo"]]},
  {href:"/courses",label:"Courses",children:[["/courses","All Courses"],["/courses","Vastu Programmes"],["/courses","Architecture Training"],["/learning","Student Learning Portal"]]},
  {href:"/shop",label:"Shop",children:[["/shop","All Products"],["/shop","Vastu Remedies"],["/shop","Books & Downloads"],["/book-consultation","Consultation Packages"]]}
