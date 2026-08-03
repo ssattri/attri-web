@@ -1,0 +1,3 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import{redirect}from"next/navigation";import ReportStudio from"./ReportStudio";
+export const dynamic="force-dynamic";
+export default async function ReportsPage(){const u=await requireChatGPTUser("/consultant/reports"),d=(await import("cloudflare:workers")).env.DB;const p=await d.prepare("SELECT account_type AS accountType FROM customer_profiles WHERE lower(email)=?").bind(u.email.toLowerCase()).first<{accountType:string}>();if(p?.accountType!=="consultant")redirect(p?.accountType==="user"?"/client":"/client/login");return <ReportStudio consultantName={u.fullName||u.displayName}/>}

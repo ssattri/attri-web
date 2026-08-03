@@ -289,6 +289,23 @@ export const consultantProjects = sqliteTable("consultant_projects", {
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const consultantVastuReports = sqliteTable("consultant_vastu_reports", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  projectId: integer("project_id").notNull(),
+  ownerEmail: text("owner_email").notNull(),
+  clientEmail: text("client_email").notNull().default(""),
+  title: text("title").notNull(),
+  executiveSummary: text("executive_summary").notNull().default(""),
+  findingsJson: text("findings_json").notNull().default("[]"),
+  remediesJson: text("remedies_json").notNull().default("[]"),
+  conclusion: text("conclusion").notNull().default(""),
+  preparedBy: text("prepared_by").notNull().default(""),
+  status: text("status").notNull().default("draft"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const staffMembers = sqliteTable("staff_members", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
