@@ -1,6 +1,8 @@
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 import HomeTestimonials from "./components/HomeTestimonials";
+import DynamicBanner from "./components/DynamicBanner";
+import ServiceEnquiryForm from "./components/ServiceEnquiryForm";
 
 const services = [
   ["01", "Scientific Vastu", "Residential, commercial and industrial audits grounded in directional analysis."],
@@ -32,6 +34,7 @@ export default function Home() {
   return (
     <main>
       <SiteHeader />
+      <DynamicBanner placement="home-top" />
 
       <section className="hero" id="top">
         <div className="hero-grid" />
@@ -187,6 +190,7 @@ export default function Home() {
           <a className="button gold" href="/book-consultation">Book a consultation <span>↗</span></a>
           <div className="contact-meta"><span>Architecture</span><span>Vastu</span><span>Engineering</span><span>Interiors</span></div>
         </div>
+        <ServiceEnquiryForm />
       </section>
 
       <SiteFooter />

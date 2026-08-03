@@ -18,15 +18,16 @@ import TestimonialManager from "./TestimonialManager";
 import ConsultancyManager from "./ConsultancyManager";
 import ConsultantAvailabilityManager from "./ConsultantAvailabilityManager";
 import ReminderOperations from "./ReminderOperations";
+import PlatformOperations from "./PlatformOperations";
 
-const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
+const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,consultations:CalendarDays,enquiries:Users,shipping:Package,banners:Images,"module-control":SlidersHorizontal,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
 export const adminNavigationGroups = [
   {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
-  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["consultancy","Live Consultancy","◉"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
-  {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
-  {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["blog","Blog & Knowledge","✎"],["testimonials","Testimonials","❝"],["faqs","FAQ Manager","?"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
-  {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
+  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["enquiries","Service Enquiries","◎"],["appointments","Appointments","◷"],["consultations","Consultation Bookings","◷"],["consultancy","Live Consultancy","◉"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
+  {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["shipping","Shipping Rules","□"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
+  {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["banners","Banners & Ads","▧"],["blog","Blog & Knowledge","✎"],["testimonials","Testimonials","❝"],["faqs","FAQ Manager","?"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
+  {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["module-control","Frontend Modules","⌗"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
 ] as const;
 
 export const adminModules = adminNavigationGroups.flatMap(group=>group.items);
@@ -47,6 +48,7 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   leads:{eyebrow:"SALES / CRM",title:"Leads & enquiries"},
   appointments:{eyebrow:"CONSULTATION DESK",title:"Appointments"},
   consultancy:{eyebrow:"LIVE CONSULTATION",title:"Multi-consultant platform"},
+  consultations:{eyebrow:"CONSULTATION DESK",title:"Consultation management"},enquiries:{eyebrow:"SALES / SERVICES",title:"Service enquiries"},shipping:{eyebrow:"STORE / DELIVERY",title:"Shipping rules"},banners:{eyebrow:"MARKETING / CREATIVE",title:"Banners & advertisements"},"module-control":{eyebrow:"SYSTEM / FRONTEND",title:"Frontend module control"},
   products:{eyebrow:"STORE / CATALOGUE",title:"Product catalogue"},
   "product-categories":{eyebrow:"STORE / CATALOGUE",title:"Product categories"},
   commerce:{eyebrow:"COMMERCE",title:"Customer orders"},
@@ -231,6 +233,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       <ConsultancyManager/>
       <ConsultantAvailabilityManager/>
       <ReminderOperations/>
+      <PlatformOperations kind="shipping"/><PlatformOperations kind="enquiries"/><PlatformOperations kind="banners"/><PlatformOperations kind="module-control"/><PlatformOperations kind="consultations"/>
 
       <section className="admin-panel appointment-admin" id="appointments">
         <div className="panel-title"><div><p>CONSULTATION DESK</p><h2>Appointments</h2></div><span>{appointments.length} requests</span></div>
