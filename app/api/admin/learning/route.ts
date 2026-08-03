@@ -1,4 +1,5 @@
 import{getPortalUser}from"../../../auth";
+import {ensurePaymentTable} from "../../../razorpay";
 async function db(){return(await import("cloudflare:workers")).env.DB}
 async function ok(){return(await getPortalUser())?.accountType==="admin"}
 async function ensureCourses(d:Awaited<ReturnType<typeof db>>){
@@ -20,9 +21,9 @@ async function ensureCourses(d:Awaited<ReturnType<typeof db>>){
 }
 function slugify(value:string){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,90)}
 export async function GET(){
-  if(!await ok())return Response.json({error:"Unauthorized"},{status:401});const d=await db();await ensureCourses(d);
+  if(!await ok())return Response.json({error:"Unauthorized"},{status:401});const d=await ensurePaymentTable();await ensureCourses(d);
   const courses=await d.prepare("SELECT id,title,slug,category,level,mode,duration,description,price,lessons,status,image_url AS imageUrl,instructor,certificate,show_in_shop AS showInShop,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,created_at AS createdAt FROM courses ORDER BY id DESC").all();
-  const enrollments=await d.prepare("SELECT e.id,e.reference,e.student_name AS studentName,e.email,e.phone,e.status,e.payment_status AS paymentStatus,e.progress,e.created_at AS createdAt,c.title AS courseTitle FROM enrollments e JOIN courses c ON c.id=e.course_id ORDER BY e.created_at DESC").all();
+  const enrollments=await d.prepare("SELECT e.id,e.reference,e.student_name AS studentName,e.email,e.phone,e.status,e.payment_status AS paymentStatus,e.progress,e.created_at AS createdAt,c.title AS courseTitle,(SELECT p.status FROM course_payment_attempts p WHERE p.enrollment_id=e.id ORDER BY p.id DESC LIMIT 1) AS gatewayStatus,(SELECT p.razorpay_order_id FROM course_payment_attempts p WHERE p.enrollment_id=e.id ORDER BY p.id DESC LIMIT 1) AS gatewayOrderId FROM enrollments e JOIN courses c ON c.id=e.course_id ORDER BY e.created_at DESC").all();
   return Response.json({courses:courses.results,enrollments:enrollments.results})
 }
 export async function POST(request:Request){
