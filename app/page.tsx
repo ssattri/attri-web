@@ -1,5 +1,6 @@
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
+import HomeTestimonials from "./components/HomeTestimonials";
 
 const services = [
   ["01", "Scientific Vastu", "Residential, commercial and industrial audits grounded in directional analysis."],
@@ -158,18 +159,7 @@ export default function Home() {
         <p>CE. S. S. Attri · Chartered Engineer & Scientific Vastu Expert</p>
       </section>
 
-      <section className="testimonials section">
-        <div className="section-title-row">
-          <div><p className="section-kicker">Client experience</p><h2>Trust is built<br /><span>project by project.</span></h2></div>
-          <p>Clear advice, coordinated expertise and practical solutions define the experience we aim to deliver.</p>
-        </div>
-        <div className="testimonial-grid">
-          <article><div className="stars">★★★★★</div><blockquote>“The team connected Vastu recommendations with the actual architecture instead of treating them as separate decisions.”</blockquote><div><b>Residential consultation</b><span>Home planning · Delhi NCR</span></div></article>
-          <article><div className="stars">★★★★★</div><blockquote>“We received clear priorities, practical corrections and a report our project team could genuinely implement.”</blockquote><div><b>Industrial Vastu audit</b><span>Factory planning · Haryana</span></div></article>
-          <article><div className="stars">★★★★★</div><blockquote>“From planning to structure and services, having one coordinated team made every discussion more efficient.”</blockquote><div><b>Architecture client</b><span>Commercial project · North India</span></div></article>
-        </div>
-        <p className="testimonial-note">Illustrative presentation—replace with verified client reviews before public launch.</p>
-      </section>
+      <HomeTestimonials/>
 
       <section className="home-faq section">
         <div className="faq-intro">

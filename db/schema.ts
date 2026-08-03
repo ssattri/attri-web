@@ -505,8 +505,17 @@ export const testimonials = sqliteTable("testimonials", {
   location: text("location").notNull().default(""),
   quote: text("quote").notNull(),
   rating: integer("rating").notNull().default(5),
+  testimonialType: text("testimonial_type").notNull().default("text"),
+  youtubeUrl: text("youtube_url").notNull().default(""),
+  videoObjectKey: text("video_object_key").notNull().default(""),
+  videoFileName: text("video_file_name").notNull().default(""),
+  videoContentType: text("video_content_type").notNull().default(""),
+  thumbnailUrl: text("thumbnail_url").notNull().default(""),
+  featured: integer("featured").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
   status: text("status").notNull().default("pending"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const faqs = sqliteTable("faqs", {
