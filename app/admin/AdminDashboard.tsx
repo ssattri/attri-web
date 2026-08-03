@@ -64,7 +64,7 @@ type WorkflowTask={id:number;reference:string;title:string;assignee:string;dueDa
 type ClientFile={id:number;reference:string;customerEmail:string;fileName:string;size:number;category:string;createdAt:string};
 type DatabaseOverview={engine:string;status:string;totalTables:number;totalRecords:number;tables:Array<{table:string;label:string;count:number}>;storage:{structured:string;files:string;migrations:string}};
 
-export default function AdminDashboard({displayName,module:initialModule="overview"}:{displayName:string;module?:string}) {
+export default function AdminDashboard({displayName,module:initialModule="overview",allowedModules=["*"]}:{displayName:string;module?:string;allowedModules?:string[]}) {
   const [module,setModule]=useState(initialModule);
   const [pages,setPages]=useState<PageRow[]>([]);
   const [leads,setLeads]=useState<Lead[]>([]);
@@ -103,14 +103,16 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   useEffect(()=>{
     const syncFromUrl=()=>{
       const requested=new URLSearchParams(window.location.search).get("module")||"overview";
-      setModule(adminModules.some(([key])=>key===requested)?requested:"overview");
+      const exists=adminModules.some(([key])=>key===requested),permitted=allowedModules.includes("*")||allowedModules.includes(requested);
+      setModule(exists&&permitted?requested:(allowedModules.includes("overview")||allowedModules.includes("*")?"overview":allowedModules[0]||"overview"));
     };
     syncFromUrl();
     window.addEventListener("popstate",syncFromUrl);
     return()=>window.removeEventListener("popstate",syncFromUrl);
-  },[]);
+  },[allowedModules]);
 
   function navigateModule(key:string,event:MouseEvent<HTMLAnchorElement>){
+    if(!allowedModules.includes("*")&&!allowedModules.includes(key))return;
     if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
     event.preventDefault();
     const href=key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`;
@@ -152,7 +154,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav>{adminNavigationGroups.map(group=><section className="admin-nav-group" key={group.label}><p>{group.label}</p>{group.items.map(([key,label])=>{const Icon=navigationIcons[key];return <a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}><Icon className="admin-nav-icon" aria-hidden="true"/> <span>{label}</span></a>})}</section>)}</nav>
+      <nav>{adminNavigationGroups.map(group=>{const items=group.items.filter(([key])=>allowedModules.includes("*")||allowedModules.includes(key));return items.length?<section className="admin-nav-group" key={group.label}><p>{group.label}</p>{items.map(([key,label])=>{const Icon=navigationIcons[key];return <a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}><Icon className="admin-nav-icon" aria-hidden="true"/> <span>{label}</span></a>})}</section>:null})}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div className="admin-profile-details"><b>{displayName}</b><small>Super Administrator</small><div className="admin-account-actions"><a href="/account/security" title="Account security">⚿ <span>Security</span></a><a className="admin-signout" href="/api/auth/logout" title="Sign out">↪ <span>Sign out</span></a></div></div></div>
     </aside>
     <main className="admin-main">

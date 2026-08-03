@@ -37,6 +37,24 @@ export async function isAdmin() {
   return (await getPortalUser())?.accountType === "admin";
 }
 
+export async function getAdminModulePermissions(email: string): Promise<string[]> {
+  try {
+    const database = (await import("cloudflare:workers")).env.DB;
+    const staff = await database.prepare("SELECT permissions_json AS permissionsJson,status FROM staff_members WHERE lower(email)=? LIMIT 1").bind(email.toLowerCase()).first<{ permissionsJson: string; status: string }>();
+    if (!staff) return ["*"];
+    if (staff.status !== "active") return [];
+    const permissions = JSON.parse(staff.permissionsJson || "[]");
+    return Array.isArray(permissions) ? permissions.filter(value => typeof value === "string") : [];
+  } catch { return ["*"]; }
+}
+
+export async function hasAdminModulePermission(module: string) {
+  const user = await getPortalUser();
+  if (!user || user.accountType !== "admin") return false;
+  const permissions = await getAdminModulePermissions(user.email);
+  return permissions.includes("*") || permissions.includes(module);
+}
+
 export async function getRegisteredAccount(): Promise<RegisteredAccount | null> {
   const user = await getPortalUser();
   if (!user) return null;
