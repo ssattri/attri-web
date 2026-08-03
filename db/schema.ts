@@ -75,6 +75,18 @@ export const products = sqliteTable("products", {
   metaDescription: text("meta_description").notNull().default(""),
   serviceType: text("service_type").notNull().default(""),
   fulfillmentMode: text("fulfillment_mode").notNull().default(""),
+  sku: text("sku").notNull().default(""),
+  shortDescription: text("short_description").notNull().default(""),
+  material: text("material").notNull().default(""),
+  colour: text("colour").notNull().default(""),
+  dimensions: text("dimensions").notNull().default(""),
+  weight: text("weight").notNull().default(""),
+  placement: text("placement").notNull().default(""),
+  benefits: text("benefits").notNull().default(""),
+  usageInstructions: text("usage_instructions").notNull().default(""),
+  careInstructions: text("care_instructions").notNull().default(""),
+  gstRate: integer("gst_rate").notNull().default(18),
+  hsnCode: text("hsn_code").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
