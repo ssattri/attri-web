@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "../components/SiteHeader";
+import PageFaqs from "../components/PageFaqs";
 import SiteFooter from "../components/SiteFooter";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function AboutPage() {
       </section>
       <section className="content-section tinted"><p className="section-kicker">What guides us</p><div className="value-grid">{values.map(([title,copy],i)=><article key={title}><span>0{i+1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
       <section className="content-section about-model"><p className="section-kicker">A connected ecosystem</p><h2>Consult. Design.<br /><span>Build. Learn.</span></h2><div><span>Consultancy</span><span>Architecture</span><span>Engineering</span><span>Vastu Software</span><span>Academy</span><span>Curated Products</span></div></section>
+      <PageFaqs pageSlug="about" />
       <section className="page-cta"><p>Work with us</p><h2>Bring your site, plan<br />or challenge.</h2><a className="button gold" href="/#contact">Start a conversation <span>↗</span></a></section>
       <SiteFooter />
     </main>

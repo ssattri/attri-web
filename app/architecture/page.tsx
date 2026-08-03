@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "../components/SiteHeader";
+import PageFaqs from "../components/PageFaqs";
 import SiteFooter from "../components/SiteFooter";
 
 export const metadata: Metadata = {
@@ -56,6 +57,7 @@ export default function ArchitecturePage() {
         <div><span>Luxury Residences</span><span>Housing & Apartments</span><span>Corporate Offices</span><span>Retail & Hospitality</span><span>Factories & Warehouses</span><span>Healthcare & Education</span></div>
       </section>
 
+      <PageFaqs pageSlug="architecture" />
       <section className="page-cta"><p>Have a site or idea?</p><h2>Let’s turn its potential<br />into a precise plan.</h2><a className="button gold" href="/#contact">Start your project <span>↗</span></a></section>
       <SiteFooter />
     </main>

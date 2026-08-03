@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "../components/SiteHeader";
+import PageFaqs from "../components/PageFaqs";
 import SiteFooter from "../components/SiteFooter";
 
 export const metadata: Metadata = {
@@ -58,13 +59,7 @@ export default function VastuPage() {
         </div>
       </section>
 
-      <section className="content-section faq">
-        <p className="section-kicker">Frequently asked</p>
-        <h2>Practical answers.<br /><span>No unnecessary fear.</span></h2>
-        <details open><summary>Is demolition always required to correct Vastu?</summary><p>No. We first assess planning, usage and placement changes, followed by proportionate non-demolition measures wherever appropriate.</p></details>
-        <details><summary>Can an existing floor plan be analysed online?</summary><p>Yes. Share a dimensioned plan with north direction and site details. We can conduct an online analysis and provide a structured report and consultation.</p></details>
-        <details><summary>Do you design new plans according to Vastu?</summary><p>Yes. Our architects and Vastu experts work together from the beginning, preventing conflicts between functional design and directional principles.</p></details>
-      </section>
+      <PageFaqs pageSlug="vastu-shastra" />
 
       <section className="page-cta"><p>Plan with clarity</p><h2>Make your space work<br />with—not against—you.</h2><a className="button gold" href="/#contact">Book a consultation <span>↗</span></a></section>
       <SiteFooter />
