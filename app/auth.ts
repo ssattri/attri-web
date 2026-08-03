@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export type PortalUser = { displayName: string; email: string; fullName: string | null };
+export type PortalUser = { displayName: string; email: string; fullName: string | null; accountType: "user" | "consultant" | "admin" };
 export type RegisteredAccount = PortalUser & { accountType: "user" | "consultant" };
 
 async function sha256(value: string) {
@@ -14,8 +14,8 @@ export async function getPortalUser(): Promise<PortalUser | null> {
   if (!token) return null;
   try {
     const database = (await import("cloudflare:workers")).env.DB;
-    const row = await database.prepare(`SELECT a.email,a.full_name AS fullName FROM auth_sessions s JOIN auth_accounts a ON lower(a.email)=lower(s.email) WHERE s.token_hash=? AND s.expires_at>CURRENT_TIMESTAMP AND a.status='active' LIMIT 1`).bind(await sha256(token)).first<{ email: string; fullName: string }>();
-    return row ? { displayName: row.fullName || row.email, email: row.email, fullName: row.fullName || null } : null;
+    const row = await database.prepare(`SELECT a.email,a.full_name AS fullName,a.account_type AS accountType FROM auth_sessions s JOIN auth_accounts a ON lower(a.email)=lower(s.email) WHERE s.token_hash=? AND s.expires_at>CURRENT_TIMESTAMP AND a.status='active' LIMIT 1`).bind(await sha256(token)).first<{ email: string; fullName: string; accountType: "user" | "consultant" | "admin" }>();
+    return row ? { displayName: row.fullName || row.email, email: row.email, fullName: row.fullName || null, accountType: row.accountType } : null;
   } catch { return null; }
 }
 
@@ -24,6 +24,17 @@ export async function requirePortalUser(returnTo: string): Promise<PortalUser> {
   if (user) return user;
   const safeReturn = returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/account";
   redirect(`/client/login?returnTo=${encodeURIComponent(safeReturn)}`);
+}
+
+export async function requireAdmin(returnTo = "/admin"): Promise<PortalUser> {
+  const user = await getPortalUser();
+  if (!user) redirect(`/admin/login?returnTo=${encodeURIComponent(returnTo)}`);
+  if (user.accountType !== "admin") redirect("/client/login?error=admin-required");
+  return user;
+}
+
+export async function isAdmin() {
+  return (await getPortalUser())?.accountType === "admin";
 }
 
 export async function getRegisteredAccount(): Promise<RegisteredAccount | null> {

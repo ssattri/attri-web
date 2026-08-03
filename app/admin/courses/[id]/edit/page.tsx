@@ -1,3 +1,3 @@
-import{notFound}from"next/navigation";import{requirePortalUser}from"../../../../auth";import CourseEditor from"../../CourseEditor";
+import{notFound}from"next/navigation";import{requireAdmin}from"../../../../auth";import CourseEditor from"../../CourseEditor";
 export const dynamic="force-dynamic";
-export default async function EditCourse({params}:{params:Promise<{id:string}>}){const{id}=await params;const courseId=Number(id);if(!Number.isInteger(courseId)||courseId<1)notFound();const user=await requirePortalUser(`/admin/courses/${id}/edit`);if(user.email.toLowerCase()!=="attriassociates99@gmail.com")return <main className="admin-denied"><h1>Access restricted</h1><a href="/">Return home</a></main>;return <CourseEditor id={courseId}/>}
+export default async function EditCourse({params}:{params:Promise<{id:string}>}){const{id}=await params;const courseId=Number(id);if(!Number.isInteger(courseId)||courseId<1)notFound();await requireAdmin(`/admin/courses/${id}/edit`);return <CourseEditor id={courseId}/>}

@@ -1,10 +1,8 @@
 import { getPortalUser } from "../../../auth";
 
-const OWNER_EMAILS = new Set(["attriassociates99@gmail.com"]);
-
 async function authorize() {
   const user = await getPortalUser();
-  return user && OWNER_EMAILS.has(user.email.toLowerCase()) ? user : null;
+  return user?.accountType === "admin" ? user : null;
 }
 
 async function getDatabase() {

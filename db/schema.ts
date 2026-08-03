@@ -267,6 +267,9 @@ export const authAccounts = sqliteTable("auth_accounts", {
   passwordSalt: text("password_salt").notNull(),
   accountType: text("account_type").notNull(),
   status: text("status").notNull().default("active"),
+  failedLoginCount: integer("failed_login_count").notNull().default(0),
+  lockedUntil: text("locked_until").notNull().default(""),
+  lastLoginAt: text("last_login_at").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });

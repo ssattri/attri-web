@@ -1,7 +1,7 @@
 import { getPortalUser } from "../../auth";
 
 async function db(){return(await import("cloudflare:workers")).env.DB}
-async function owner(){const u=await getPortalUser();return u?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function owner(){const u=await getPortalUser();return u?.accountType==="admin"}
 async function init(){
   const database=await db();
   await database.batch([

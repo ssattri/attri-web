@@ -1,6 +1,6 @@
 import{getPortalUser}from"../../../auth";
 async function db(){return(await import("cloudflare:workers")).env.DB}
-async function owner(){return(await getPortalUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function owner(){return(await getPortalUser())?.accountType==="admin"}
 const allowed=["customer","staff","branch","service","testimonial","faq"] as const;type Kind=typeof allowed[number];
 function valid(value:unknown):value is Kind{return typeof value==="string"&&(allowed as readonly string[]).includes(value)}
 const table:Record<Kind,string>={customer:"customer_profiles",staff:"staff_members",branch:"branches",service:"service_catalog",testimonial:"testimonials",faq:"faqs"};

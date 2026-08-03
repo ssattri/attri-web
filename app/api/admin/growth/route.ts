@@ -1,6 +1,6 @@
 import{getPortalUser}from"../../../auth";
 async function runtime(){return(await import("cloudflare:workers")).env}
-async function owner(){return(await getPortalUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function owner(){return(await getPortalUser())?.accountType==="admin"}
 export async function GET(){if(!await owner())return Response.json({error:"Unauthorized"},{status:401});const e=await runtime();const d=e.DB;const[leads,appointments,orders,revenue,students,notifications,settings]=await Promise.all([
  d.prepare("SELECT COUNT(*) AS total,SUM(CASE WHEN status='won' THEN 1 ELSE 0 END) AS converted FROM leads").first(),
  d.prepare("SELECT COUNT(*) AS total,SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS completed FROM appointments").first(),

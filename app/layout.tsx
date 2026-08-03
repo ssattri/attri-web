@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./auth.css";
+import "./security.css";
 
 export const metadata: Metadata = {
   title: "Attri Associates & Vastu Consultants | Architecture & Scientific Vastu",
