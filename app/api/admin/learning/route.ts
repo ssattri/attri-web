@@ -53,7 +53,8 @@ export async function PATCH(request:Request){
     }
   }else{
     if(!["pending","confirmed","active","completed","cancelled"].includes(b.status??""))return Response.json({error:"Invalid enrollment status."},{status:400});
-    await d.prepare("UPDATE enrollments SET status=? WHERE id=?").bind(b.status,b.id).run();
+    const paymentStatus=["pending","successful","failed","refunded"].includes(b.paymentStatus||"")?b.paymentStatus:"pending";
+    await d.prepare("UPDATE enrollments SET status=?,payment_status=? WHERE id=?").bind(b.status,paymentStatus,b.id).run();
   }
   return Response.json({success:true})
 }

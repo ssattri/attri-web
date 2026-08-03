@@ -157,6 +157,38 @@ export const enrollments = sqliteTable("enrollments", {
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const courseSections = sqliteTable("course_sections", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  courseId: integer("course_id").notNull(),
+  title: text("title").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const courseLessons = sqliteTable("course_lessons", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  courseId: integer("course_id").notNull(),
+  sectionId: integer("section_id").notNull(),
+  title: text("title").notNull(),
+  lessonType: text("lesson_type").notNull().default("video"),
+  videoUrl: text("video_url").notNull().default(""),
+  content: text("content").notNull().default(""),
+  durationMinutes: integer("duration_minutes").notNull().default(0),
+  isPreview: integer("is_preview").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  status: text("status").notNull().default("published"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const lessonProgress = sqliteTable("lesson_progress", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  enrollmentId: integer("enrollment_id").notNull(),
+  lessonId: integer("lesson_id").notNull(),
+  completed: integer("completed").notNull().default(0),
+  completedAt: text("completed_at").notNull().default(""),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const supportTickets = sqliteTable("support_tickets", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   reference: text("reference").notNull().unique(),

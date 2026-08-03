@@ -1,3 +1,4 @@
+import {getPortalUser} from "../../auth";
 async function db(){return(await import("cloudflare:workers")).env.DB}
 async function init(){
  const d=await db();await d.batch([
@@ -23,7 +24,7 @@ async function init(){
 }
 export async function GET(){await init();const d=await db();const r=await d.prepare("SELECT id,title,slug,category,level,mode,duration,description,price,lessons,image_url AS imageUrl,instructor,certificate FROM courses WHERE status='published' ORDER BY id DESC").all();return Response.json({courses:r.results})}
 export async function POST(request:Request){
- const b=await request.json() as Record<string,string>;if(!b.courseId||!b.name||!b.email||!b.phone)return Response.json({error:"Complete all required enrollment details."},{status:400});
- await init();const d=await db();const course=await d.prepare("SELECT id FROM courses WHERE id=? AND status='published'").bind(Number(b.courseId)).first();if(!course)return Response.json({error:"Course is unavailable."},{status:404});
- const reference=`ENR-${Date.now().toString(36).toUpperCase()}`;await d.prepare("INSERT INTO enrollments (reference,course_id,student_name,email,phone,experience) VALUES (?,?,?,?,?,?)").bind(reference,Number(b.courseId),b.name.trim(),b.email.trim(),b.phone.trim(),b.experience??"").run();return Response.json({success:true,reference},{status:201})
+ const origin=request.headers.get("origin");if(origin&&origin!==new URL(request.url).origin)return Response.json({error:"Invalid request origin."},{status:403});const u=await getPortalUser();if(!u||u.accountType!=="user")return Response.json({error:"Sign in with a User account to enroll."},{status:401});const b=await request.json() as Record<string,string>;if(!b.courseId)return Response.json({error:"Choose a course."},{status:400});
+ await init();const d=await db();const course=await d.prepare("SELECT id,price FROM courses WHERE id=? AND status='published'").bind(Number(b.courseId)).first<{id:number;price:number}>();if(!course)return Response.json({error:"Course is unavailable."},{status:404});const existing=await d.prepare("SELECT reference,status FROM enrollments WHERE course_id=? AND lower(email)=? LIMIT 1").bind(course.id,u.email.toLowerCase()).first<{reference:string;status:string}>();if(existing)return Response.json({error:`You already have enrollment ${existing.reference} (${existing.status}).`},{status:409});const profile=await d.prepare("SELECT phone FROM customer_profiles WHERE lower(email)=?").bind(u.email.toLowerCase()).first<{phone:string}>();
+ const reference=`ENR-${Date.now().toString(36).toUpperCase()}`,free=course.price===0;await d.prepare("INSERT INTO enrollments (reference,course_id,student_name,email,phone,experience,status,payment_status) VALUES (?,?,?,?,?,?,?,?)").bind(reference,course.id,u.fullName||u.displayName,u.email,profile?.phone||"","",free?"active":"pending",free?"successful":"pending").run();return Response.json({success:true,reference,status:free?"active":"pending"},{status:201})
 }

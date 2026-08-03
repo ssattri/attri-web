@@ -122,6 +122,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     const response=await fetch(url,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({id,status,...(kind?{kind}:{})})});
     const data=await response.json();setMessage(response.ok?"Status updated.":data.error);if(response.ok)await refresh();
   }
+  async function updateEnrollment(id:number,status:string,paymentStatus:string){const response=await fetch("/api/admin/learning",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({id,status,paymentStatus})});const data=await response.json();setMessage(response.ok?"Enrollment updated.":data.error);if(response.ok)await refresh()}
   async function removePage(id:number){
     if(!window.confirm("Delete this CMS page permanently?"))return;
     const response=await fetch(`/api/cms/pages?id=${id}`,{method:"DELETE"});
@@ -234,7 +235,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
 
       <section className="admin-panel split-module" id="learning">
         <div className="panel-title"><div><p>STUDENT MANAGEMENT</p><h2>Enrollments</h2></div><span>{enrollments.length} enrollments</span></div>
-        <div className="record-list">{enrollments.length===0?<p className="empty-row">No enrollment requests yet.</p>:enrollments.map(x=><article key={x.id}><div><b>{x.studentName}</b><small>{x.courseTitle} · {x.reference} · {x.email}</small></div><select value={x.status} onChange={e=>update("/api/admin/learning",x.id,e.target.value)}><option>pending</option><option>confirmed</option><option>active</option><option>completed</option><option>cancelled</option></select></article>)}</div>
+        <div className="record-list enrollment-admin-list">{enrollments.length===0?<p className="empty-row">No enrollment requests yet.</p>:enrollments.map(x=><article key={x.id}><div><b>{x.studentName}</b><small>{x.courseTitle} · {x.reference} · {x.email}</small><span>Progress {x.progress}%</span></div><label>Payment<select value={x.paymentStatus} onChange={e=>updateEnrollment(x.id,x.status,e.target.value)}><option>pending</option><option>successful</option><option>failed</option><option>refunded</option></select></label><label>Access<select value={x.status} onChange={e=>updateEnrollment(x.id,e.target.value,x.paymentStatus)}><option>pending</option><option>confirmed</option><option>active</option><option>completed</option><option>cancelled</option></select></label></article>)}</div>
       </section>
 
       <section className="admin-panel appointment-admin" id="support">
