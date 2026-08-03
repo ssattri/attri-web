@@ -8,6 +8,9 @@ import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import SettingsCenter from "./SettingsCenter";
 import MediaManager from "./MediaManager";
+import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog } from "lucide-react";
+
+const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,commerce:ShoppingCart,courses:GraduationCap,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
 export const adminNavigationGroups = [
   {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
@@ -149,7 +152,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav>{adminNavigationGroups.map(group=><section className="admin-nav-group" key={group.label}><p>{group.label}</p>{group.items.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}>{icon} <span>{label}</span></a>)}</section>)}</nav>
+      <nav>{adminNavigationGroups.map(group=><section className="admin-nav-group" key={group.label}><p>{group.label}</p>{group.items.map(([key,label])=>{const Icon=navigationIcons[key];return <a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}><Icon className="admin-nav-icon" aria-hidden="true"/> <span>{label}</span></a>})}</section>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div className="admin-profile-details"><b>{displayName}</b><small>Super Administrator</small><div className="admin-account-actions"><a href="/account/security" title="Account security">⚿ <span>Security</span></a><a className="admin-signout" href="/api/auth/logout" title="Sign out">↪ <span>Sign out</span></a></div></div></div>
     </aside>
     <main className="admin-main">
