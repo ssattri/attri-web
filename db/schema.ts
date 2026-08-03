@@ -313,7 +313,22 @@ export const supportTickets = sqliteTable("support_tickets", {
   message: text("message").notNull(),
   status: text("status").notNull().default("open"),
   priority: text("priority").notNull().default("normal"),
+  accountType: text("account_type").notNull().default("user"),
+  issueArea: text("issue_area").notNull().default(""),
+  pageUrl: text("page_url").notNull().default(""),
+  deviceInfo: text("device_info").notNull().default(""),
+  assignedTo: text("assigned_to").notNull().default(""),
+  adminReply: text("admin_reply").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(""),
+});
+
+export const portalReviews = sqliteTable("portal_reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }), reference: text("reference").notNull().unique(), customerEmail: text("customer_email").notNull(), customerName: text("customer_name").notNull().default(""), accountType: text("account_type").notNull().default("user"), targetType: text("target_type").notNull().default("general"), targetKey: text("target_key").notNull().default(""), targetName: text("target_name").notNull().default(""), rating: integer("rating").notNull().default(5), title: text("title").notNull().default(""), review: text("review").notNull(), status: text("status").notNull().default("pending"), adminReply: text("admin_reply").notNull().default(""), featured: integer("featured").notNull().default(0), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`), updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const taxSettings = sqliteTable("tax_settings", {
+  id: integer("id").primaryKey(), legalName: text("legal_name").notNull().default(""), gstin: text("gstin").notNull().default(""), pan: text("pan").notNull().default(""), registeredAddress: text("registered_address").notNull().default(""), stateCode: text("state_code").notNull().default(""), defaultGstRate: integer("default_gst_rate").notNull().default(18), defaultServiceSac: text("default_service_sac").notNull().default("998311"), invoicePrefix: text("invoice_prefix").notNull().default("AAVC"), invoiceTerms: text("invoice_terms").notNull().default(""), updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const invoices = sqliteTable("invoices", {
@@ -324,6 +339,12 @@ export const invoices = sqliteTable("invoices", {
   description: text("description").notNull(),
   amount: integer("amount").notNull(),
   taxRate: integer("tax_rate").notNull().default(0),
+  gstin: text("gstin").notNull().default(""),
+  hsnSac: text("hsn_sac").notNull().default(""),
+  taxableAmount: integer("taxable_amount").notNull().default(0),
+  cgstAmount: integer("cgst_amount").notNull().default(0),
+  sgstAmount: integer("sgst_amount").notNull().default(0),
+  igstAmount: integer("igst_amount").notNull().default(0),
   status: text("status").notNull().default("issued"),
   dueDate: text("due_date").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),

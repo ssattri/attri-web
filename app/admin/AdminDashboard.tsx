@@ -8,7 +8,7 @@ import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import SettingsCenter from "./SettingsCenter";
 import MediaManager from "./MediaManager";
-import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig, CircleHelp, Newspaper, MessageSquareQuote, Headset } from "lucide-react";
+import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig, CircleHelp, Newspaper, MessageSquareQuote, Headset, Star, BadgeIndianRupee } from "lucide-react";
 import CategoryManager from "./CategoryManager";
 import CmsPagesManager from "./CmsPagesManager";
 import FaqManager from "./FaqManager";
@@ -19,13 +19,14 @@ import ConsultancyManager from "./ConsultancyManager";
 import ConsultantAvailabilityManager from "./ConsultantAvailabilityManager";
 import ReminderOperations from "./ReminderOperations";
 import PlatformOperations from "./PlatformOperations";
+import EngagementManager from "./EngagementManager";
 
-const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,consultations:CalendarDays,enquiries:Users,shipping:Package,banners:Images,"module-control":SlidersHorizontal,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
+const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,consultations:CalendarDays,enquiries:Users,shipping:Package,banners:Images,"module-control":SlidersHorizontal,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,reviews:Star,tax:BadgeIndianRupee,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
 export const adminNavigationGroups = [
   {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
-  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["enquiries","Service Enquiries","◎"],["appointments","Appointments","◷"],["consultations","Consultation Bookings","◷"],["consultancy","Live Consultancy","◉"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
-  {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["shipping","Shipping Rules","□"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
+  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["enquiries","Service Enquiries","◎"],["appointments","Appointments","◷"],["consultations","Consultation Bookings","◷"],["consultancy","Live Consultancy","◉"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"],["reviews","Ratings & Reviews","★"]]},
+  {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["shipping","Shipping Rules","□"],["tax","GST & Tax","₹"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
   {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["banners","Banners & Ads","▧"],["blog","Blog & Knowledge","✎"],["testimonials","Testimonials","❝"],["faqs","FAQ Manager","?"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
   {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["module-control","Frontend Modules","⌗"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
 ] as const;
@@ -56,6 +57,8 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   "course-categories":{eyebrow:"ATTRI ACADEMY / CATALOGUE",title:"Course categories"},
   learning:{eyebrow:"ATTRI ACADEMY",title:"Students & enrollments"},
   support:{eyebrow:"CLIENT SUCCESS",title:"Support tickets"},
+  reviews:{eyebrow:"TRUST / MODERATION",title:"Ratings & reviews"},
+  tax:{eyebrow:"FINANCE / COMPLIANCE",title:"GST, HSN & tax settings"},
   finance:{eyebrow:"FINANCE",title:"Invoices & receivables"},
   reports:{eyebrow:"CONSULTATION INTELLIGENCE",title:"Client reports"},
   operations:{eyebrow:"ENTERPRISE OPERATIONS",title:"Certificates & payments"},
@@ -281,7 +284,11 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         <div className="record-list enrollment-admin-list">{enrollments.length===0?<p className="empty-row">No enrollment requests yet.</p>:enrollments.map(x=><article key={x.id}><div><b>{x.studentName}</b><small>{x.courseTitle} · {x.reference} · {x.email}</small><span>Progress {x.progress}%{x.gatewayStatus?` · Razorpay ${x.gatewayStatus}`:""}{x.gatewayOrderId?` · ${x.gatewayOrderId}`:""}</span></div><label>Payment<select value={x.paymentStatus} onChange={e=>updateEnrollment(x.id,x.status,e.target.value)}><option>pending</option><option>successful</option><option>failed</option><option>refunded</option></select></label><label>Access<select value={x.status} onChange={e=>updateEnrollment(x.id,e.target.value,x.paymentStatus)}><option>pending</option><option>confirmed</option><option>active</option><option>completed</option><option>cancelled</option></select></label></article>)}</div>
       </section>
 
-      <section className="admin-panel appointment-admin" id="support">
+      <EngagementManager kind="support" />
+      <EngagementManager kind="reviews" />
+      <EngagementManager kind="tax" />
+
+      <section className="admin-panel appointment-admin" id="support-legacy">
         <div className="panel-title"><div><p>CLIENT SUPPORT</p><h2>Support tickets</h2></div><span>{tickets.length} tickets</span></div>
         <div className="appointment-table"><div className="appointment-head"><span>Customer</span><span>Issue</span><span>Priority</span><span>Status</span></div>
           {tickets.length===0?<p className="empty-row">No support tickets yet.</p>:tickets.map(x=><article key={x.id}><div><b>{x.customerEmail}</b><small>{x.reference}</small></div><div><b>{x.subject}</b><small>{x.category}</small></div><div><b>{x.priority}</b><small>{x.createdAt?.slice(0,10)}</small></div><select value={x.status} onChange={e=>update("/api/admin/support",x.id,e.target.value)}><option>open</option><option>in-progress</option><option>waiting</option><option>resolved</option><option>closed</option></select></article>)}

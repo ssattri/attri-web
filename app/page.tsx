@@ -3,6 +3,7 @@ import SiteFooter from "./components/SiteFooter";
 import HomeTestimonials from "./components/HomeTestimonials";
 import DynamicBanner from "./components/DynamicBanner";
 import ServiceEnquiryForm from "./components/ServiceEnquiryForm";
+import PublicReviews from "./components/PublicReviews";
 
 const services = [
   ["01", "Scientific Vastu", "Residential, commercial and industrial audits grounded in directional analysis."],
@@ -179,6 +180,8 @@ export default function Home() {
           <details><summary>What will I receive after a consultation?</summary><p>The deliverables depend on the selected service and may include observations, marked plans, recommendations, remedies, drawings, reports and an implementation discussion.</p></details>
         </div>
       </section>
+
+      <PublicReviews />
 
       <section className="contact section" id="contact">
         <div>

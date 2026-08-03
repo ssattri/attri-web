@@ -1,0 +1,2 @@
+import{requireRegisteredAccount}from"../../auth";import PortalEngagement from"../../components/PortalEngagement";export const dynamic="force-dynamic";
+export default async function ClientFeedback(){await requireRegisteredAccount("/client/feedback","user");return <main className="portal-standalone"><header><a href="/client">← Client dashboard</a><div><p>CLIENT SUCCESS CENTRE</p><h1>Reviews & support</h1><span>Submit feedback, report a problem and track every response.</span></div></header><PortalEngagement/></main>}
