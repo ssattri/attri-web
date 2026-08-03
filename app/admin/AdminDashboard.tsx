@@ -21,6 +21,7 @@ import ReminderOperations from "./ReminderOperations";
 import PlatformOperations from "./PlatformOperations";
 import EngagementManager from "./EngagementManager";
 import InvoiceManager from "./InvoiceManager";
+import OverviewCommandCenter from "./OverviewCommandCenter";
 
 const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,consultations:CalendarDays,enquiries:Users,shipping:Package,banners:Images,"module-control":SlidersHorizontal,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,reviews:Star,tax:BadgeIndianRupee,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
@@ -105,6 +106,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   const [database,setDatabase]=useState<DatabaseOverview|null>(null);
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState(true);
+  const [lastUpdated,setLastUpdated]=useState(new Date());
 
   async function refresh() {
     setBusy(true);
@@ -118,9 +120,10 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     if(f.ok){setInvoices(fd.invoices);setReports(fd.reports)}
     if(o.ok){setCertificates(od.certificates);setPayments(od.payments);setTasks(od.tasks);setFiles(od.files)}
     if(d.ok)setDatabase(dd);
+    setLastUpdated(new Date());
     setBusy(false);
   }
-  useEffect(()=>{void refresh()},[]);
+  useEffect(()=>{void refresh();const timer=window.setInterval(()=>void refresh(),45000);return()=>window.clearInterval(timer)},[]);
   useEffect(()=>{
     const syncFromUrl=()=>{
       const requested=new URLSearchParams(window.location.search).get("module")||"overview";
@@ -181,12 +184,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     <main className="admin-main">
       <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><NotificationCenter compact/><a href="/" target="_blank">View website ↗</a>{module==="products"?<a className="admin-header-action" href="/admin/products/new">＋ Add product</a>:module==="courses"?<a className="admin-header-action" href="/admin/courses/new">＋ Add course</a>:<a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a>}</div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
-      <section className="admin-stats" id="overview">
-        <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
-        <article><span>Published pages</span><strong>{pages.filter(x=>x.status==="published").length}</strong><small>{pages.length} CMS records</small></article>
-        <article><span>Active projects</span><strong>{projects.filter(x=>["active","featured"].includes(x.status)).length}</strong><small>{projects.length} total projects</small></article>
-        <article><span>Appointments</span><strong>{appointments.filter(x=>x.status==="pending").length}</strong><small>{appointments.length} total requests</small></article>
-      </section>
+      <OverviewCommandCenter leads={leads} projects={projects} appointments={appointments} orders={orders} products={products} enrollments={enrollments} courses={courses} tickets={tickets} invoices={invoices} payments={payments} tasks={tasks} pages={pages} database={database} busy={busy} lastUpdated={lastUpdated} onRefresh={()=>void refresh()}/>
 
       <GrowthCenter/>
       <RolePermissions/>
@@ -335,7 +333,6 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         </div>
       </section>
 
-      <section className="module-roadmap" id="roadmap"><div><p>NEXT MODULES</p><h2>Enterprise roadmap</h2></div>{["Live Gateway","Campaigns","Report Exports","Customer Messaging"].map((x,i)=><article key={x}><span>0{i+1}</span><b>{x}</b><small>{i===0?"Next in build queue":"Planned module"}</small></article>)}</section>
     </main>
   </div>
 }
