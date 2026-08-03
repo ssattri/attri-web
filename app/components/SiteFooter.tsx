@@ -1,8 +1,2 @@
-export default function SiteFooter() {
-  return <footer className="site-footer">
-    <a className="brand footer-brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES &amp; VASTU CONSULTANTS</small></span></a>
-    <p>Infinite World of Modern &amp; Vedic Vastu Science</p>
-    <div><a href="/architecture">Architecture</a><a href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a><a href="/courses">Courses</a><a href="/shop">Shop</a><a href="/book-consultation">Contact</a></div>
-    <small>© 2026 Attri Associates. All rights reserved.</small>
-  </footer>;
-}
+async function business(){try{const d=(await import("cloudflare:workers")).env.DB,rows=await d.prepare("SELECT setting_key AS key,setting_value AS value FROM site_settings WHERE is_public=1").all<{key:string;value:string}>();return Object.fromEntries(rows.results.map(x=>[x.key,x.value]))}catch{return{} as Record<string,string>}}
+export default async function SiteFooter(){const s=await business(),email=s.primary_email||"attriassociates99@gmail.com",phone=s.primary_phone||"+91 9990-7777-16",address=s.head_office_address||"Faridabad, Haryana, India",hours=[s.working_days,s.working_hours].filter(Boolean).join(" · ");return <footer className="site-footer"><a className="brand footer-brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES &amp; VASTU CONSULTANTS</small></span></a><p>{s.tagline||"Infinite World of Modern & Vedic Vastu Science"}</p><div><a href="/architecture">Architecture</a><a href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a><a href="/courses">Courses</a><a href="/shop">Shop</a><a href="/book-consultation">Contact</a></div><section className="footer-business-details"><a href={`mailto:${email}`}>{email}</a><a href={`tel:${phone.replace(/[^+\d]/g,"")}`}>{phone}</a><span>{address}</span>{hours&&<span>{hours}</span>}</section><small>© 2026 {s.business_name||"Attri Associates"}. All rights reserved.</small></footer>}
