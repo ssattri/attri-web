@@ -10,6 +10,7 @@ export default function BookingForm(){
     const form=event.currentTarget;const body=Object.fromEntries(new FormData(form));
     const response=await fetch("/api/appointments",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
     const data=await response.json();setBusy(false);
+    if(response.status===401){window.location.href=`/client/login?returnTo=${encodeURIComponent("/book-consultation")}`;return}
     if(response.ok){setResult({reference:data.reference});form.reset()}else setResult({error:data.error});
   }
   if(result?.reference)return <div className="booking-success"><span>✓</span><p>REQUEST RECEIVED</p><h2>Your consultation request is registered.</h2><strong>{result.reference}</strong><p>Our team will contact you to confirm the final time and consultation details.</p><button onClick={()=>setResult(null)}>Book another consultation</button></div>;
@@ -23,6 +24,6 @@ export default function BookingForm(){
     <label className="message-field">Tell us about your requirement<textarea name="message" rows={5} placeholder="Property type, location, approximate area and the guidance you need"/></label>
     {result?.error&&<p className="booking-error">{result.error}</p>}
     <button className="booking-submit" disabled={busy}>{busy?"Submitting…":"Request consultation"} <span>↗</span></button>
-    <small className="privacy-copy">By submitting, you agree to be contacted regarding this consultation request. No payment is collected at this stage.</small>
+    <small className="privacy-copy">A registered User account is required. By submitting, you agree to be contacted regarding this consultation request. No payment is collected at this stage.</small>
   </form>
 }

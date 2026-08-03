@@ -121,6 +121,22 @@ export const orderEvents = sqliteTable("order_events", {
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const storePaymentAttempts = sqliteTable("store_payment_attempts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  orderId: integer("order_id").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull().default("INR"),
+  razorpayOrderId: text("razorpay_order_id").notNull().unique(),
+  razorpayPaymentId: text("razorpay_payment_id").notNull().default(""),
+  status: text("status").notNull().default("created"),
+  signatureVerified: integer("signature_verified").notNull().default(0),
+  failureReason: text("failure_reason").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const courses = sqliteTable("courses", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),

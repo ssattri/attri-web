@@ -45,6 +45,9 @@ export async function GET(){
   return Response.json({products:rows.results,courses:courses.results});
 }
 export async function POST(request:Request){
+  void request;
+  return Response.json({error:"Use the authenticated Razorpay checkout."},{status:410});
+  /* Legacy guest checkout intentionally disabled.
   const body=await request.json() as {name?:string;email?:string;phone?:string;address?:string;city?:string;state?:string;pincode?:string;paymentMethod?:string;items?:Array<{id:number;quantity:number}>};
   if(!body.name||!body.email||!body.phone||!body.address||!body.city||!body.state||!body.pincode||!body.items?.length)return Response.json({error:"Complete all checkout fields and add at least one product."},{status:400});
   await init();const database=await db();const ids=body.items.map(x=>x.id);
@@ -63,5 +66,5 @@ export async function POST(request:Request){
     ...items.map(x=>database.prepare("UPDATE products SET stock=stock-? WHERE id=? AND stock>=?").bind(x.quantity,x.id,x.quantity)),
     database.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(inserted.meta.last_row_id,"pending","Order placed by customer")
   ]);
-  return Response.json({success:true,reference,subtotal,shippingAmount,total,paymentMethod},{status:201});
+  return Response.json({success:true,reference,subtotal,shippingAmount,total,paymentMethod},{status:201});*/
 }

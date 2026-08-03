@@ -1,4 +1,4 @@
-import { getPortalUser } from "../../auth";
+import { getPortalUser, getRegisteredAccount } from "../../auth";
 
 async function db(){return(await import("cloudflare:workers")).env.DB}
 async function owner(){const u=await getPortalUser();return u?.accountType==="admin"}
@@ -17,16 +17,17 @@ async function init(){
   ]);
 }
 export async function POST(request:Request){
+  const origin=request.headers.get("origin");if(origin&&origin!==new URL(request.url).origin)return Response.json({error:"Invalid request origin."},{status:403});
+  const account=await getRegisteredAccount();if(!account||account.accountType!=="user")return Response.json({error:"Sign in or register as a User before booking a consultation."},{status:401});
   const body=await request.json() as Record<string,string>;
   const required=["name","email","phone","service","consultationMode","preferredDate","preferredTime"];
   if(required.some(k=>!body[k]?.trim()))return Response.json({error:"Please complete all required fields."},{status:400});
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))return Response.json({error:"Enter a valid email address."},{status:400});
   if(!/^[+0-9 ()-]{8,18}$/.test(body.phone))return Response.json({error:"Enter a valid phone number."},{status:400});
   const reference=`AA-${Date.now().toString(36).toUpperCase()}`;
   await init();const database=await db();
   await database.prepare(`INSERT INTO appointments
     (reference,name,email,phone,service,consultation_mode,preferred_date,preferred_time,project_type,message)
-    VALUES (?,?,?,?,?,?,?,?,?,?)`).bind(reference,body.name.trim(),body.email.trim(),body.phone.trim(),body.service,body.consultationMode,body.preferredDate,body.preferredTime,body.projectType??"",body.message?.trim()??"").run();
+    VALUES (?,?,?,?,?,?,?,?,?,?)`).bind(reference,body.name.trim(),account.email.toLowerCase(),body.phone.trim(),body.service,body.consultationMode,body.preferredDate,body.preferredTime,body.projectType??"",body.message?.trim()??"").run();
   return Response.json({success:true,reference},{status:201});
 }
 export async function GET(){
