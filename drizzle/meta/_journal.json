@@ -218,6 +218,13 @@
       "when": 1785762388853,
       "tag": "0030_complete_karen_page",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "6",
+      "when": 1785762913673,
+      "tag": "0031_silent_bulldozer",
+      "breakpoints": true
     }
   ]
 }
