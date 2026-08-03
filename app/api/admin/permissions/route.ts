@@ -3,7 +3,7 @@ const modules=[
  ["overview","Overview","Dashboard"],["analytics","Analytics","Dashboard"],["notifications","Notifications","Dashboard"],
  ["leads","Leads & CRM","Customers & Delivery"],["appointments","Appointments","Customers & Delivery"],["projects","Projects","Customers & Delivery"],["reports","Reports","Customers & Delivery"],["support","Support Tickets","Customers & Delivery"],
  ["products","Products","Store & Academy"],["product-categories","Product Categories","Store & Academy"],["commerce","Orders","Store & Academy"],["courses","Courses","Store & Academy"],["course-categories","Course Categories","Store & Academy"],["learning","Students & LMS","Store & Academy"],["finance","Invoices","Store & Academy"],
- ["pages","Pages & CMS","Content & Marketing"],["faqs","FAQ Manager","Content & Marketing"],["media","Media Manager","Content & Marketing"],["seo-manager","SEO Manager","Content & Marketing"],
+ ["pages","Pages & CMS","Content & Marketing"],["blog","Blog & Knowledge","Content & Marketing"],["faqs","FAQ Manager","Content & Marketing"],["media","Media Manager","Content & Marketing"],["seo-manager","SEO Manager","Content & Marketing"],
  ["operations","Operations","System & Administration"],["automation","Workflows","System & Administration"],["data-managers","Data Managers","System & Administration"],["database","Database","System & Administration"],["vault","File Vault","System & Administration"],["permissions","Team Access","System & Administration"],["settings","Settings & Integrations","System & Administration"]
 ] as const;
 const moduleKeys=modules.map(x=>x[0]);
@@ -14,7 +14,7 @@ async function initialise(){const d=(await runtime()).DB;await d.prepare("CREATE
  ["Architect","Projects, appointments, files and reports",["overview","appointments","projects","reports","media","vault"]],
  ["Vastu Expert","Consultations, projects, reports and client files",["overview","appointments","projects","reports","vault"]],
  ["Sales Team","Leads, appointments, products and orders",["overview","leads","appointments","products","commerce"]],
- ["Course Instructor","Courses, students, media and support",["overview","courses","learning","media","support"]],
+ ["Course Instructor","Courses, students, knowledge and media",["overview","courses","learning","blog","media","support"]],
  ["Accounts","Orders, invoices, reports and operations",["overview","commerce","finance","reports","operations"]]
  ] as const;for(const role of presets)await d.prepare("INSERT INTO admin_roles (name,description,permissions_json) VALUES (?,?,?)").bind(role[0],role[1],JSON.stringify(role[2])).run()}return d}
 function cleanPermissions(value:unknown){return Array.isArray(value)?value.filter((x):x is string=>typeof x==="string"&&moduleKeys.includes(x as never)):[]}

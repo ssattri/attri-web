@@ -15,6 +15,27 @@ export const cmsPages = sqliteTable("cms_pages", {
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const blogPosts = sqliteTable("blog_posts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt").notNull().default(""),
+  content: text("content").notNull().default(""),
+  category: text("category").notNull().default("Vastu"),
+  tags: text("tags").notNull().default(""),
+  author: text("author").notNull().default("CE. SS Attri"),
+  coverImageUrl: text("cover_image_url").notNull().default(""),
+  status: text("status").notNull().default("draft"),
+  featured: integer("featured").notNull().default(0),
+  publishedAt: text("published_at").notNull().default(""),
+  readingMinutes: integer("reading_minutes").notNull().default(5),
+  metaTitle: text("meta_title").notNull().default(""),
+  metaKeywords: text("meta_keywords").notNull().default(""),
+  metaDescription: text("meta_description").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const leads = sqliteTable("leads", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
