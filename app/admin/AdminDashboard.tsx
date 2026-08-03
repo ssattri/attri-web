@@ -8,14 +8,15 @@ import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import SettingsCenter from "./SettingsCenter";
 import MediaManager from "./MediaManager";
-import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog } from "lucide-react";
+import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig } from "lucide-react";
+import CategoryManager from "./CategoryManager";
 
-const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,commerce:ShoppingCart,courses:GraduationCap,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
+const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
 export const adminNavigationGroups = [
   {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
   {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
-  {label:"Store & Academy",items:[["products","Products","＋"],["commerce","Orders","□"],["courses","Courses","△"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
+  {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
   {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
   {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
 ] as const;
@@ -35,8 +36,10 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   leads:{eyebrow:"SALES / CRM",title:"Leads & enquiries"},
   appointments:{eyebrow:"CONSULTATION DESK",title:"Appointments"},
   products:{eyebrow:"STORE / CATALOGUE",title:"Product catalogue"},
+  "product-categories":{eyebrow:"STORE / CATALOGUE",title:"Product categories"},
   commerce:{eyebrow:"COMMERCE",title:"Customer orders"},
   courses:{eyebrow:"ATTRI ACADEMY / CATALOGUE",title:"Course catalogue"},
+  "course-categories":{eyebrow:"ATTRI ACADEMY / CATALOGUE",title:"Course categories"},
   learning:{eyebrow:"ATTRI ACADEMY",title:"Students & enrollments"},
   support:{eyebrow:"CLIENT SUCCESS",title:"Support tickets"},
   finance:{eyebrow:"FINANCE",title:"Invoices & receivables"},
@@ -233,6 +236,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
           </div>
       </section>
 
+      <CategoryManager kind="product"/>
+
       <section className="admin-panel split-module course-admin" id="courses">
         <div className="panel-title"><div><p>COURSE CATALOGUE</p><h2>Courses</h2></div><a className="panel-add-action" href="/admin/courses/new">＋ Add course</a></div>
           <div className="product-admin-list course-admin-list">
@@ -244,6 +249,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
             </article>)}
           </div>
       </section>
+
+      <CategoryManager kind="course"/>
 
       <section className="admin-panel split-module" id="learning">
         <div className="panel-title"><div><p>STUDENT MANAGEMENT</p><h2>Enrollments</h2></div><span>{enrollments.length} enrollments</span></div>
