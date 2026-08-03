@@ -11,7 +11,7 @@ export async function GET(){
   ON CONFLICT(email) DO UPDATE SET full_name=excluded.full_name,updated_at=CURRENT_TIMESTAMP`).bind(email,u.fullName||u.displayName).run();
  const url=new URL("http://client");const [appointments,orders,enrollments,tickets,invoices,reports,certificates,payments,files]=await Promise.all([
   d.prepare("SELECT reference,service,consultation_mode AS consultationMode,preferred_date AS preferredDate,preferred_time AS preferredTime,status,created_at AS createdAt FROM appointments WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
-  d.prepare("SELECT reference,subtotal,status,payment_status AS paymentStatus,created_at AS createdAt FROM orders WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
+  d.prepare("SELECT reference,CASE WHEN total>0 THEN total ELSE subtotal END AS total,status,payment_status AS paymentStatus,tracking_number AS trackingNumber,created_at AS createdAt FROM orders WHERE lower(email)=? ORDER BY created_at DESC").bind(email).all(),
   d.prepare("SELECT e.reference,c.title AS courseTitle,e.status,e.payment_status AS paymentStatus,e.progress,e.created_at AS createdAt FROM enrollments e JOIN courses c ON c.id=e.course_id WHERE lower(e.email)=? ORDER BY e.created_at DESC").bind(email).all(),
   d.prepare("SELECT reference,subject,category,status,priority,created_at AS createdAt FROM support_tickets WHERE lower(customer_email)=? ORDER BY created_at DESC").bind(email).all(),
   d.prepare("SELECT number,description,amount,tax_rate AS taxRate,status,due_date AS dueDate,created_at AS createdAt FROM invoices WHERE lower(customer_email)=? ORDER BY created_at DESC").bind(email).all(),

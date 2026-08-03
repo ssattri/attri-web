@@ -36,12 +36,18 @@ async function ensureProducts(database:Awaited<ReturnType<typeof db>>){
     ["hsn_code","ALTER TABLE products ADD COLUMN hsn_code TEXT NOT NULL DEFAULT ''"]
   ])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
 }
+async function ensureOrders(database:Awaited<ReturnType<typeof db>>){
+ const columns=await database.prepare("PRAGMA table_info(orders)").all<{name:string}>();
+ for(const[name,sql]of[["shipping_amount","ALTER TABLE orders ADD COLUMN shipping_amount INTEGER NOT NULL DEFAULT 0"],["total","ALTER TABLE orders ADD COLUMN total INTEGER NOT NULL DEFAULT 0"],["payment_method","ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'pay-after-confirmation'"],["tracking_number","ALTER TABLE orders ADD COLUMN tracking_number TEXT NOT NULL DEFAULT ''"],["admin_notes","ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''"],["updated_at","ALTER TABLE orders ADD COLUMN updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP"]])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
+ await database.prepare("CREATE TABLE IF NOT EXISTS order_events (id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL,status TEXT NOT NULL,note TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+}
 function slugify(value:string){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80)}
 export async function GET(){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
   const database=await db();
   await ensureProducts(database);
-  const orders=await database.prepare("SELECT id,reference,customer_name AS customerName,phone,items_json AS itemsJson,subtotal,status,payment_status AS paymentStatus,created_at AS createdAt FROM orders ORDER BY created_at DESC LIMIT 200").all();
+  await ensureOrders(database);
+  const orders=await database.prepare("SELECT id,reference,customer_name AS customerName,email,phone,address,city,state,pincode,items_json AS itemsJson,subtotal,shipping_amount AS shippingAmount,total,payment_method AS paymentMethod,status,payment_status AS paymentStatus,tracking_number AS trackingNumber,admin_notes AS adminNotes,created_at AS createdAt,updated_at AS updatedAt FROM orders ORDER BY created_at DESC LIMIT 200").all();
   const products=await database.prepare("SELECT id,name,slug,category,description,price,stock,status,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,special_price AS specialPrice,special_from AS specialFrom,special_to AS specialTo,duration,classes,sort_order AS sortOrder,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,service_type AS serviceType,fulfillment_mode AS fulfillmentMode,sku,short_description AS shortDescription,material,colour,dimensions,weight,placement,benefits,usage_instructions AS usageInstructions,care_instructions AS careInstructions,gst_rate AS gstRate,hsn_code AS hsnCode,created_at AS createdAt FROM products ORDER BY sort_order,id DESC").all();
   return Response.json({orders:orders.results,products:products.results});
 }
@@ -61,7 +67,7 @@ export async function POST(request:Request){
 }
 export async function PATCH(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
-  const body=await request.json() as {id?:number;kind?:string;status?:string;name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string;serviceType?:string;fulfillmentMode?:string;sku?:string;shortDescription?:string;material?:string;colour?:string;dimensions?:string;weight?:string;placement?:string;benefits?:string;usageInstructions?:string;careInstructions?:string;gstRate?:string|number;hsnCode?:string};
+  const body=await request.json() as {id?:number;kind?:string;status?:string;paymentStatus?:string;trackingNumber?:string;adminNotes?:string;name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string;serviceType?:string;fulfillmentMode?:string;sku?:string;shortDescription?:string;material?:string;colour?:string;dimensions?:string;weight?:string;placement?:string;benefits?:string;usageInstructions?:string;careInstructions?:string;gstRate?:string|number;hsnCode?:string};
   if(!body.id)return Response.json({error:"A record is required."},{status:400});
   const database=await db();
   if(body.kind==="product"){
@@ -80,7 +86,12 @@ export async function PATCH(request:Request){
     }
   }else{
     if(!["pending","confirmed","processing","shipped","completed","cancelled"].includes(body.status??""))return Response.json({error:"Invalid order status"},{status:400});
-    await database.prepare("UPDATE orders SET status=? WHERE id=?").bind(body.status,body.id).run();
+    if(body.paymentStatus&&!['pending','paid','failed','refunded'].includes(body.paymentStatus))return Response.json({error:"Invalid payment status"},{status:400});
+    await ensureOrders(database);
+    await database.batch([
+      database.prepare("UPDATE orders SET status=?,payment_status=COALESCE(?,payment_status),tracking_number=COALESCE(?,tracking_number),admin_notes=COALESCE(?,admin_notes),updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(body.status,body.paymentStatus??null,body.trackingNumber?.trim()??null,body.adminNotes?.trim()??null,body.id),
+      database.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(body.id,body.status,body.adminNotes?.trim()||`Order moved to ${body.status}`)
+    ]);
   }
   return Response.json({success:true});
 }

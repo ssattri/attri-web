@@ -102,8 +102,22 @@ export const orders = sqliteTable("orders", {
   pincode: text("pincode").notNull(),
   itemsJson: text("items_json").notNull(),
   subtotal: integer("subtotal").notNull(),
+  shippingAmount: integer("shipping_amount").notNull().default(0),
+  total: integer("total").notNull().default(0),
+  paymentMethod: text("payment_method").notNull().default("pay-after-confirmation"),
   status: text("status").notNull().default("pending"),
   paymentStatus: text("payment_status").notNull().default("pending"),
+  trackingNumber: text("tracking_number").notNull().default(""),
+  adminNotes: text("admin_notes").notNull().default(""),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const orderEvents = sqliteTable("order_events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderId: integer("order_id").notNull(),
+  status: text("status").notNull(),
+  note: text("note").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 

@@ -5,6 +5,7 @@ import DataManagers from "./DataManagers";
 import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
 import NotificationCenter from "./NotificationCenter";
+import OrdersManager from "./OrdersManager";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
@@ -44,7 +45,7 @@ type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;up
 type Lead={id:number;name:string;email:string;phone:string;service:string;status:string;createdAt:string};
 type Project={id:number;title:string;category:string;location:string;status:string;description:string;createdAt:string};
 type Appointment={id:number;reference:string;name:string;phone:string;service:string;consultationMode:string;preferredDate:string;preferredTime:string;status:string};
-type Order={id:number;reference:string;customerName:string;phone:string;itemsJson:string;subtotal:number;status:string;paymentStatus:string;createdAt:string};
+type Order={id:number;reference:string;customerName:string;email:string;phone:string;address:string;city:string;state:string;pincode:string;itemsJson:string;subtotal:number;shippingAmount:number;total:number;paymentMethod:string;status:string;paymentStatus:string;trackingNumber:string;adminNotes:string;createdAt:string};
 type Product={id:number;name:string;slug:string;category:string;description:string;price:number;stock:number;status:string;imageUrl:string;itemType:string;deliveryMode:string;specialPrice:number;specialFrom:string;specialTo:string;duration:string;classes:number;sortOrder:number;metaTitle:string;metaKeywords:string;metaDescription:string;serviceType:string;fulfillmentMode:string;createdAt:string};
 type Enrollment={id:number;reference:string;studentName:string;email:string;phone:string;courseTitle:string;status:string;paymentStatus:string;progress:number};
 type Course={id:number;title:string;slug:string;category:string;level:string;mode:string;duration:string;description:string;price:number;lessons:number;status:string;imageUrl:string;instructor:string;certificate:number;showInShop:number;metaTitle:string;metaKeywords:string;metaDescription:string;createdAt:string};
@@ -203,10 +204,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       </section>
 
       <section className="admin-panel appointment-admin" id="commerce">
-        <div className="panel-title"><div><p>COMMERCE</p><h2>Orders</h2></div><span>{orders.length} orders</span></div>
-        <div className="appointment-table order-table"><div className="appointment-head"><span>Customer</span><span>Order</span><span>Value</span><span>Status</span></div>
-          {orders.length===0?<p className="empty-row">No order requests yet.</p>:orders.map(x=><article key={x.id}><div><b>{x.customerName}</b><small>{x.phone}</small></div><div><b>{x.reference}</b><small>{JSON.parse(x.itemsJson).length} product line(s)</small></div><div><b>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.subtotal/100)}</b><small>{x.paymentStatus}</small></div><select value={x.status} onChange={e=>update("/api/admin/commerce",x.id,e.target.value)}><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>completed</option><option>cancelled</option></select></article>)}
-        </div>
+        <div className="panel-title"><div><p>COMMERCE</p><h2>Order fulfilment</h2></div><span>{orders.length} orders</span></div>
+        <OrdersManager initialOrders={orders}/>
       </section>
 
       <section className="admin-panel split-module product-admin" id="products">
