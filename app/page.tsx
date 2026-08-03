@@ -1,3 +1,6 @@
+import SiteHeader from "./components/SiteHeader";
+import SiteFooter from "./components/SiteFooter";
+
 const services = [
   ["01", "Scientific Vastu", "Residential, commercial and industrial audits grounded in directional analysis."],
   ["02", "Architecture", "Context-led planning, timeless form and buildable detail from concept to completion."],
@@ -27,22 +30,7 @@ const platformFeatures = [
 export default function Home() {
   return (
     <main>
-      <header className="nav-wrap">
-        <a className="brand" href="#top" aria-label="Attri Associates home">
-          <span className="brand-mark">A</span>
-          <span><strong>ATTRI</strong><small>ASSOCIATES</small></span>
-        </a>
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          <a href="/about">About</a>
-          <a href="/architecture">Architecture</a>
-          <a href="/vastu-shastra">Vastu Shastra</a>
-          <a href="#projects">Projects</a>
-          <a href="#software">Software</a>
-          <a href="/courses">Courses</a>
-          <a href="/shop">Shop</a>
-        </nav>
-        <div className="nav-actions"><a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a><a className="client-login-icon" href="/client/login" aria-label="User and consultant login" title="Account login"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5Zm-7.25 8.5c.55-4.1 3-6.25 7.25-6.25s6.7 2.15 7.25 6.25"/></svg></a></div>
-      </header>
+      <SiteHeader />
 
       <section className="hero" id="top">
         <div className="hero-grid" />
@@ -211,12 +199,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer>
-        <a className="brand footer-brand" href="#top"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES & VASTU CONSULTANTS</small></span></a>
-        <p>Infinite World of Modern & Vedic Vastu Science</p>
-        <div><a href="#expertise">Services</a><a href="#projects">Projects</a><a href="#software">Software</a><a href="#contact">Contact</a></div>
-        <small>© 2026 Attri Associates. All rights reserved.</small>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

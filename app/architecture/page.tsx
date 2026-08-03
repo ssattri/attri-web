@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import SiteHeader from "../components/SiteHeader";
+import SiteFooter from "../components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Architecture, Structural & Interior Design | Attri Associates",
@@ -17,11 +19,7 @@ const disciplines = [
 export default function ArchitecturePage() {
   return (
     <main className="info-page">
-      <header className="inner-nav">
-        <a className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></a>
-        <nav><a href="/about">About</a><a className="active" href="/architecture">Architecture</a><a href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
-        <a className="nav-cta" href="/#contact">Start a project <span>↗</span></a>
-      </header>
+      <SiteHeader active="/architecture" />
 
       <section className="info-hero architecture-hero">
         <div className="architectural-lines" aria-hidden="true"><i /><i /><i /><i /></div>
@@ -59,7 +57,7 @@ export default function ArchitecturePage() {
       </section>
 
       <section className="page-cta"><p>Have a site or idea?</p><h2>Let’s turn its potential<br />into a precise plan.</h2><a className="button gold" href="/#contact">Start your project <span>↗</span></a></section>
-      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><a href="/">Return home ↑</a></footer>
+      <SiteFooter />
     </main>
   );
 }

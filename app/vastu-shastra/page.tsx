@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import SiteHeader from "../components/SiteHeader";
+import SiteFooter from "../components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Scientific Vastu Shastra Consultation | Attri Associates",
@@ -22,11 +24,7 @@ const process = [
 export default function VastuPage() {
   return (
     <main className="info-page">
-      <header className="inner-nav">
-        <a className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></a>
-        <nav><a href="/about">About</a><a href="/architecture">Architecture</a><a className="active" href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
-        <a className="nav-cta" href="/#contact">Book consultation <span>↗</span></a>
-      </header>
+      <SiteHeader active="/vastu-shastra" />
 
       <section className="info-hero vastu-hero">
         <div className="info-hero-copy">
@@ -69,7 +67,7 @@ export default function VastuPage() {
       </section>
 
       <section className="page-cta"><p>Plan with clarity</p><h2>Make your space work<br />with—not against—you.</h2><a className="button gold" href="/#contact">Book a consultation <span>↗</span></a></section>
-      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><a href="/">Return home ↑</a></footer>
+      <SiteFooter />
     </main>
   );
 }

@@ -32,6 +32,9 @@ a { color: inherit; text-decoration: none; }
 .nav-cta { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; border-bottom: 1px solid var(--gold); padding-bottom: 7px; }
 .nav-cta span { color: #ffad59; margin-left: 6px; }
 .nav-actions{display:flex;align-items:center;gap:16px}.client-login-icon{display:grid;place-items:center;width:39px;height:39px;border:1px solid rgba(255,255,255,.42);border-radius:50%;color:#fff;transition:.25s}.client-login-icon:hover{border-color:#f49338;background:#f49338;color:#21152f;transform:translateY(-2px)}.client-login-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.shared-site-header{background:linear-gradient(180deg,rgba(18,11,27,.72),rgba(18,11,27,0));backdrop-filter:blur(3px)}
+.shared-site-header .desktop-nav a.active{color:#ffad59;opacity:1}
+.mobile-menu-button,.mobile-site-menu{display:none}
 
 .hero {
   min-height: 820px; height: 100vh; max-height: 980px; position: relative; overflow: hidden; color: #fff;
@@ -157,6 +160,10 @@ footer{background:#120b1b;color:white;padding:60px 7vw 35px;display:grid;grid-te
 footer>p{justify-self:end;color:#f08a3b;font-family:"Playfair Display";font-style:italic}
 footer>div{display:flex;gap:25px;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.6)}
 footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:12px}
+.site-footer{position:relative;z-index:2}
+.site-footer>div{flex-wrap:wrap;row-gap:12px}
+.site-footer a{transition:color .2s}
+.site-footer>div a:hover{color:#ffad59}
 
 .inner-nav{height:84px;padding:0 5vw;display:flex;align-items:center;justify-content:space-between;background:#180e23;color:white;border-bottom:1px solid rgba(255,255,255,.12)}
 .inner-nav nav{display:flex;gap:32px;font-size:11px;letter-spacing:.08em}
@@ -376,6 +383,8 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:12px}
 
 @media (max-width: 900px) {
   .desktop-nav{display:none}.nav-wrap{height:75px}.nav-cta{font-size:0}.nav-cta span{font-size:18px}
+  .mobile-menu-button{display:grid;width:38px;height:38px;padding:11px 8px;align-content:center;gap:6px;border:1px solid rgba(255,255,255,.38);border-radius:50%;background:transparent;cursor:pointer}.mobile-menu-button span{display:block;height:1px;background:white;transition:.25s}.menu-open .mobile-menu-button span:first-child{transform:translateY(3.5px) rotate(45deg)}.menu-open .mobile-menu-button span:last-child{transform:translateY(-3.5px) rotate(-45deg)}
+  .mobile-site-menu{position:absolute;display:flex;visibility:hidden;opacity:0;transform:translateY(-10px);top:75px;left:0;right:0;padding:20px 6vw 28px;flex-direction:column;background:#180e23;border-top:1px solid rgba(255,255,255,.1);box-shadow:0 25px 50px rgba(0,0,0,.35);transition:.25s;pointer-events:none}.menu-open .mobile-site-menu{visibility:visible;opacity:1;transform:none;pointer-events:auto}.mobile-site-menu a{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.1);font:500 12px "Poppins";letter-spacing:.05em}.mobile-site-menu a.active,.mobile-site-menu a span{color:#ff9b42}
   .hero{min-height:760px;height:100svh}.hero-content{padding-top:145px}.compass{width:210px;height:210px;right:-55px;top:47%;opacity:.35}
   .hero-foot{gap:20px}.hero-foot>span,.hero-stat:nth-last-child(-n+2){display:none}
   .section{padding:85px 6vw}.intro-grid,.section-head,.section-title-row,.software,.contact{grid-template-columns:1fr;gap:40px}
