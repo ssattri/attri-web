@@ -49,7 +49,28 @@ export const appointments = sqliteTable("appointments", {
   message: text("message").notNull().default(""),
   status: text("status").notNull().default("pending"),
   paymentStatus: text("payment_status").notNull().default("not-required"),
+  packageSlug: text("package_slug").notNull().default(""),
+  amount: integer("amount").notNull().default(0),
+  durationMinutes: integer("duration_minutes").notNull().default(60),
+  meetingUrl: text("meeting_url").notNull().default(""),
+  assignedTo: text("assigned_to").notNull().default(""),
+  adminNotes: text("admin_notes").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const consultationPaymentAttempts = sqliteTable("consultation_payment_attempts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  appointmentId: integer("appointment_id").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  amount: integer("amount").notNull(),
+  razorpayOrderId: text("razorpay_order_id").notNull().unique(),
+  razorpayPaymentId: text("razorpay_payment_id").notNull().default(""),
+  status: text("status").notNull().default("created"),
+  signatureVerified: integer("signature_verified").notNull().default(0),
+  failureReason: text("failure_reason").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const products = sqliteTable("products", {

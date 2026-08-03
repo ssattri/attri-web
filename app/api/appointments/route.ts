@@ -35,14 +35,14 @@ export async function GET(){
   await init();const database=await db();
   const rows=await database.prepare(`SELECT id,reference,name,email,phone,service,consultation_mode AS consultationMode,
     preferred_date AS preferredDate,preferred_time AS preferredTime,project_type AS projectType,message,status,
-    payment_status AS paymentStatus,created_at AS createdAt FROM appointments ORDER BY preferred_date ASC, preferred_time ASC LIMIT 200`).all();
+    payment_status AS paymentStatus,amount,duration_minutes AS durationMinutes,meeting_url AS meetingUrl,assigned_to AS assignedTo,admin_notes AS adminNotes,created_at AS createdAt FROM appointments ORDER BY preferred_date ASC, preferred_time ASC LIMIT 200`).all();
   return Response.json({appointments:rows.results});
 }
 export async function PATCH(request:Request){
   if(!await owner())return Response.json({error:"Unauthorized"},{status:401});
-  const body=await request.json() as {id?:number,status?:string};
+  const body=await request.json() as {id?:number,status?:string;meetingUrl?:string;assignedTo?:string;adminNotes?:string};
   if(!body.id||!["pending","confirmed","completed","cancelled"].includes(body.status??""))return Response.json({error:"Invalid appointment status"},{status:400});
   await init();const database=await db();
-  await database.prepare("UPDATE appointments SET status=? WHERE id=?").bind(body.status,body.id).run();
+  await database.prepare("UPDATE appointments SET status=?,meeting_url=COALESCE(?,meeting_url),assigned_to=COALESCE(?,assigned_to),admin_notes=COALESCE(?,admin_notes) WHERE id=?").bind(body.status,body.meetingUrl??null,body.assignedTo??null,body.adminNotes??null,body.id).run();
   return Response.json({success:true});
 }
