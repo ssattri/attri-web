@@ -79,6 +79,31 @@ export const appointments = sqliteTable("appointments", {
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const consultantProfiles = sqliteTable("consultant_profiles", {
+  id: integer("id").primaryKey({ autoIncrement: true }), email: text("email").notNull().unique(), displayName: text("display_name").notNull(),
+  professionalTitle: text("professional_title").notNull().default("Consultant"), specialties: text("specialties").notNull().default(""), bio: text("bio").notNull().default(""),
+  languages: text("languages").notNull().default("Hindi, English"), experienceYears: integer("experience_years").notNull().default(0), photoUrl: text("photo_url").notNull().default(""),
+  phone: text("phone").notNull().default(""), whatsapp: text("whatsapp").notNull().default(""), meetingUrl: text("meeting_url").notNull().default(""),
+  callEnabled: integer("call_enabled").notNull().default(1), chatEnabled: integer("chat_enabled").notNull().default(1), videoEnabled: integer("video_enabled").notNull().default(1),
+  fee: integer("fee").notNull().default(0), durationMinutes: integer("duration_minutes").notNull().default(30), availableDays: text("available_days").notNull().default("Mon,Tue,Wed,Thu,Fri"),
+  availableFrom: text("available_from").notNull().default("10:00"), availableTo: text("available_to").notNull().default("18:00"), simultaneousCapacity: integer("simultaneous_capacity").notNull().default(1),
+  availabilityStatus: text("availability_status").notNull().default("available"), status: text("status").notNull().default("active"), sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`), updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const consultationSessions = sqliteTable("consultation_sessions", {
+  id: integer("id").primaryKey({ autoIncrement: true }), reference: text("reference").notNull().unique(), userEmail: text("user_email").notNull(), userName: text("user_name").notNull(),
+  consultantId: integer("consultant_id").notNull(), consultationMode: text("consultation_mode").notNull(), scheduledDate: text("scheduled_date").notNull(), scheduledTime: text("scheduled_time").notNull(),
+  durationMinutes: integer("duration_minutes").notNull().default(30), status: text("status").notNull().default("pending"), paymentStatus: text("payment_status").notNull().default("pending"),
+  amount: integer("amount").notNull().default(0), meetingUrl: text("meeting_url").notNull().default(""), notes: text("notes").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`), updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const consultationMessages = sqliteTable("consultation_messages", {
+  id: integer("id").primaryKey({ autoIncrement: true }), sessionId: integer("session_id").notNull(), senderEmail: text("sender_email").notNull(), senderRole: text("sender_role").notNull(),
+  message: text("message").notNull(), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const consultationPaymentAttempts = sqliteTable("consultation_payment_attempts", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   reference: text("reference").notNull().unique(),

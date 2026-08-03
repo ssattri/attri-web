@@ -8,19 +8,20 @@ import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import SettingsCenter from "./SettingsCenter";
 import MediaManager from "./MediaManager";
-import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig, CircleHelp, Newspaper, MessageSquareQuote } from "lucide-react";
+import { LayoutDashboard, ChartNoAxesCombined, Bell, Users, CalendarDays, BriefcaseBusiness, FileChartColumn, LifeBuoy, Package, ShoppingCart, GraduationCap, BookOpenCheck, ReceiptIndianRupee, Files, Images, SearchCheck, Settings2, Workflow, Database, FolderLock, ShieldCheck, SlidersHorizontal, Cog, Tags, LibraryBig, CircleHelp, Newspaper, MessageSquareQuote, Headset } from "lucide-react";
 import CategoryManager from "./CategoryManager";
 import CmsPagesManager from "./CmsPagesManager";
 import FaqManager from "./FaqManager";
 import ProjectManager from "./ProjectManager";
 import BlogManager from "./BlogManager";
 import TestimonialManager from "./TestimonialManager";
+import ConsultancyManager from "./ConsultancyManager";
 
-const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
+const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
 export const adminNavigationGroups = [
   {label:"Dashboard",items:[["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"]]},
-  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
+  {label:"Customers & Delivery",items:[["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["consultancy","Live Consultancy","◉"],["projects","Projects","◇"],["reports","Reports","▥"],["support","Support Tickets","◉"]]},
   {label:"Store & Academy",items:[["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],["courses","Courses","△"],["course-categories","Course Categories","◇"],["learning","Students & LMS","♢"],["finance","Invoices","₹"]]},
   {label:"Content & Marketing",items:[["pages","Pages & CMS","▤"],["blog","Blog & Knowledge","✎"],["testimonials","Testimonials","❝"],["faqs","FAQ Manager","?"],["media","Media Manager","▧"],["seo-manager","SEO Manager","↗"]]},
   {label:"System & Administration",items:[["operations","Operations","⚙"],["automation","Workflows","↻"],["data-managers","Data Managers","⌗"],["database","Database","◫"],["vault","File Vault","⌘"],["permissions","Team Access","♙"],["settings","Settings & Integrations","⚿"]]}
@@ -43,6 +44,7 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   projects:{eyebrow:"DELIVERY / PORTFOLIO",title:"Project management"},
   leads:{eyebrow:"SALES / CRM",title:"Leads & enquiries"},
   appointments:{eyebrow:"CONSULTATION DESK",title:"Appointments"},
+  consultancy:{eyebrow:"LIVE CONSULTATION",title:"Multi-consultant platform"},
   products:{eyebrow:"STORE / CATALOGUE",title:"Product catalogue"},
   "product-categories":{eyebrow:"STORE / CATALOGUE",title:"Product categories"},
   commerce:{eyebrow:"COMMERCE",title:"Customer orders"},
@@ -224,6 +226,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         </div>
       </section>
       <ProjectManager/>
+      <ConsultancyManager/>
 
       <section className="admin-panel appointment-admin" id="appointments">
         <div className="panel-title"><div><p>CONSULTATION DESK</p><h2>Appointments</h2></div><span>{appointments.length} requests</span></div>

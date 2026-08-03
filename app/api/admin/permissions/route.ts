@@ -1,7 +1,7 @@
 import{hasAdminModulePermission}from"../../../auth";
 const modules=[
  ["overview","Overview","Dashboard"],["analytics","Analytics","Dashboard"],["notifications","Notifications","Dashboard"],
- ["leads","Leads & CRM","Customers & Delivery"],["appointments","Appointments","Customers & Delivery"],["projects","Projects","Customers & Delivery"],["reports","Reports","Customers & Delivery"],["support","Support Tickets","Customers & Delivery"],
+ ["leads","Leads & CRM","Customers & Delivery"],["appointments","Appointments","Customers & Delivery"],["consultancy","Live Consultancy","Customers & Delivery"],["projects","Projects","Customers & Delivery"],["reports","Reports","Customers & Delivery"],["support","Support Tickets","Customers & Delivery"],
  ["products","Products","Store & Academy"],["product-categories","Product Categories","Store & Academy"],["commerce","Orders","Store & Academy"],["courses","Courses","Store & Academy"],["course-categories","Course Categories","Store & Academy"],["learning","Students & LMS","Store & Academy"],["finance","Invoices","Store & Academy"],
  ["pages","Pages & CMS","Content & Marketing"],["blog","Blog & Knowledge","Content & Marketing"],["testimonials","Testimonials","Content & Marketing"],["faqs","FAQ Manager","Content & Marketing"],["media","Media Manager","Content & Marketing"],["seo-manager","SEO Manager","Content & Marketing"],
  ["operations","Operations","System & Administration"],["automation","Workflows","System & Administration"],["data-managers","Data Managers","System & Administration"],["database","Database","System & Administration"],["vault","File Vault","System & Administration"],["permissions","Team Access","System & Administration"],["settings","Settings & Integrations","System & Administration"]
@@ -12,7 +12,7 @@ async function owner(){return hasAdminModulePermission("permissions")}
 async function initialise(){const d=(await runtime()).DB;await d.prepare("CREATE TABLE IF NOT EXISTS admin_roles (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL UNIQUE,description TEXT NOT NULL DEFAULT '',permissions_json TEXT NOT NULL DEFAULT '[]',status TEXT NOT NULL DEFAULT 'active',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();const count=await d.prepare("SELECT COUNT(*) AS total FROM admin_roles").first<{total:number}>();if(!count?.total){const presets=[
  ["Super Admin","Complete control of every backend module",moduleKeys],
  ["Architect","Projects, appointments, files and reports",["overview","appointments","projects","reports","media","vault"]],
- ["Vastu Expert","Consultations, projects, reports and client files",["overview","appointments","projects","reports","vault"]],
+ ["Vastu Expert","Consultations, projects, reports and client files",["overview","appointments","consultancy","projects","reports","vault"]],
  ["Sales Team","Leads, appointments, products and orders",["overview","leads","appointments","products","commerce"]],
  ["Course Instructor","Courses, students, knowledge and media",["overview","courses","learning","blog","media","support"]],
  ["Accounts","Orders, invoices, reports and operations",["overview","commerce","finance","reports","operations"]]
