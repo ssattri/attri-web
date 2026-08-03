@@ -1,4 +1,5 @@
 import { ensurePaymentTable } from "./razorpay";
+import { createOrderInvoice } from "./invoice-data";
 
 export async function ensureStorePaymentTable(){
   const db=await ensurePaymentTable();
@@ -17,17 +18,14 @@ export async function activateStoreOrder(razorpayOrderId:string,paymentId:string
   if(attempt.paymentStatus==="paid")return true;
   const items=JSON.parse(attempt.itemsJson) as Line[];
   for(const item of items){const row=await db.prepare("SELECT stock FROM products WHERE id=? AND status='active'").bind(item.id).first<{stock:number}>();if(!row||row.stock<item.quantity){await db.prepare("UPDATE store_payment_attempts SET status='stock_review',razorpay_payment_id=?,signature_verified=MAX(signature_verified,?),failure_reason='Stock changed after checkout',updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(paymentId,verified,attempt.id).run();await db.prepare("INSERT INTO notifications(recipient_email,channel,subject,message,status) VALUES ('admin','dashboard',?,?, 'queued')").bind(`Stock review: ${attempt.reference}`,`Payment captured, but one or more products need manual stock review for ${attempt.reference}.`).run();return true}}
-  const invoiceNumber=`INV-${attempt.reference.replace(/^ORD-/,"")}`;
-  const taxRate=Math.round(items.reduce((sum,x)=>sum+(x.gstRate||0)*x.price*x.quantity,0)/Math.max(1,items.reduce((sum,x)=>sum+x.price*x.quantity,0)));
   await db.batch([
     ...items.map(item=>db.prepare("UPDATE products SET stock=stock-? WHERE id=? AND stock>=?").bind(item.quantity,item.id,item.quantity)),
     db.prepare("UPDATE store_payment_attempts SET razorpay_payment_id=?,status='captured',signature_verified=MAX(signature_verified,?),failure_reason='',updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(paymentId,verified,attempt.id),
     db.prepare("UPDATE orders SET payment_status='paid',status='confirmed',payment_method='razorpay',updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(attempt.orderId),
     db.prepare("INSERT INTO order_events(order_id,status,note) VALUES (?,'confirmed','Razorpay payment captured and order confirmed')").bind(attempt.orderId),
-    db.prepare("INSERT OR IGNORE INTO invoices(number,customer_name,customer_email,description,amount,tax_rate,status,due_date) VALUES (?,?,?,?,?,?,'paid',date('now'))").bind(invoiceNumber,attempt.customerName,attempt.email,`GST invoice for store order ${attempt.reference}`,attempt.amount,taxRate),
-    db.prepare("INSERT INTO notifications(recipient_email,channel,subject,message,status) VALUES (?,'email',?,?, 'queued')").bind(attempt.email,`Order confirmed: ${attempt.reference}`,`Your payment was received. Invoice ${invoiceNumber} is available in your client portal.`),
     db.prepare("INSERT INTO notifications(recipient_email,channel,subject,message,status) VALUES ('admin','dashboard',?,?, 'queued')").bind(`New paid order: ${attempt.reference}`,`Razorpay payment received for ${attempt.reference}. The order is ready for fulfilment.`),
   ]);
+  const invoice=await createOrderInvoice(attempt.orderId,paymentId);if(invoice?.number)await db.prepare("INSERT INTO notifications(recipient_email,channel,subject,message,status) VALUES (?,'email',?,?, 'queued')").bind(attempt.email,`Order confirmed: ${attempt.reference}`,`Your payment was received. Invoice ${invoice.number} is available in your client portal.`).run();
   const existing=await db.prepare("SELECT id FROM payment_records WHERE transaction_id=? LIMIT 1").bind(paymentId).first();
   if(!existing)await db.prepare("INSERT INTO payment_records(reference,customer_name,customer_email,purpose,gateway,transaction_id,amount,status) VALUES (?,?,?,?,?,?,?,'successful')").bind(`PAY-${Date.now().toString(36).toUpperCase()}`,attempt.customerName,attempt.email,`Store order ${attempt.reference}`,"Razorpay",paymentId,attempt.amount).run();
   return true;

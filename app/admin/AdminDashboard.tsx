@@ -20,6 +20,7 @@ import ConsultantAvailabilityManager from "./ConsultantAvailabilityManager";
 import ReminderOperations from "./ReminderOperations";
 import PlatformOperations from "./PlatformOperations";
 import EngagementManager from "./EngagementManager";
+import InvoiceManager from "./InvoiceManager";
 
 const navigationIcons={overview:LayoutDashboard,analytics:ChartNoAxesCombined,notifications:Bell,leads:Users,appointments:CalendarDays,consultancy:Headset,consultations:CalendarDays,enquiries:Users,shipping:Package,banners:Images,"module-control":SlidersHorizontal,projects:BriefcaseBusiness,reports:FileChartColumn,support:LifeBuoy,reviews:Star,tax:BadgeIndianRupee,products:Package,"product-categories":Tags,commerce:ShoppingCart,courses:GraduationCap,"course-categories":LibraryBig,learning:BookOpenCheck,finance:ReceiptIndianRupee,pages:Files,blog:Newspaper,testimonials:MessageSquareQuote,faqs:CircleHelp,media:Images,"seo-manager":SearchCheck,operations:Cog,automation:Workflow,"data-managers":SlidersHorizontal,database:Database,vault:FolderLock,permissions:ShieldCheck,settings:Settings2} as const;
 
@@ -295,7 +296,9 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         </div>
       </section>
 
-      <section className="admin-panel split-module" id="finance">
+      <InvoiceManager />
+
+      <section className="admin-panel split-module" id="finance-legacy">
         <div className="panel-title"><div><p>FINANCE DESK</p><h2>Invoices & receivables</h2></div><span>{invoices.length} invoices</span></div>
         <div className="cms-layout"><form onSubmit={e=>submit(e,"/api/admin/finance","Invoice issued.")}><input type="hidden" name="kind" value="invoice"/><h3>Issue invoice</h3><label>Client name<input name="customerName" required/></label><label>Client email<input name="customerEmail" type="email" required/></label><label>Description<input name="description" required placeholder="Consultation or project milestone"/></label><label>Amount (₹)<input name="amount" type="number" min="1" required/></label><label>GST rate (%)<input name="taxRate" type="number" min="0" max="28" defaultValue="18"/></label><label>Due date<input name="dueDate" type="date" required/></label><button>Issue invoice</button></form>
           <div className="record-list">{invoices.length===0?<p className="empty-row">No invoices issued yet.</p>:invoices.map(x=><article key={x.id}><div><b>{x.number} · {new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.amount/100)}</b><small>{x.customerName} · due {x.dueDate}</small></div><select value={x.status} onChange={e=>update("/api/admin/finance",x.id,e.target.value,"invoice")}><option>issued</option><option>paid</option><option>overdue</option><option>cancelled</option></select></article>)}</div>
