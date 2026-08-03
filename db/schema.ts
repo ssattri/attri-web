@@ -268,6 +268,27 @@ export const subscriptions = sqliteTable("subscriptions", {
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const consultantProjects = sqliteTable("consultant_projects", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  reference: text("reference").notNull().unique(),
+  ownerEmail: text("owner_email").notNull(),
+  projectName: text("project_name").notNull(),
+  clientName: text("client_name").notNull(),
+  propertyType: text("property_type").notNull().default("Residence"),
+  address: text("address").notNull().default(""),
+  city: text("city").notNull().default(""),
+  facing: text("facing").notNull().default("North"),
+  compassRotation: integer("compass_rotation").notNull().default(0),
+  floorPlanKey: text("floor_plan_key").notNull().default(""),
+  floorPlanName: text("floor_plan_name").notNull().default(""),
+  score: integer("score").notNull().default(0),
+  findingsJson: text("findings_json").notNull().default("[]"),
+  notes: text("notes").notNull().default(""),
+  status: text("status").notNull().default("draft"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const staffMembers = sqliteTable("staff_members", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
