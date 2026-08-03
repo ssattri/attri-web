@@ -127,6 +127,13 @@
       "when": 1785733653189,
       "tag": "0017_sloppy_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1785738995200,
+      "tag": "0018_abandoned_radioactive_man",
+      "breakpoints": true
     }
   ]
 }

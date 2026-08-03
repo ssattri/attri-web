@@ -255,6 +255,7 @@ export const customerProfiles = sqliteTable("customer_profiles", {
   gstin: text("gstin").notNull().default(""),
   status: text("status").notNull().default("active"),
   accountType: text("account_type").notNull().default(""),
+  registrationCompleted: integer("registration_completed").notNull().default(0),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });

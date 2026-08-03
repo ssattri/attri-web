@@ -1,0 +1,1 @@
+ALTER TABLE `customer_profiles` ADD `registration_completed` integer DEFAULT 0 NOT NULL;
