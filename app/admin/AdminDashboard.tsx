@@ -6,6 +6,7 @@ import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
 import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
+import SettingsCenter from "./SettingsCenter";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
@@ -14,7 +15,7 @@ export const adminModules = [
   ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["commerce","Orders","□"],
   ["courses","Courses","△"],["learning","Students & LMS","♢"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
   ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
-  ["vault","File Vault","⌘"]
+  ["vault","File Vault","⌘"],["settings","Settings & Integrations","⚿"]
 ] as const;
 
 const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
@@ -38,7 +39,8 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   reports:{eyebrow:"CONSULTATION INTELLIGENCE",title:"Client reports"},
   operations:{eyebrow:"ENTERPRISE OPERATIONS",title:"Certificates & payments"},
   automation:{eyebrow:"AUTOMATION",title:"Workflows & follow-ups"},
-  vault:{eyebrow:"SECURE STORAGE",title:"Client file vault"}
+  vault:{eyebrow:"SECURE STORAGE",title:"Client file vault"},
+  settings:{eyebrow:"SYSTEM / CONFIGURATION",title:"Settings & integrations"}
 };
 
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};
@@ -163,6 +165,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       <RolePermissions/>
 
       <NotificationCenter/>
+
+      <SettingsCenter/>
 
       <section className="admin-panel database-centre" id="database">
         <div className="panel-title"><div><p>DATA INFRASTRUCTURE</p><h2>Enterprise database centre</h2></div><span>{database?.status||"connecting"}</span></div>

@@ -541,3 +541,11 @@ export const siteSettings = sqliteTable("site_settings", {
   updatedBy: text("updated_by").notNull().default(""),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const integrationSecrets = sqliteTable("integration_secrets", {
+  key: text("key").primaryKey(),
+  cipherText: text("cipher_text").notNull(),
+  iv: text("iv").notNull(),
+  updatedBy: text("updated_by").notNull(),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

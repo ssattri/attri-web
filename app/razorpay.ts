@@ -1,7 +1,8 @@
 import { learningDb } from "./learning-data";
+import { readSecret } from "./secret-vault";
 
 export type RazorpayRuntime={DB:D1Database;RAZORPAY_KEY_ID?:string;RAZORPAY_KEY_SECRET?:string;RAZORPAY_WEBHOOK_SECRET?:string};
-export async function razorpayEnv(){return (await import("cloudflare:workers")).env as RazorpayRuntime}
+export async function razorpayEnv(){const e=(await import("cloudflare:workers")).env as RazorpayRuntime;return{...e,RAZORPAY_KEY_ID:e.RAZORPAY_KEY_ID||await readSecret("RAZORPAY_KEY_ID"),RAZORPAY_KEY_SECRET:e.RAZORPAY_KEY_SECRET||await readSecret("RAZORPAY_KEY_SECRET"),RAZORPAY_WEBHOOK_SECRET:e.RAZORPAY_WEBHOOK_SECRET||await readSecret("RAZORPAY_WEBHOOK_SECRET")}}
 export function configured(e:RazorpayRuntime){return Boolean(e.RAZORPAY_KEY_ID&&e.RAZORPAY_KEY_SECRET)}
 function hex(bytes:ArrayBuffer){return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,"0")).join("")}
 export async function hmac(value:string,secret:string){const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);return hex(await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(value)))}
