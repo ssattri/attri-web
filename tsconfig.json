@@ -28,6 +28,9 @@
       ],
       "cloudflare:workers": [
         "./app/node-runtime.ts"
+      ],
+      "@server": [
+        "./app/node-runtime.ts"
       ]
     }
   },

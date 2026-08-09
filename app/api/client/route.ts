@@ -1,4 +1,5 @@
-import{getChatGPTUser}from"../../chatgpt-auth";async function db(){return(await import("cloudflare:workers")).env.DB}
+import{getChatGPTUser}from"../../chatgpt-auth";const db = () => runtimeEnv.DB;
+import { env as runtimeEnv } from "@server";
 async function user(){return await getChatGPTUser()}
 async function init(){const d=await db();await d.batch([
  d.prepare(`CREATE TABLE IF NOT EXISTS support_tickets (id INTEGER PRIMARY KEY AUTOINCREMENT,reference TEXT NOT NULL UNIQUE,customer_email TEXT NOT NULL,subject TEXT NOT NULL,category TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'open',priority TEXT NOT NULL DEFAULT 'normal',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),

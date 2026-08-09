@@ -1,5 +1,6 @@
 import{getChatGPTUser}from"../../../chatgpt-auth";
-async function db(){return(await import("cloudflare:workers")).env.DB}
+import { env as runtimeEnv } from "@server";
+const db = () => runtimeEnv.DB;
 async function owner(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 const allowed=["customer","staff","branch","service","testimonial","faq"] as const;type Kind=typeof allowed[number];
 function valid(value:unknown):value is Kind{return typeof value==="string"&&(allowed as readonly string[]).includes(value)}

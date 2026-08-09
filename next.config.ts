@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
       "cloudflare:workers": path.resolve(__dirname, "app/node-runtime.ts"),
+      "@server": path.resolve(__dirname, "app/node-runtime.ts"),
     };
     return config;
   },

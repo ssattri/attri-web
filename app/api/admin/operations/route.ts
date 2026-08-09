@@ -1,5 +1,6 @@
 import{getChatGPTUser}from"../../../chatgpt-auth";
-async function env(){return(await import("cloudflare:workers")).env}
+import { env as runtimeEnv } from "@server";
+const env = runtimeEnv;
 async function owner(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 async function init(){const{DB:d}=await env();await d.batch([
  d.prepare(`CREATE TABLE IF NOT EXISTS certificates (id INTEGER PRIMARY KEY AUTOINCREMENT,reference TEXT NOT NULL UNIQUE,student_name TEXT NOT NULL,student_email TEXT NOT NULL,course_title TEXT NOT NULL,issued_date TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'issued',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),

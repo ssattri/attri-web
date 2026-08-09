@@ -1,6 +1,7 @@
 import { getChatGPTUser } from "../../../chatgpt-auth";
+import { env as runtimeEnv } from "@server";
 
-async function db() { return (await import("cloudflare:workers")).env.DB; }
+async function db() { return runtimeEnv.DB; }
 async function allowed() { const user = await getChatGPTUser(); return user?.email.toLowerCase() === "attriassociates99@gmail.com"; }
 async function init() {
   const database = await db();

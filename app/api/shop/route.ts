@@ -1,4 +1,5 @@
-async function db(){return(await import("cloudflare:workers")).env.DB}
+import { env as runtimeEnv } from "@server";
+const db = () => runtimeEnv.DB;
 async function init(){
   const database=await db();
   await database.batch([

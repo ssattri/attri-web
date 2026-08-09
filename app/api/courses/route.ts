@@ -1,4 +1,5 @@
-async function db(){return(await import("cloudflare:workers")).env.DB}
+import { env as runtimeEnv } from "@server";
+const db = () => runtimeEnv.DB;
 async function init(){
  const d=await db();await d.batch([
   d.prepare(`CREATE TABLE IF NOT EXISTS courses (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,slug TEXT NOT NULL UNIQUE,category TEXT NOT NULL,level TEXT NOT NULL DEFAULT 'Beginner',mode TEXT NOT NULL DEFAULT 'Recorded',duration TEXT NOT NULL DEFAULT '',description TEXT NOT NULL DEFAULT '',price INTEGER NOT NULL DEFAULT 0,lessons INTEGER NOT NULL DEFAULT 0,status TEXT NOT NULL DEFAULT 'published',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),

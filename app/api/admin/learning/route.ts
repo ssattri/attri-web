@@ -1,5 +1,6 @@
 import{getChatGPTUser}from"../../../chatgpt-auth";
-async function db(){return(await import("cloudflare:workers")).env.DB}
+import { env as runtimeEnv } from "@server";
+const db = () => runtimeEnv.DB;
 async function ok(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 async function ensureCourses(d:Awaited<ReturnType<typeof db>>){
   await d.prepare(`CREATE TABLE IF NOT EXISTS courses (

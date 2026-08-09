@@ -1,5 +1,6 @@
 import{getChatGPTUser}from"../../../chatgpt-auth";
-async function runtime(){return(await import("cloudflare:workers")).env}
+import { env as runtimeEnv } from "@server";
+async function runtime(){return runtimeEnv}
 async function owner(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
 export async function GET(){if(!await owner())return Response.json({error:"Unauthorized"},{status:401});const e=await runtime();const d=e.DB;const[leads,appointments,orders,revenue,students,notifications,settings]=await Promise.all([
  d.prepare("SELECT COUNT(*) AS total,SUM(CASE WHEN status='won' THEN 1 ELSE 0 END) AS converted FROM leads").first(),

@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { env as runtimeEnv } from "@server";
 import { redirect } from "next/navigation";
 
 export type ChatGPTUser = {
@@ -47,7 +48,7 @@ export async function requireChatGPTUser(
 
 export async function getRegisteredAccount():Promise<RegisteredAccount|null>{
   const user=await getChatGPTUser();if(!user)return null;
-  try{const d=(await import("cloudflare:workers")).env.DB;const profile=await d.prepare("SELECT account_type AS accountType,registration_completed AS registrationCompleted,status FROM customer_profiles WHERE lower(email)=?").bind(user.email.toLowerCase()).first<{accountType:string;registrationCompleted:number;status:string}>();if(profile?.registrationCompleted!==1||profile.status!=="active"||!["user","consultant"].includes(profile.accountType))return null;return{...user,accountType:profile.accountType as"user"|"consultant"}}catch{return null}
+  try{const d = runtimeEnv.DB;const profile=await d.prepare("SELECT account_type AS accountType,registration_completed AS registrationCompleted,status FROM customer_profiles WHERE lower(email)=?").bind(user.email.toLowerCase()).first<{accountType:string;registrationCompleted:number;status:string}>();if(profile?.registrationCompleted!==1||profile.status!=="active"||!["user","consultant"].includes(profile.accountType))return null;return{...user,accountType:profile.accountType as"user"|"consultant"}}catch{return null}
 }
 
 export async function requireRegisteredAccount(returnTo:string,role?:"user"|"consultant"):Promise<RegisteredAccount>{const user=await requireChatGPTUser(returnTo);const account=await getRegisteredAccount();if(!account)redirect(`/client/login?registration=required`);if(role&&account.accountType!==role)redirect(account.accountType==="consultant"?"/consultant":"/client");return{...user,accountType:account.accountType}}

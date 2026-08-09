@@ -1,6 +1,7 @@
 import { getChatGPTUser } from "../../chatgpt-auth";
+import { env as runtimeEnv } from "@server";
 
-async function database(){ return (await import("cloudflare:workers")).env.DB; }
+async function database(){ return runtimeEnv.DB; }
 
 async function initialise(){
   const d=await database();

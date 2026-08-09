@@ -1,4 +1,5 @@
 import { getChatGPTUser } from "../../../chatgpt-auth";
+import { env as runtimeEnv } from "@server";
 
 const OWNER_EMAILS = new Set(["attriassociates99@gmail.com"]);
 
@@ -8,7 +9,7 @@ async function authorize() {
 }
 
 async function getDatabase() {
-  const runtime = await import("cloudflare:workers");
+  const runtime = runtimeEnv;
   return runtime.env.DB;
 }
 
