@@ -7,6 +7,10 @@ const DEFAULT_PASSWORD_SHA256 =
   "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
 const SESSION_LIFETIME_SECONDS = 60 * 60 * 12;
 
+export function canonicalSiteUrl() {
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, "");
+}
+
 export type AdminUser = {
   displayName: string;
   email: string;

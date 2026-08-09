@@ -1,4 +1,4 @@
-import { authenticateAdmin, clearAdminSession, createAdminSession, safeAdminPath } from "../../../admin-auth";
+import { authenticateAdmin, canonicalSiteUrl, clearAdminSession, createAdminSession, safeAdminPath } from "../../../admin-auth";
 
 export async function POST(request: Request) {
   const form = await request.formData();
@@ -7,14 +7,14 @@ export async function POST(request: Request) {
   const returnTo = safeAdminPath(String(form.get("returnTo") || "/admin"));
 
   if (!await authenticateAdmin(email, password)) {
-    return Response.redirect(new URL(`/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`, request.url), 303);
+    return Response.redirect(new URL(`/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`, canonicalSiteUrl()), 303);
   }
 
   await createAdminSession();
-  return Response.redirect(new URL(returnTo, request.url), 303);
+  return Response.redirect(new URL(returnTo, canonicalSiteUrl()), 303);
 }
 
 export async function DELETE(request: Request) {
   await clearAdminSession();
-  return Response.redirect(new URL("/admin/login", request.url), 303);
+  return Response.redirect(new URL("/admin/login", canonicalSiteUrl()), 303);
 }
