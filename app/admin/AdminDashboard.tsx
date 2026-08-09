@@ -7,9 +7,10 @@ import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
 import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
+import MonitoringCenter from "./MonitoringCenter";
 
 export const adminModules = [
-  ["overview","Overview","⌂"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
+  ["overview","Overview","⌂"],["monitoring","Live Monitoring","◉"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
   ["seo-manager","SEO Manager","↗"],["database","Database","◫"],["data-managers","Data Managers","⌗"],
   ["permissions","Team Access","♙"],["pages","Pages & CMS","▤"],["projects","Projects","◇"],
   ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["commerce","Orders","□"],
@@ -20,6 +21,7 @@ export const adminModules = [
 
 const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   overview:{eyebrow:"OPERATIONS / OVERVIEW",title:"Business command centre"},
+  monitoring:{eyebrow:"OPERATIONS / LIVE MONITORING",title:"Real-time monitoring"},
   analytics:{eyebrow:"INSIGHTS / ANALYTICS",title:"Performance analytics"},
   notifications:{eyebrow:"COMMUNICATIONS",title:"Notification centre"},
   "seo-manager":{eyebrow:"MARKETING / SEARCH",title:"SEO manager"},
@@ -95,6 +97,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     setBusy(false);
   }
   useEffect(()=>{void refresh()},[]);
+  useEffect(()=>{const timer=window.setInterval(()=>{void refresh()},30000);return()=>window.clearInterval(timer)},[]);
   useEffect(()=>{
     const syncFromUrl=()=>{
       const requested=new URLSearchParams(window.location.search).get("module")||"overview";
@@ -160,6 +163,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       </section>
 
       <GrowthCenter/>
+      {module==="monitoring"&&<MonitoringCenter leads={leads} orders={orders} tickets={tickets} appointments={appointments} database={database} busy={busy}/>} 
       <RolePermissions/>
 
       <NotificationCenter/>
