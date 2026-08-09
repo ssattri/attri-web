@@ -8,9 +8,8 @@ async function authorize() {
   return user && OWNER_EMAILS.has(user.email.toLowerCase()) ? user : null;
 }
 
-async function getDatabase() {
-  const runtime = runtimeEnv;
-  return runtime.env.DB;
+function getDatabase() {
+  return runtimeEnv.DB;
 }
 
 async function ensureSchema() {
