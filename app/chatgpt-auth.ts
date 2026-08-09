@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { env as runtimeEnv } from "@server";
 import { redirect } from "next/navigation";
+import { getAdminUser } from "./admin-auth";
 
 export type ChatGPTUser = {
   displayName: string;
@@ -19,6 +20,8 @@ const SIGN_OUT_PATH = "/signout-with-chatgpt";
 const CALLBACK_PATH = "/callback";
 
 export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
+  const admin = await getAdminUser();
+  if (admin) return admin;
   const requestHeaders = await headers();
   const email = requestHeaders.get(USER_EMAIL_HEADER);
   if (!email) return null;

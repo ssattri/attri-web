@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, MouseEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import DataManagers from "./DataManagers";
 import GrowthCenter from "./GrowthCenter";
 import RolePermissions from "./RolePermissions";
@@ -146,7 +147,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
       <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}>{icon} <span>{label}</span></a>)}</nav>
-      <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator</small></div></div>
+      <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator · <Link href="/admin/logout">Sign out</Link></small></div></div>
     </aside>
     <main className="admin-main">
       <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><NotificationCenter compact/><a href="/" target="_blank">View website ↗</a>{module==="products"?<a className="admin-header-action" href="/admin/products/new">＋ Add product</a>:module==="courses"?<a className="admin-header-action" href="/admin/courses/new">＋ Add course</a>:<a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a>}</div></header>
