@@ -162,6 +162,15 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         <article><span>Appointments</span><strong>{appointments.filter(x=>x.status==="pending").length}</strong><small>{appointments.length} total requests</small></article>
       </section>
 
+      <section className="admin-panel development-status" id="development-status">
+        <div className="panel-title"><div><p>PROJECT DELIVERY / DEVELOPMENT LOG</p><h2>Development status</h2></div><span>Last updated · 10 Aug 2026</span></div>
+        <div className="development-status-grid"><div className="development-current"><p>CURRENT STAGE</p><h3>Platform operations & launch readiness</h3><span>The public website, authenticated portals and admin control centre are connected and ready for continued content, credential and production setup.</span><div className="development-progress"><i style={{width:"78%"}}/><b>78% complete</b></div></div><div className="development-list">
+          <article><span>✓</span><div><b>Frontend foundation</b><small>Architecture, Vastu, interiors, consultation, shop and course experiences delivered.</small></div><em>Complete</em></article>
+          <article><span>✓</span><div><b>Admin control centre</b><small>CMS, CRM, projects, appointments, commerce, LMS, finance, reports, operations and file vault delivered.</small></div><em>Complete</em></article>
+          <article><span>✓</span><div><b>Client & consultant portals</b><small>Client workflows and the Vastu Compass/report workspace are available.</small></div><em>Complete</em></article>
+          <article className="next"><span>→</span><div><b>Next: production activation</b><small>Connect payment gateways, analytics, messaging and final launch QA.</small></div><em>In progress</em></article>
+        </div></div>
+      </section>
       <GrowthCenter/>
       {module==="monitoring"&&<MonitoringCenter leads={leads} orders={orders} tickets={tickets} appointments={appointments} database={database} busy={busy}/>} 
       <RolePermissions/>
