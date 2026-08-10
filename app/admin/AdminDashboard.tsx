@@ -149,7 +149,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
-      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}>{icon} <span>{label}</span></a>)}</nav>
+      <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}><i className="admin-nav-icon" aria-hidden="true">{icon}</i><span>{label}</span></a>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator · <Link href="/admin/logout">Sign out</Link></small></div></div>
     </aside>
     <main className="admin-main">

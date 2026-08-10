@@ -16,7 +16,7 @@ export default async function AdminLogin({
   return <main className="admin-login-page">
     <section className="admin-login-intro">
       <Link className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></Link>
-      <div><p>SECURE ADMINISTRATION</p><h1>Control your<br/><em>business.</em></h1><span>Manage content, customers, commerce and operations from one protected control centre.</span></div>
+      <div><p>SECURE ADMINISTRATION</p><h1>Control your<br/><em>business.</em></h1><span>Manage content, customers, commerce and operations from the protected control centre.</span></div>
     </section>
     <section className="admin-login-card">
       <form action="/api/admin/session" method="post">
