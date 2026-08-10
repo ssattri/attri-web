@@ -1,4 +1,4 @@
-import { authenticateAdmin, clearAdminSession, createAdminSession, safeAdminPath } from "../../../admin-auth";
+import { authenticateAdmin, canonicalSiteUrl, clearAdminSession, createAdminSession, safeAdminPath } from "../../../admin-auth";
 
 export async function POST(request: Request) {
   const form = await request.formData();
