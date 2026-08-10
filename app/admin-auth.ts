@@ -13,6 +13,12 @@ export function canonicalSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, "");
 }
 
+export function adminRedirectUrl(request: Request, path: string) {
+  const incoming = new URL(request.url);
+  const local = incoming.hostname === "localhost" || incoming.hostname === "127.0.0.1" || incoming.hostname === "0.0.0.0";
+  return new URL(path, local ? incoming.origin : "https://www.attriassociates.com");
+}
+
 export type AdminUser = {
   displayName: string;
   email: string;
