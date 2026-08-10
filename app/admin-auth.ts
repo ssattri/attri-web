@@ -15,7 +15,9 @@ export function canonicalSiteUrl() {
 
 export function adminRedirectUrl(request: Request, path: string) {
   const incoming = new URL(request.url);
-  const local = incoming.hostname === "localhost" || incoming.hostname === "127.0.0.1" || incoming.hostname === "0.0.0.0";
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const local = process.env.NODE_ENV !== "production" && !forwardedHost && !forwardedProto && (incoming.hostname === "localhost" || incoming.hostname === "127.0.0.1" || incoming.hostname === "0.0.0.0");
   return new URL(path, local ? incoming.origin : "https://www.attriassociates.com");
 }
 
