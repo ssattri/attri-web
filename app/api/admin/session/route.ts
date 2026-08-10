@@ -1,5 +1,10 @@
 import { authenticateAdmin, clearAdminSession, createAdminSession, safeAdminPath } from "../../../admin-auth";
 
+// Never expose the auth endpoint as a browser page if a proxy or user follows it.
+export async function GET() {
+  return Response.redirect("/admin/login", 303);
+}
+
 export async function POST(request: Request) {
   const form = await request.formData();
   const email = String(form.get("email") || "");

@@ -54,10 +54,7 @@ export async function createAdminSession() {
   cookieStore.set(ADMIN_SESSION_COOKIE, `${payload}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
-    // The site can be served behind Hostinger/Cloudflare HTTP termination. Setting
-    // Secure from the Node runtime can prevent the browser receiving the cookie.
-    // HTTP-only and SameSite=Lax still protect the session from script access/CSRF.
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: SESSION_LIFETIME_SECONDS,
   });
@@ -68,7 +65,7 @@ export async function clearAdminSession() {
   cookieStore.set(ADMIN_SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 0,
   });
