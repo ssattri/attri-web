@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { env as runtimeEnv } from "@server";
 
 const ADMIN_SESSION_COOKIE = "attri_admin_session";
 const DEFAULT_ADMIN_EMAIL = "attriassociates99@gmail.com";
@@ -23,9 +24,11 @@ export function adminEmail() {
 
 export async function authenticateAdmin(email: string, password: string) {
   const submittedEmail = email.trim().toLowerCase();
-  const expectedPasswordHash = process.env.ADMIN_PASSWORD
+  let storedPasswordHash = "";
+  try { storedPasswordHash = (await runtimeEnv.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='admin_password_sha256'").first<{setting_value:string}>())?.setting_value || ""; } catch { /* environment fallback */ }
+  const expectedPasswordHash = storedPasswordHash || (process.env.ADMIN_PASSWORD
     ? await sha256(process.env.ADMIN_PASSWORD)
-    : DEFAULT_PASSWORD_SHA256;
+    : DEFAULT_PASSWORD_SHA256);
   const submittedPasswordHash = await sha256(password);
 
   return (
