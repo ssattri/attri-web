@@ -172,7 +172,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         </div></div>
       </section>
       <GrowthCenter/>
-      {module==="monitoring"&&<MonitoringCenter leads={leads} orders={orders} tickets={tickets} appointments={appointments} database={database} busy={busy}/>} 
+      {module==="monitoring"&&<MonitoringCenter leads={leads} orders={orders} tickets={tickets} appointments={appointments} database={database} busy={busy} onRefresh={refresh}/>} 
       <RolePermissions/>
 
       <NotificationCenter/>

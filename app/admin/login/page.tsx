@@ -16,16 +16,16 @@ export default async function AdminLogin({
   return <main className="admin-login-page">
     <section className="admin-login-intro">
       <Link className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></Link>
-      <div><p>SECURE ADMINISTRATION</p><h1>Control your<br/><em>business.</em></h1><span>Manage content, customers, commerce and operations from the protected control centre.</span></div>
+      <div className="admin-login-hero-copy"><p>SECURE ADMINISTRATION</p><h1>Control centre<br/><em>access.</em></h1><span>Administration is isolated from customer accounts and protected by role validation, lockout controls and short owner sessions.</span><div className="admin-login-badges"><b>ADMIN ONLY</b><b>ATTEMPT LOCKOUT</b><b>AUDIT READY</b></div></div>
     </section>
     <section className="admin-login-card">
       <form action="/api/admin/session" method="post">
-        <p>ADMIN SIGN IN</p><h2>Welcome back</h2>
+        <p>ADMIN LOGIN</p><h2>Authorised personnel<br/>only</h2><span className="admin-login-subtitle">Enter your administrator credentials to continue.</span>
         <input type="hidden" name="returnTo" value={returnTo}/>
         {query.error ? <div className="admin-login-error" role="alert">Incorrect email or password.</div> : null}
-        <label>Email address<input name="email" type="email" autoComplete="username" required autoFocus/></label>
-        <label>Password<input name="password" type="password" autoComplete="current-password" required/></label>
-        <button type="submit">Sign in to control centre</button>
+        <label>Administrator email<input name="email" type="email" autoComplete="username" placeholder="admin@example.com" required autoFocus/></label>
+        <label>Password<input name="password" type="password" autoComplete="current-password" placeholder="Your secure password" required/></label>
+        <button type="submit">Enter control centre →</button>
         <Link href="/">← Return to website</Link>
       </form>
     </section>

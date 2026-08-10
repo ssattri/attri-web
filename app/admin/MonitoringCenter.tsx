@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Lead = { name: string; email: string; status: string; service: string };
 type Order = { reference: string; customerName: string; total: number; status: string; paymentStatus: string };
@@ -14,6 +14,7 @@ type Props = {
   appointments: Appointment[];
   database: { status: string; totalRecords: number; totalTables: number } | null;
   busy: boolean;
+  onRefresh: () => Promise<void>;
 };
 
 const tabs = [
@@ -24,8 +25,13 @@ const tabs = [
   ["infrastructure", "Infrastructure", "◫"],
 ] as const;
 
-export default function MonitoringCenter({ leads, orders, tickets, appointments, database, busy }: Props) {
+export default function MonitoringCenter({ leads, orders, tickets, appointments, database, busy, onRefresh }: Props) {
   const [active, setActive] = useState<(typeof tabs)[number][0]>("operations");
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => { void onRefresh().then(() => setLastUpdated(new Date())); }, 30000);
+    return () => window.clearInterval(timer);
+  }, [onRefresh]);
   const newLeads = leads.filter(x => x.status === "new").length;
   const openTickets = tickets.filter(x => !["resolved", "closed"].includes(x.status)).length;
   const pendingOrders = orders.filter(x => !["completed", "cancelled"].includes(x.status)).length;
@@ -58,10 +64,12 @@ export default function MonitoringCenter({ leads, orders, tickets, appointments,
     ["Last refresh", busy ? "Syncing" : "Live", "Automatic 30-second polling", "success"],
   ];
 
+  async function refreshNow(){ await onRefresh(); setLastUpdated(new Date()); }
   return <section className="monitoring-center" id="monitoring">
-    <div className="monitoring-heading"><div><p>LIVE OPERATIONS</p><h2>Real-time monitoring</h2><span>Track the business pulse by category. Data refreshes automatically every 30 seconds.</span></div><div className="monitoring-live"><i></i>{busy ? "Syncing" : "Live now"}</div></div>
+    <div className="monitoring-hero"><div><p><i></i> LIVE OPERATIONS</p><h2>Business command centre</h2><span>Live operational monitoring across every connected module.</span></div><button onClick={()=>void refreshNow()} disabled={busy}>⟳ &nbsp; {busy ? "Refreshing…" : "Refresh data"}</button></div>
+    <div className="monitoring-heading"><div><p>REAL-TIME MONITORING</p><h2>Category overview</h2><span>Track the business pulse by category. Data refreshes automatically every 30 seconds.</span></div><div className="monitoring-live"><i></i>{busy ? "Syncing" : "Live now"}</div></div>
     <div className="monitoring-tabs" role="tablist">{tabs.map(([key, label, icon]) => <button key={key} role="tab" aria-selected={active === key} className={active === key ? "active" : ""} onClick={() => setActive(key)}><b>{icon}</b>{label}</button>)}</div>
     <div className="monitoring-cards">{cards.map(([label, value, detail, tone]) => <article className={`monitor-card ${tone}`} key={label}><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>)}</div>
-    <div className="monitoring-details"><div><p>RECENT ACTIVITY</p><h3>{active === "sales" ? "Lead pipeline" : active === "commerce" ? "Order queue" : active === "support" ? "Support queue" : "Today's attention"}</h3>{active === "sales" ? leads.slice(0, 5).map(x => <div className="monitor-row" key={`${x.email}-${x.name}`}><b>{x.name}</b><span>{x.service || "General enquiry"}</span><em className={x.status}>{x.status}</em></div>) : active === "commerce" ? orders.slice(0, 5).map(x => <div className="monitor-row" key={x.reference}><b>{x.reference}</b><span>{x.customerName} · {money(x.total)}</span><em className={x.status}>{x.status}</em></div>) : active === "support" ? tickets.slice(0, 5).map(x => <div className="monitor-row" key={x.reference}><b>{x.subject}</b><span>{x.reference}</span><em className={x.priority}>{x.status}</em></div>) : <><div className="monitor-row"><b>{pendingAppointments} appointments</b><span>Waiting for confirmation</span><em className="pending">Review</em></div><div className="monitor-row"><b>{newLeads} new leads</b><span>Awaiting first contact</span><em className="new">Respond</em></div><div className="monitor-row"><b>{openTickets} support tickets</b><span>Open client conversations</span><em className="urgent">Monitor</em></div></>}</div><div className="monitoring-side"><p>MONITORING NOTES</p><h3>Keep the centre moving.</h3><span>Use the category tabs to focus your team. Status changes made elsewhere appear here on the next refresh.</span><div className="monitor-legend"><i className="success"></i>Healthy <i className="warning"></i>Needs attention <i className="danger"></i>Action required</div></div></div>
+    <div className="monitoring-details"><div><p>RECENT ACTIVITY</p><h3>{active === "sales" ? "Lead pipeline" : active === "commerce" ? "Order queue" : active === "support" ? "Support queue" : "Today's attention"}</h3>{active === "sales" ? leads.slice(0, 5).map(x => <div className="monitor-row" key={`${x.email}-${x.name}`}><b>{x.name}</b><span>{x.service || "General enquiry"}</span><em className={x.status}>{x.status}</em></div>) : active === "commerce" ? orders.slice(0, 5).map(x => <div className="monitor-row" key={x.reference}><b>{x.reference}</b><span>{x.customerName} · {money(x.total)}</span><em className={x.status}>{x.status}</em></div>) : active === "support" ? tickets.slice(0, 5).map(x => <div className="monitor-row" key={x.reference}><b>{x.subject}</b><span>{x.reference}</span><em className={x.priority}>{x.status}</em></div>) : <><div className="monitor-row"><b>{pendingAppointments} appointments</b><span>Waiting for confirmation</span><em className="pending">Review</em></div><div className="monitor-row"><b>{newLeads} new leads</b><span>Awaiting first contact</span><em className="new">Respond</em></div><div className="monitor-row"><b>{openTickets} support tickets</b><span>Open client conversations</span><em className="urgent">Monitor</em></div></>}</div><div className="monitoring-side"><p>MONITORING NOTES</p><h3>Keep the centre moving.</h3><span>Use the category tabs to focus your team. Status changes made elsewhere appear here on the next refresh.</span><div className="monitor-legend"><i className="success"></i>Healthy <i className="warning"></i>Needs attention <i className="danger"></i>Action required</div><small className="monitor-updated">● Auto-refresh every 30 seconds · Updated {lastUpdated.toLocaleTimeString()}</small></div></div>
   </section>;
 }
