@@ -6,7 +6,8 @@ const ADMIN_SESSION_COOKIE = "attri_admin_session";
 const DEFAULT_ADMIN_EMAIL = "attriassociates99@gmail.com";
 const DEFAULT_PASSWORD_SHA256 =
   "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
-const SESSION_LIFETIME_SECONDS = 60 * 60 * 12;
+// Keep an authenticated admin session across browser refreshes and normal workdays.
+const SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 30;
 
 export function canonicalSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, "");
@@ -45,7 +46,10 @@ export async function createAdminSession() {
   cookieStore.set(ADMIN_SESSION_COOKIE, `${payload}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // The site can be served behind Hostinger/Cloudflare HTTP termination. Setting
+    // Secure from the Node runtime can prevent the browser receiving the cookie.
+    // HTTP-only and SameSite=Lax still protect the session from script access/CSRF.
+    secure: false,
     path: "/",
     maxAge: SESSION_LIFETIME_SECONDS,
   });
@@ -56,7 +60,7 @@ export async function clearAdminSession() {
   cookieStore.set(ADMIN_SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: false,
     path: "/",
     maxAge: 0,
   });
