@@ -15,11 +15,11 @@ export async function POST(request: Request) {
     return Response.redirect(`/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`, 303);
   }
 
-  await createAdminSession();
+  await createAdminSession(request);
   return Response.redirect(returnTo, 303);
 }
 
 export async function DELETE(request: Request) {
-  await clearAdminSession();
+  await clearAdminSession(request);
   return Response.redirect("/admin/login", 303);
 }

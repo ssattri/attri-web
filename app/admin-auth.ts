@@ -46,26 +46,30 @@ export async function authenticateAdmin(email: string, password: string) {
   );
 }
 
-export async function createAdminSession() {
+export async function createAdminSession(request?: Request) {
   const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS;
   const payload = `${adminEmail()}.${expires}`;
   const signature = await sign(payload);
+  const forwardedProto = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const secure = forwardedProto ? forwardedProto === "https" : request ? new URL(request.url).protocol === "https:" : process.env.NODE_ENV === "production";
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_SESSION_COOKIE, `${payload}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: SESSION_LIFETIME_SECONDS,
   });
 }
 
-export async function clearAdminSession() {
+export async function clearAdminSession(request?: Request) {
+  const forwardedProto = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const secure = forwardedProto ? forwardedProto === "https" : request ? new URL(request.url).protocol === "https:" : process.env.NODE_ENV === "production";
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: 0,
   });
