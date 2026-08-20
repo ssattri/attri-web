@@ -6,8 +6,11 @@ const ADMIN_SESSION_COOKIE = "attri_admin_session";
 const DEFAULT_ADMIN_EMAIL = "attriassociates99@gmail.com";
 const DEFAULT_PASSWORD_SHA256 =
   "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
-// Keep an authenticated admin session across browser refreshes and normal workdays.
-const SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 30;
+const SESSION_LIFETIME_SECONDS = 60 * 60 * 8;
+
+function isProduction() {
+  return process.env.NODE_ENV === "production";
+}
 
 export function canonicalSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, "");
@@ -18,7 +21,7 @@ export function adminRedirectUrl(request: Request, path: string) {
   const forwardedHost = request.headers.get("x-forwarded-host");
   const forwardedProto = request.headers.get("x-forwarded-proto");
   const local = process.env.NODE_ENV !== "production" && !forwardedHost && !forwardedProto && (incoming.hostname === "localhost" || incoming.hostname === "127.0.0.1" || incoming.hostname === "0.0.0.0");
-  return new URL(path, local ? incoming.origin : "https://www.attriassociates.com");
+  return new URL(path, local ? incoming.origin : canonicalSiteUrl());
 }
 
 export type AdminUser = {
@@ -28,16 +31,21 @@ export type AdminUser = {
 };
 
 export function adminEmail() {
-  return (process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).trim().toLowerCase();
+  const configuredEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  if (configuredEmail) return configuredEmail;
+  if (isProduction()) throw new Error("ADMIN_EMAIL must be configured in production.");
+  return DEFAULT_ADMIN_EMAIL;
 }
 
 export async function authenticateAdmin(email: string, password: string) {
   const submittedEmail = email.trim().toLowerCase();
   let storedPasswordHash = "";
   try { storedPasswordHash = (await runtimeEnv.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='admin_password_sha256'").first<{setting_value:string}>())?.setting_value || ""; } catch { /* environment fallback */ }
-  const expectedPasswordHash = storedPasswordHash || (process.env.ADMIN_PASSWORD
-    ? await sha256(process.env.ADMIN_PASSWORD)
-    : DEFAULT_PASSWORD_SHA256);
+  const configuredPassword = process.env.ADMIN_PASSWORD;
+  const expectedPasswordHash = storedPasswordHash || (configuredPassword
+    ? await sha256(configuredPassword)
+    : isProduction() ? "" : DEFAULT_PASSWORD_SHA256);
+  if (!expectedPasswordHash) return false;
   const submittedPasswordHash = await sha256(password);
 
   return (
@@ -117,9 +125,13 @@ export function safeAdminPath(value: string | null | undefined) {
 
 async function sign(payload: string) {
   const fallbackSecret = `attri-admin-session:${DEFAULT_PASSWORD_SHA256}`;
+  const configuredSecret = process.env.ADMIN_SESSION_SECRET;
+  if (isProduction() && (!configuredSecret || configuredSecret.length < 32)) {
+    throw new Error("ADMIN_SESSION_SECRET must contain at least 32 characters in production.");
+  }
   const key = await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(process.env.ADMIN_SESSION_SECRET || fallbackSecret),
+    new TextEncoder().encode(configuredSecret || fallbackSecret),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],

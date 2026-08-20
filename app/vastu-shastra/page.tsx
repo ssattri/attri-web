@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -23,9 +24,9 @@ export default function VastuPage() {
   return (
     <main className="info-page">
       <header className="inner-nav">
-        <a className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></a>
-        <nav><a href="/about">About</a><a href="/architecture">Architecture</a><a className="active" href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
-        <a className="nav-cta" href="/#contact">Book consultation <span>↗</span></a>
+        <Link className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></Link>
+        <nav><Link href="/about">About</Link><Link href="/architecture">Architecture</Link><Link className="active" href="/vastu-shastra">Vastu Shastra</Link><Link href="/#projects">Projects</Link><Link href="/#software">Software</Link></nav>
+        <Link className="nav-cta" href="/#contact">Book consultation <span>↗</span></Link>
       </header>
 
       <section className="info-hero vastu-hero">
@@ -33,7 +34,7 @@ export default function VastuPage() {
           <p className="eyebrow"><span /> Knowledge · Analysis · Alignment</p>
           <h1>Vastu Shastra for<br /><em>modern life.</em></h1>
           <p>Ancient spatial intelligence interpreted through measurement, planning logic and practical design decisions.</p>
-          <a className="button gold" href="/#contact">Request a Vastu audit <span>↗</span></a>
+          <Link className="button gold" href="/#contact">Request a Vastu audit <span>↗</span></Link>
         </div>
         <div className="vastu-mandala" aria-hidden="true"><div><span>N</span><b>ब्रह्मस्थान</b><span>S</span></div></div>
       </section>
@@ -49,7 +50,7 @@ export default function VastuPage() {
       <section className="content-section tinted">
         <p className="section-kicker">Where we apply it</p>
         <div className="info-card-grid">
-          {applications.map(([title, copy], i) => <article key={title}><span>0{i + 1}</span><h3>{title}</h3><p>{copy}</p><a href="/#contact">Explore consultation →</a></article>)}
+          {applications.map(([title, copy], i) => <article key={title}><span>0{i + 1}</span><h3>{title}</h3><p>{copy}</p><Link href="/#contact">Explore consultation →</Link></article>)}
         </div>
       </section>
 
@@ -68,8 +69,8 @@ export default function VastuPage() {
         <details><summary>Do you design new plans according to Vastu?</summary><p>Yes. Our architects and Vastu experts work together from the beginning, preventing conflicts between functional design and directional principles.</p></details>
       </section>
 
-      <section className="page-cta"><p>Plan with clarity</p><h2>Make your space work<br />with—not against—you.</h2><a className="button gold" href="/#contact">Book a consultation <span>↗</span></a></section>
-      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><a href="/">Return home ↑</a></footer>
+      <section className="page-cta"><p>Plan with clarity</p><h2>Make your space work<br />with—not against—you.</h2><Link className="button gold" href="/#contact">Book a consultation <span>↗</span></Link></section>
+      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><Link href="/">Return home ↑</Link></footer>
     </main>
   );
 }

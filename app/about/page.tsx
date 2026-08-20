@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,13 +17,13 @@ export default function AboutPage() {
   return (
     <main className="info-page">
       <header className="inner-nav">
-        <a className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></a>
-        <nav><a className="active" href="/about">About</a><a href="/architecture">Architecture</a><a href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
-        <a className="nav-cta" href="/#contact">Start a conversation <span>↗</span></a>
+        <Link className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></Link>
+        <nav><Link className="active" href="/about">About</Link><Link href="/architecture">Architecture</Link><Link href="/vastu-shastra">Vastu Shastra</Link><Link href="/#projects">Projects</Link><Link href="/#software">Software</Link></nav>
+        <Link className="nav-cta" href="/#contact">Start a conversation <span>↗</span></Link>
       </header>
       <section className="info-hero about-hero">
         <div className="about-monogram" aria-hidden="true">A</div>
-        <div className="info-hero-copy"><p className="eyebrow"><span /> The multidisciplinary studio</p><h1>Many disciplines.<br /><em>One intention.</em></h1><p>To create balanced, high-performing spaces by bringing modern design intelligence and Vedic spatial wisdom into one collaborative practice.</p><a className="button gold" href="/#contact">Meet our team <span>↗</span></a></div>
+        <div className="info-hero-copy"><p className="eyebrow"><span /> The multidisciplinary studio</p><h1>Many disciplines.<br /><em>One intention.</em></h1><p>To create balanced, high-performing spaces by bringing modern design intelligence and Vedic spatial wisdom into one collaborative practice.</p><Link className="button gold" href="/#contact">Meet our team <span>↗</span></Link></div>
       </section>
       <section className="content-section two-col">
         <div><p className="section-kicker">Our perspective</p><h2>Designing the whole,<br /><span>not isolated parts.</span></h2></div>
@@ -34,8 +35,8 @@ export default function AboutPage() {
       </section>
       <section className="content-section tinted"><p className="section-kicker">What guides us</p><div className="value-grid">{values.map(([title,copy],i)=><article key={title}><span>0{i+1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
       <section className="content-section about-model"><p className="section-kicker">A connected ecosystem</p><h2>Consult. Design.<br /><span>Build. Learn.</span></h2><div><span>Consultancy</span><span>Architecture</span><span>Engineering</span><span>Vastu Software</span><span>Academy</span><span>Curated Products</span></div></section>
-      <section className="page-cta"><p>Work with us</p><h2>Bring your site, plan<br />or challenge.</h2><a className="button gold" href="/#contact">Start a conversation <span>↗</span></a></section>
-      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><a href="/">Return home ↑</a></footer>
+      <section className="page-cta"><p>Work with us</p><h2>Bring your site, plan<br />or challenge.</h2><Link className="button gold" href="/#contact">Start a conversation <span>↗</span></Link></section>
+      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><Link href="/">Return home ↑</Link></footer>
     </main>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, MouseEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import DataManagers from "./DataManagers";
@@ -96,7 +97,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
     if(d.ok)setDatabase(dd);
     setBusy(false);
   }
-  useEffect(()=>{void refresh()},[]);
+  useEffect(()=>{const timer=window.setTimeout(()=>void refresh(),0);return()=>window.clearTimeout(timer)},[]);
   useEffect(()=>{const timer=window.setInterval(()=>{void refresh()},30000);return()=>window.clearInterval(timer)},[]);
   useEffect(()=>{
     const syncFromUrl=()=>{
@@ -148,12 +149,12 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   const current=moduleTitles[module]||moduleTitles.overview;
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
-      <a className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></a>
+      <Link className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></Link>
       <nav>{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} key={key}><i className="admin-nav-icon" aria-hidden="true">{icon}</i><span>{label}</span></a>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator · <Link href="/admin/logout">Sign out</Link></small></div></div>
     </aside>
     <main className="admin-main">
-      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><NotificationCenter compact/><a href="/" target="_blank">View website ↗</a>{module==="products"?<a className="admin-header-action" href="/admin/products/new">＋ Add product</a>:module==="courses"?<a className="admin-header-action" href="/admin/courses/new">＋ Add course</a>:<a className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</a>}</div></header>
+      <header><div><p>{current.eyebrow}</p><h1>{module==="overview"?`Good morning, ${displayName.split(" ")[0]}.`:current.title}</h1></div><div><NotificationCenter compact/><Link href="/" target="_blank">View website ↗</Link>{module==="products"?<Link className="admin-header-action" href="/admin/products/new">＋ Add product</Link>:module==="courses"?<Link className="admin-header-action" href="/admin/courses/new">＋ Add course</Link>:<Link className="admin-header-action" href="/admin?module=pages" onClick={event=>navigateModule("pages",event)}>＋ Quick create</Link>}</div></header>
       {message&&<div className="admin-toast" onClick={()=>setMessage("")}>{message}<span>×</span></div>}
       <section className="admin-stats" id="overview">
         <article><span>New leads</span><strong>{leads.filter(x=>x.status==="new").length}</strong><small>{leads.length} total enquiries</small></article>
@@ -223,25 +224,25 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       </section>
 
       <section className="admin-panel split-module product-admin" id="products">
-        <div className="panel-title"><div><p>STORE CATALOGUE</p><h2>Products</h2></div><a className="panel-add-action" href="/admin/products/new">＋ Add product</a></div>
+        <div className="panel-title"><div><p>STORE CATALOGUE</p><h2>Products</h2></div><Link className="panel-add-action" href="/admin/products/new">＋ Add product</Link></div>
           <div className="product-admin-list full-catalog-list">
             {products.length===0?<p className="empty-row">No products yet. Use Add Product to create your catalogue.</p>:products.map((x,i)=><article key={x.id}>
-              <div className={`product-admin-thumb art-${i%6}`}>{x.imageUrl?<img src={x.imageUrl} alt=""/>:<b>◈</b>}</div>
+              <div className={`product-admin-thumb art-${i%6}`}>{x.imageUrl?<Image unoptimized width={800} height={600} src={x.imageUrl} alt=""/>:<b>◈</b>}</div>
               <div className="product-admin-copy"><b>{x.name}</b><small>{x.category} · {x.itemType}{x.serviceType?` / ${x.serviceType}`:""} · {x.fulfillmentMode||x.deliveryMode} · order {x.sortOrder}</small><span>{new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.price/100)}{x.specialPrice?` → ${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.specialPrice/100)}`:""} · {x.stock} stock/seats{x.itemType==="course"?` · ${x.duration} · ${x.classes} classes`:""}</span></div>
               <select value={x.status} onChange={e=>update("/api/admin/commerce",x.id,e.target.value,"product")} aria-label={`Visibility for ${x.name}`}><option value="active">Published</option><option value="draft">Draft</option></select>
-              <div className="course-row-actions"><a href={`/admin/products/${x.id}/edit`}>Edit</a><button className="danger-action product-delete" onClick={()=>removeProduct(x.id)}>Delete</button></div>
+              <div className="course-row-actions"><Link href={`/admin/products/${x.id}/edit`}>Edit</Link><button className="danger-action product-delete" onClick={()=>removeProduct(x.id)}>Delete</button></div>
             </article>)}
           </div>
       </section>
 
       <section className="admin-panel split-module course-admin" id="courses">
-        <div className="panel-title"><div><p>COURSE CATALOGUE</p><h2>Courses</h2></div><a className="panel-add-action" href="/admin/courses/new">＋ Add course</a></div>
+        <div className="panel-title"><div><p>COURSE CATALOGUE</p><h2>Courses</h2></div><Link className="panel-add-action" href="/admin/courses/new">＋ Add course</Link></div>
           <div className="product-admin-list course-admin-list">
             {courses.length===0?<p className="empty-row">No courses yet. Create your first programme.</p>:courses.map((x,i)=><article key={x.id}>
-              <div className={`product-admin-thumb course-${i%4}`}>{x.imageUrl?<img src={x.imageUrl} alt=""/>:<b>{String(i+1).padStart(2,"0")}</b>}</div>
+              <div className={`product-admin-thumb course-${i%4}`}>{x.imageUrl?<Image unoptimized width={800} height={600} src={x.imageUrl} alt=""/>:<b>{String(i+1).padStart(2,"0")}</b>}</div>
               <div className="product-admin-copy"><b>{x.title}</b><small>{x.category} · {x.level} · {x.duration}</small><span>{x.price?new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(x.price/100):"Free"} · {x.lessons} lessons{x.showInShop?" · Shop":""}</span></div>
               <select value={x.status} onChange={e=>update("/api/admin/learning",x.id,e.target.value,"course")}><option value="published">Published</option><option value="draft">Draft</option></select>
-              <div className="course-row-actions"><a href={`/admin/courses/${x.id}/edit`}>Edit</a><button className="danger-action" onClick={()=>removeCourse(x.id)}>Delete</button></div>
+              <div className="course-row-actions"><Link href={`/admin/courses/${x.id}/edit`}>Edit</Link><button className="danger-action" onClick={()=>removeCourse(x.id)}>Delete</button></div>
             </article>)}
           </div>
       </section>

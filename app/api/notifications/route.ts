@@ -2,6 +2,7 @@ import { getChatGPTUser } from "../../chatgpt-auth";
 import { env as runtimeEnv } from "@server";
 
 async function database(){ return runtimeEnv.DB; }
+type NotificationRow = { isRead: number };
 
 async function initialise(){
   const d=await database();
@@ -17,8 +18,8 @@ export async function GET(){
   await initialise(); const d=await database(); const email=user.email.toLowerCase();
   const profile=await d.prepare("SELECT account_type AS accountType FROM customer_profiles WHERE lower(email)=?").bind(email).first<{accountType:string}>();
   const role=profile?.accountType; if(!["user","consultant"].includes(role??""))return Response.json({error:"Complete account setup."},{status:403});
-  const result=await d.prepare(`SELECT n.id,n.title,n.message,n.severity,n.action_url AS actionUrl,n.created_at AS createdAt,CASE WHEN r.id IS NULL THEN 0 ELSE 1 END AS isRead FROM portal_notifications n LEFT JOIN notification_reads r ON r.notification_id=n.id AND lower(r.user_email)=? WHERE n.status='published' AND (n.expires_at='' OR n.expires_at>=date('now')) AND (n.audience='all' OR n.audience=? OR lower(n.recipient_email)=?) ORDER BY n.created_at DESC LIMIT 50`).bind(email,role,email).all();
-  return Response.json({role,notifications:result.results,unread:result.results.filter((x:any)=>!x.isRead).length});
+  const result=await d.prepare(`SELECT n.id,n.title,n.message,n.severity,n.action_url AS actionUrl,n.created_at AS createdAt,CASE WHEN r.id IS NULL THEN 0 ELSE 1 END AS isRead FROM portal_notifications n LEFT JOIN notification_reads r ON r.notification_id=n.id AND lower(r.user_email)=? WHERE n.status='published' AND (n.expires_at='' OR n.expires_at>=date('now')) AND (n.audience='all' OR n.audience=? OR lower(n.recipient_email)=?) ORDER BY n.created_at DESC LIMIT 50`).bind(email,role,email).all<NotificationRow>();
+  return Response.json({role,notifications:result.results,unread:result.results.filter(x=>!x.isRead).length});
 }
 
 export async function PATCH(request:Request){

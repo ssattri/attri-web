@@ -16,7 +16,7 @@ export default async function AdminLogin({
   return <main className="admin-login-page">
     <section className="admin-login-intro">
       <Link className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></Link>
-      <div className="admin-login-hero-copy"><p>SECURE ADMINISTRATION</p><h1>Control centre<br/><em>access.</em></h1><span>Administration is isolated from customer accounts and protected by role validation, lockout controls and short owner sessions.</span><div className="admin-login-badges"><b>ADMIN ONLY</b><b>ATTEMPT LOCKOUT</b><b>AUDIT READY</b></div></div>
+      <div className="admin-login-hero-copy"><p>SECURE ADMINISTRATION</p><h1>Control centre<br/><em>access.</em></h1><span>Administration is isolated from customer accounts and protected by signed, short-lived owner sessions.</span><div className="admin-login-badges"><b>ADMIN ONLY</b><b>8-HOUR SESSION</b><b>HTTP-ONLY COOKIE</b></div></div>
     </section>
     <section className="admin-login-card">
       <form action="/api/admin/session" method="post">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 const services = [
   ["01", "Scientific Vastu", "Residential, commercial and industrial audits grounded in directional analysis."],
   ["02", "Architecture", "Context-led planning, timeless form and buildable detail from concept to completion."],
@@ -33,15 +34,15 @@ export default function Home() {
           <span><strong>ATTRI</strong><small>ASSOCIATES</small></span>
         </a>
         <nav className="desktop-nav" aria-label="Primary navigation">
-          <a href="/about">About</a>
-          <a href="/architecture">Architecture</a>
-          <a href="/vastu-shastra">Vastu Shastra</a>
+          <Link href="/about">About</Link>
+          <Link href="/architecture">Architecture</Link>
+          <Link href="/vastu-shastra">Vastu Shastra</Link>
           <a href="#projects">Projects</a>
           <a href="#software">Software</a>
-          <a href="/courses">Courses</a>
-          <a href="/shop">Shop</a>
+          <Link href="/courses">Courses</Link>
+          <Link href="/shop">Shop</Link>
         </nav>
-        <div className="nav-actions"><a href="/client/login">Client login</a><a className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></a></div>
+        <div className="nav-actions"><Link href="/client/login">Client login</Link><Link className="nav-cta" href="/book-consultation">Book consultation <span>↗</span></Link></div>
       </header>
 
       <section className="hero" id="top">
@@ -56,7 +57,7 @@ export default function Home() {
             science to create places that perform beautifully.
           </p>
           <div className="hero-actions">
-            <a className="button gold" href="/book-consultation">Begin your project <span>↗</span></a>
+            <Link className="button gold" href="/book-consultation">Begin your project <span>↗</span></Link>
             <a className="text-link" href="#projects"><span className="play">▶</span> Explore our work</a>
           </div>
         </div>
@@ -158,8 +159,8 @@ export default function Home() {
           <p>Professional education, practical tools and trusted products in one connected destination.</p>
         </div>
         <div className="ecosystem-grid">
-          <article><span>01</span><div className="eco-icon">◈</div><h3>Academy</h3><p>Live and recorded courses, assignments, certifications and practitioner learning paths.</p><a href="/courses">Explore courses →</a></article>
-          <article id="shop"><span>02</span><div className="eco-icon">✦</div><h3>Vastu Shop</h3><p>Curated remedies, tools, books, reports and digital resources with expert guidance.</p><a href="/shop">Visit the shop →</a></article>
+          <article><span>01</span><div className="eco-icon">◈</div><h3>Academy</h3><p>Live and recorded courses, assignments, certifications and practitioner learning paths.</p><Link href="/courses">Explore courses →</Link></article>
+          <article id="shop"><span>02</span><div className="eco-icon">✦</div><h3>Vastu Shop</h3><p>Curated remedies, tools, books, reports and digital resources with expert guidance.</p><Link href="/shop">Visit the shop →</Link></article>
           <article><span>03</span><div className="eco-icon">⌁</div><h3>Calculators</h3><p>Direction, area, construction cost, material quantity and planning calculators.</p><a href="#contact">Use free tools →</a></article>
         </div>
       </section>
@@ -206,7 +207,7 @@ export default function Home() {
         </div>
         <div className="contact-panel">
           <p>Tell us what you are planning. Our team will recommend the right consultation and next step.</p>
-          <a className="button gold" href="/book-consultation">Book a consultation <span>↗</span></a>
+          <Link className="button gold" href="/book-consultation">Book a consultation <span>↗</span></Link>
           <div className="contact-meta"><span>Architecture</span><span>Vastu</span><span>Engineering</span><span>Interiors</span></div>
         </div>
       </section>

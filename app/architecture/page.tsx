@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,9 +19,9 @@ export default function ArchitecturePage() {
   return (
     <main className="info-page">
       <header className="inner-nav">
-        <a className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></a>
-        <nav><a href="/about">About</a><a className="active" href="/architecture">Architecture</a><a href="/vastu-shastra">Vastu Shastra</a><a href="/#projects">Projects</a><a href="/#software">Software</a></nav>
-        <a className="nav-cta" href="/#contact">Start a project <span>↗</span></a>
+        <Link className="brand" href="/"><span className="brand-mark">A</span><span><strong>ATTRI</strong><small>ASSOCIATES</small></span></Link>
+        <nav><Link href="/about">About</Link><Link className="active" href="/architecture">Architecture</Link><Link href="/vastu-shastra">Vastu Shastra</Link><Link href="/#projects">Projects</Link><Link href="/#software">Software</Link></nav>
+        <Link className="nav-cta" href="/#contact">Start a project <span>↗</span></Link>
       </header>
 
       <section className="info-hero architecture-hero">
@@ -29,7 +30,7 @@ export default function ArchitecturePage() {
           <p className="eyebrow"><span /> Architecture · Engineering · Experience</p>
           <h1>Ideas made<br /><em>buildable.</em></h1>
           <p>Integrated design for residential, commercial and industrial spaces—from the first line to the final detail.</p>
-          <a className="button gold" href="/#contact">Discuss your project <span>↗</span></a>
+          <Link className="button gold" href="/#contact">Discuss your project <span>↗</span></Link>
         </div>
         <div className="architecture-index"><strong>01</strong><span>Context</span><strong>02</strong><span>Performance</span><strong>03</strong><span>Experience</span></div>
       </section>
@@ -58,8 +59,8 @@ export default function ArchitecturePage() {
         <div><span>Luxury Residences</span><span>Housing & Apartments</span><span>Corporate Offices</span><span>Retail & Hospitality</span><span>Factories & Warehouses</span><span>Healthcare & Education</span></div>
       </section>
 
-      <section className="page-cta"><p>Have a site or idea?</p><h2>Let’s turn its potential<br />into a precise plan.</h2><a className="button gold" href="/#contact">Start your project <span>↗</span></a></section>
-      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><a href="/">Return home ↑</a></footer>
+      <section className="page-cta"><p>Have a site or idea?</p><h2>Let’s turn its potential<br />into a precise plan.</h2><Link className="button gold" href="/#contact">Start your project <span>↗</span></Link></section>
+      <footer className="simple-footer"><span>© 2026 Attri Associates & Vastu Consultants</span><Link href="/">Return home ↑</Link></footer>
     </main>
   );
 }
