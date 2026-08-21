@@ -200,3 +200,12 @@ environment values must never be recorded here.
   because its history contains substantial independent functionality and cannot
   be safely replaced by the local branch without a deliberate source-of-truth
   decision.
+
+## 2026-08-21 — Live administrator recovery deployed
+
+### Changes
+
+- Added and deployed a token-protected password recovery page to the active
+  D1-based production source.
+- Recovery requires a 14-character password with uppercase, lowercase, number,
+  and symbol characters, and invalidates all existing administrator sessions.
