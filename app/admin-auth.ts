@@ -4,156 +4,38 @@ import { env as runtimeEnv } from "@server";
 
 const ADMIN_SESSION_COOKIE = "attri_admin_session";
 const DEFAULT_ADMIN_EMAIL = "attriassociates99@gmail.com";
-const DEFAULT_PASSWORD_SHA256 =
-  "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
+const DEFAULT_PASSWORD_SHA256 = "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
 const SESSION_LIFETIME_SECONDS = 60 * 60 * 8;
+const PASSWORD_ITERATIONS = 310_000;
 
-function isProduction() {
-  return process.env.NODE_ENV === "production";
-}
+function isProduction() { return process.env.NODE_ENV === "production"; }
+export function canonicalSiteUrl() { return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, ""); }
+export function adminRedirectUrl(request: Request, path: string) { const incoming = new URL(request.url); return new URL(path, !isProduction() && ["localhost", "127.0.0.1", "0.0.0.0"].includes(incoming.hostname) ? incoming.origin : canonicalSiteUrl()); }
+export type AdminUser = { displayName: string; email: string; fullName: string };
 
-export function canonicalSiteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, "");
-}
+export function adminEmail() { const configured = process.env.ADMIN_EMAIL?.trim().toLowerCase(); if (configured) return configured; if (isProduction()) throw new Error("ADMIN_EMAIL must be configured in production."); return DEFAULT_ADMIN_EMAIL; }
+async function readSetting(key: string) { try { return (await runtimeEnv.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key=?").bind(key).first<{ setting_value: string }>())?.setting_value || ""; } catch { return ""; } }
+async function writeSetting(key: string, value: string, updatedBy: string) { await runtimeEnv.DB.prepare("INSERT INTO site_settings(setting_key,setting_value,value_type,is_public,updated_by,updated_at) VALUES (?,?,'secret',0,?,CURRENT_TIMESTAMP) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value,value_type='secret',is_public=0,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP").bind(key, value, updatedBy).run(); }
 
-export function adminRedirectUrl(request: Request, path: string) {
-  const incoming = new URL(request.url);
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProto = request.headers.get("x-forwarded-proto");
-  const local = process.env.NODE_ENV !== "production" && !forwardedHost && !forwardedProto && (incoming.hostname === "localhost" || incoming.hostname === "127.0.0.1" || incoming.hostname === "0.0.0.0");
-  return new URL(path, local ? incoming.origin : canonicalSiteUrl());
-}
+export async function isAdminPasswordConfigured() { const stored = await readSetting("admin_password_hash"); const configured = process.env.ADMIN_PASSWORD; return Boolean(stored || (configured && !configured.startsWith("replace-")) || (!isProduction() && !configured)); }
+export async function authenticateAdmin(email: string, password: string) { if (!safeEqual(email.trim().toLowerCase(), adminEmail())) return false; const stored = await readSetting("admin_password_hash"); if (stored) return verifyPassword(password, stored); const legacy = await readSetting("admin_password_sha256"); const configured = process.env.ADMIN_PASSWORD; const expected = legacy || (configured ? await sha256(configured) : isProduction() ? "" : DEFAULT_PASSWORD_SHA256); return Boolean(expected) && safeEqual(await sha256(password), expected); }
+export async function verifyRecoveryToken(token: string, type: "setup" | "reset") { const expected = type === "setup" ? process.env.ADMIN_SETUP_TOKEN : process.env.ADMIN_PASSWORD_RESET_TOKEN; return Boolean(expected && token) && safeEqual(token, expected || ""); }
+export function validatePassword(password: string) { if (password.length < 14) return "Use at least 14 characters."; if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) return "Include uppercase, lowercase, number, and symbol characters."; return ""; }
+export async function setAdminPassword(password: string, updatedBy: string) { const error = validatePassword(password); if (error) throw new Error(error); await writeSetting("admin_password_hash", await hashPassword(password), updatedBy); await writeSetting("admin_session_version", crypto.randomUUID(), updatedBy); }
+async function sessionVersion() { return await readSetting("admin_session_version") || "1"; }
 
-export type AdminUser = {
-  displayName: string;
-  email: string;
-  fullName: string;
-};
+export async function createAdminSession(request?: Request) { const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS; const payload = `${adminEmail()}.${expires}.${await sessionVersion()}`; const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim(); const secure = forwarded ? forwarded === "https" : request ? new URL(request.url).protocol === "https:" : isProduction(); (await cookies()).set(ADMIN_SESSION_COOKIE, `${payload}.${await sign(payload)}`, { httpOnly: true, sameSite: "lax", secure, path: "/", maxAge: SESSION_LIFETIME_SECONDS }); }
+export async function clearAdminSession(request?: Request) { const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim(); const secure = forwarded ? forwarded === "https" : request ? new URL(request.url).protocol === "https:" : isProduction(); (await cookies()).set(ADMIN_SESSION_COOKIE, "", { httpOnly: true, sameSite: "lax", secure, path: "/", maxAge: 0 }); }
+export async function getAdminUser(): Promise<AdminUser | null> { const session = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value; if (!session) return null; const index = session.lastIndexOf("."); if (index < 0) return null; const payload = session.slice(0, index), signature = session.slice(index + 1), parts = payload.split("."); if (parts.length !== 3) return null; const [email, expiry, version] = parts, expires = Number(expiry); if (email !== adminEmail() || !Number.isInteger(expires) || expires <= Math.floor(Date.now() / 1000) || version !== await sessionVersion() || !safeEqual(signature, await sign(payload))) return null; return { displayName: "SS Attri", email, fullName: "SS Attri" }; }
+export async function requireAdminUser(returnTo: string): Promise<AdminUser> { const user = await getAdminUser(); if (user) return user; redirect(`/admin/login?return_to=${encodeURIComponent(safeAdminPath(returnTo))}`); }
+export function safeAdminPath(value: string | null | undefined) { if (!value?.startsWith("/admin") || value.startsWith("//")) return "/admin"; try { const url = new URL(value, "https://app.local"); return url.origin === "https://app.local" && url.pathname !== "/admin/login" ? `${url.pathname}${url.search}${url.hash}` : "/admin"; } catch { return "/admin"; } }
 
-export function adminEmail() {
-  const configuredEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  if (configuredEmail) return configuredEmail;
-  if (isProduction()) throw new Error("ADMIN_EMAIL must be configured in production.");
-  return DEFAULT_ADMIN_EMAIL;
-}
-
-export async function authenticateAdmin(email: string, password: string) {
-  const submittedEmail = email.trim().toLowerCase();
-  let storedPasswordHash = "";
-  try { storedPasswordHash = (await runtimeEnv.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='admin_password_sha256'").first<{setting_value:string}>())?.setting_value || ""; } catch { /* environment fallback */ }
-  const configuredPassword = process.env.ADMIN_PASSWORD;
-  const expectedPasswordHash = storedPasswordHash || (configuredPassword
-    ? await sha256(configuredPassword)
-    : isProduction() ? "" : DEFAULT_PASSWORD_SHA256);
-  if (!expectedPasswordHash) return false;
-  const submittedPasswordHash = await sha256(password);
-
-  return (
-    safeEqual(submittedEmail, adminEmail()) &&
-    safeEqual(submittedPasswordHash, expectedPasswordHash)
-  );
-}
-
-export async function createAdminSession(request?: Request) {
-  const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS;
-  const payload = `${adminEmail()}.${expires}`;
-  const signature = await sign(payload);
-  const forwardedProto = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
-  const secure = forwardedProto ? forwardedProto === "https" : request ? new URL(request.url).protocol === "https:" : process.env.NODE_ENV === "production";
-  const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, `${payload}.${signature}`, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    path: "/",
-    maxAge: SESSION_LIFETIME_SECONDS,
-  });
-}
-
-export async function clearAdminSession(request?: Request) {
-  const forwardedProto = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
-  const secure = forwardedProto ? forwardedProto === "https" : request ? new URL(request.url).protocol === "https:" : process.env.NODE_ENV === "production";
-  const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    path: "/",
-    maxAge: 0,
-  });
-}
-
-export async function getAdminUser(): Promise<AdminUser | null> {
-  const cookieStore = await cookies();
-  const session = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
-  if (!session) return null;
-
-  const separator = session.lastIndexOf(".");
-  if (separator < 0) return null;
-  const payload = session.slice(0, separator);
-  const signature = session.slice(separator + 1);
-  const expirySeparator = payload.lastIndexOf(".");
-  if (expirySeparator < 0) return null;
-  const email = payload.slice(0, expirySeparator);
-  const expires = Number(payload.slice(expirySeparator + 1));
-  if (
-    email !== adminEmail() ||
-    !Number.isInteger(expires) ||
-    expires <= Math.floor(Date.now() / 1000) ||
-    !safeEqual(signature, await sign(payload))
-  ) return null;
-
-  return { displayName: "SS Attri", email, fullName: "SS Attri" };
-}
-
-export async function requireAdminUser(returnTo: string): Promise<AdminUser> {
-  const user = await getAdminUser();
-  if (user) return user;
-  redirect(`/admin/login?return_to=${encodeURIComponent(safeAdminPath(returnTo))}`);
-}
-
-export function safeAdminPath(value: string | null | undefined) {
-  if (!value?.startsWith("/admin") || value.startsWith("//")) return "/admin";
-  try {
-    const url = new URL(value, "https://app.local");
-    if (url.origin !== "https://app.local" || url.pathname === "/admin/login") return "/admin";
-    return `${url.pathname}${url.search}${url.hash}`;
-  } catch {
-    return "/admin";
-  }
-}
-
-async function sign(payload: string) {
-  const fallbackSecret = `attri-admin-session:${DEFAULT_PASSWORD_SHA256}`;
-  const configuredSecret = process.env.ADMIN_SESSION_SECRET;
-  if (isProduction() && (!configuredSecret || configuredSecret.length < 32)) {
-    throw new Error("ADMIN_SESSION_SECRET must contain at least 32 characters in production.");
-  }
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(configuredSecret || fallbackSecret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
-  return bytesToHex(new Uint8Array(signature));
-}
-
-async function sha256(value: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return bytesToHex(new Uint8Array(digest));
-}
-
-function bytesToHex(bytes: Uint8Array) {
-  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function safeEqual(left: string, right: string) {
-  let difference = left.length ^ right.length;
-  const length = Math.max(left.length, right.length);
-  for (let index = 0; index < length; index++) {
-    difference |= (left.charCodeAt(index) || 0) ^ (right.charCodeAt(index) || 0);
-  }
-  return difference === 0;
-}
+async function hashPassword(password: string) { const salt = crypto.getRandomValues(new Uint8Array(16)); return `pbkdf2-sha256$${PASSWORD_ITERATIONS}$${toBase64(salt)}$${toBase64(await derivePassword(password, salt, PASSWORD_ITERATIONS))}`; }
+async function verifyPassword(password: string, encoded: string) { const [algorithm, iterationsText, saltText, hashText] = encoded.split("$"), iterations = Number(iterationsText); if (algorithm !== "pbkdf2-sha256" || !Number.isInteger(iterations) || iterations < 100_000 || !saltText || !hashText) return false; try { return safeEqual(toBase64(await derivePassword(password, fromBase64(saltText), iterations)), hashText); } catch { return false; } }
+async function derivePassword(password: string, salt: Uint8Array, iterations: number) { const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]); return new Uint8Array(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: salt as BufferSource, iterations }, key, 256)); }
+async function sign(payload: string) { const configured = process.env.ADMIN_SESSION_SECRET; if (isProduction() && (!configured || configured.length < 32)) throw new Error("ADMIN_SESSION_SECRET must contain at least 32 characters in production."); const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(configured || `attri-admin-session:${DEFAULT_PASSWORD_SHA256}`), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]); return toHex(new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload)))); }
+async function sha256(value: string) { return toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)))); }
+function toHex(bytes: Uint8Array) { return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join(""); }
+function toBase64(bytes: Uint8Array) { return btoa(String.fromCharCode(...bytes)); }
+function fromBase64(value: string) { return Uint8Array.from(atob(value), character => character.charCodeAt(0)); }
+function safeEqual(left: string, right: string) { let difference = left.length ^ right.length; const length = Math.max(left.length, right.length); for (let index = 0; index < length; index += 1) difference |= (left.charCodeAt(index) || 0) ^ (right.charCodeAt(index) || 0); return difference === 0; }

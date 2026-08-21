@@ -127,3 +127,55 @@ environment values must never be recorded here.
 - `public/og.png` was generated with the built-in image generation tool as a
   landscape brand card using the existing aubergine, saffron, ivory, architecture,
   and compass visual language. Required text was verified in the result.
+
+## 2026-08-21 — Local admin sign-in configuration
+
+### Request
+
+- Correct the development admin sign-in failure.
+
+### Cause and resolution
+
+- The local environment did not define any administrator credentials or a session
+  secret. The application therefore relied on an undocumented legacy development
+  password hash, leaving no usable local sign-in credential.
+- Added explicit development-only administrator configuration in `.env.local`.
+  The value is intentionally excluded from Git and is not recorded in this log.
+- Restarting the development server is required after this change so Next.js loads
+  the new environment values.
+- Updated the local password format to avoid `.env` interpolation syntax and fixed
+  development redirects so forwarded headers cannot send a localhost sign-in to the
+  production domain.
+
+## 2026-08-21 — Secure administrator password controls
+
+### Request
+
+- Add secure administrator password setup and password-reset provisions.
+
+### Changes
+
+- Added a first-time setup page protected by `ADMIN_SETUP_TOKEN`.
+- Added a password-reset page supporting either an authenticated current-password
+  change or recovery with `ADMIN_PASSWORD_RESET_TOKEN`.
+- New passwords are stored as salted PBKDF2-SHA-256 hashes with 310,000 iterations.
+- Password changes rotate the server-side session version, invalidating other
+  existing administrator sessions.
+- Retained legacy SHA-256 verification only for existing deployments until their
+  password is changed through the new flow.
+- Added development-only setup and recovery tokens in the ignored local environment
+  file so the new screens can be exercised locally without being committed.
+
+## 2026-08-21 — Admin UI refinement
+
+### Request
+
+- Improve the login page and admin-panel structure, design, and usability.
+
+### Changes
+
+- Reworked the sign-in hierarchy and recovery affordance without changing the
+  server-side authentication contract.
+- Added semantic labels, useful invalid-field state, touch-friendly controls,
+  visible keyboard focus, and small-screen layout refinements.
+- Added an Account security entry point and session context to the admin header.

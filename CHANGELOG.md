@@ -35,6 +35,8 @@ changes are grouped under `Unreleased` until a release version is assigned.
 - Reduced administrator session lifetime from 30 days to 8 hours.
 - Restricted portal notification actions to safe internal paths.
 - Replaced unchecked API and client `any` values with explicit data models.
+- Added secure administrator password setup, signed-in change, and token-protected
+  recovery flows with PBKDF2 password hashes and session invalidation.
 
 ### Fixed
 
@@ -42,3 +44,9 @@ changes are grouped under `Unreleased` until a release version is assigned.
   now passes with zero warnings.
 - Removed an unused client API variable and an unused React import.
 - Corrected admin sign-in copy so it accurately describes implemented controls.
+- Added missing local administrator configuration so the development admin sign-in
+  is usable with explicit credentials.
+- Fixed local admin redirects so development sign-in stays on the local site.
+- Refined the administrator sign-in and password screens with clearer recovery
+  guidance, accessible error states, improved focus treatment, and responsive
+  layouts. Added a direct Account security entry point in the admin header.
