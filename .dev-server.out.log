@@ -11,3 +11,9 @@ Creating turbopack project {
  POST /api/admin/password 403 in 1389ms (next.js: 1300ms, application-code: 89ms)
  POST /api/admin/password 403 in 17ms (next.js: 6ms, application-code: 11ms)
  POST /api/admin/session 303 in 2.6s (next.js: 123ms, application-code: 2.5s)
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.8:3000
+- Environments: .env.local
+✓ Ready in 6.4s
+[?25h

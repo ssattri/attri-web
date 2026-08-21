@@ -179,3 +179,24 @@ environment values must never be recorded here.
 - Added semantic labels, useful invalid-field state, touch-friendly controls,
   visible keyboard focus, and small-screen layout refinements.
 - Added an Account security entry point and session context to the admin header.
+
+## 2026-08-21 — Live admin incident investigation
+
+### Finding
+
+- The main domain serves an independently maintained Sites source history rather
+  than the current local repository history. Its admin flow uses the provisioned
+  D1 database and `attri_session` cookie, not the local Supabase-backed admin
+  flow.
+- A fresh request to `/admin` correctly redirects to the live sign-in page and
+  the sign-in page responds successfully. The reported failure is therefore
+  associated with an existing authenticated browser session or its dashboard
+  render path, not anonymous admin routing.
+
+### Safety decision
+
+- Production runtime configuration was applied and the existing release was
+  restarted. The separately maintained deployed source was not overwritten,
+  because its history contains substantial independent functionality and cannot
+  be safely replaced by the local branch without a deliberate source-of-truth
+  decision.
