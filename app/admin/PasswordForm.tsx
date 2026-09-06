@@ -2,11 +2,11 @@
 
 import { FormEvent, useState } from "react";
 
-export default function PasswordForm({ mode }: { mode: "change" | "recovery" | "setup" }) {
+export default function PasswordForm({ mode }: { mode: "change" | "recovery" | "setup" | "first-login" }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const isChange = mode === "change";
-  const title = mode === "setup" ? "Set administrator password" : isChange ? "Change administrator password" : "Reset administrator password";
+  const title = mode === "setup" ? "Set administrator password" : mode === "first-login" ? "Create your login password" : isChange ? "Change administrator password" : "Reset administrator password";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setMessage("");
@@ -20,7 +20,7 @@ export default function PasswordForm({ mode }: { mode: "change" | "recovery" | "
   return <form onSubmit={submit} className="admin-password-form" aria-describedby="password-help">
     <p>ADMIN SECURITY</p><h2>{title}</h2>
     <span className="admin-login-subtitle" id="password-help">Use at least 14 characters with uppercase, lowercase, number, and symbol characters.</span>
-    {isChange ? <label>Current password<input name="currentPassword" type="password" autoComplete="current-password" required autoFocus /></label> : <label>{mode === "setup" ? "Setup token" : "Recovery token"}<input name="recoveryToken" type="password" autoComplete="one-time-code" required autoFocus /></label>}
+    {isChange ? <label>Current password<input name="currentPassword" type="password" autoComplete="current-password" required autoFocus /></label> : mode === "first-login" ? null : <label>{mode === "setup" ? "Setup token" : "Recovery token"}<input name="recoveryToken" type="password" autoComplete="one-time-code" required autoFocus /></label>}
     <label>New password<input name="password" type="password" autoComplete="new-password" required /></label>
     <label>Confirm new password<input name="confirmPassword" type="password" autoComplete="new-password" required /></label>
     {message ? <div className="admin-login-error" role="alert">{message}</div> : null}

@@ -201,6 +201,16 @@ environment values must never be recorded here.
   be safely replaced by the local branch without a deliberate source-of-truth
   decision.
 
+## 2026-09-06 — One-time administrator login
+
+### Changes
+
+- Added a server-only `ADMIN_ONE_TIME_PASSWORD` flow for first access.
+- The one-time password is consumed after successful authentication and redirects
+  the administrator to create a permanent password before dashboard access.
+- First-login password setup rotates the session version and invalidates the
+  temporary session.
+
 ## 2026-09-06 — Recovery token validation
 
 ### Changes
