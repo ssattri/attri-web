@@ -23,7 +23,7 @@ export default async function AdminLogin({
       <form action="/api/admin/session" method="post" aria-describedby="login-help">
         <p>ADMIN LOGIN</p><h2>Welcome<br/>back.</h2><span className="admin-login-subtitle" id="login-help">Enter your administrator credentials to continue.</span>
         <input type="hidden" name="returnTo" value={returnTo}/>
-        {hasError ? <div className="admin-login-error" role="alert">We could not verify those credentials. Check your email and password, then try again.</div> : null}
+        {hasError ? <div className="admin-login-error" role="alert">{query.error === "configuration" ? "Admin sign-in is not configured correctly yet. Use the secure recovery flow or contact the site owner." : "We could not verify those credentials. Check your email and password, then try again."}</div> : null}
         <label>Administrator email<input name="email" type="email" autoComplete="username" inputMode="email" placeholder="admin@example.com" aria-invalid={hasError} required autoFocus/></label>
         <label>Password<input name="password" type="password" autoComplete="current-password" placeholder="Enter your password" aria-invalid={hasError} required/></label>
         <button type="submit">Enter control centre →</button>

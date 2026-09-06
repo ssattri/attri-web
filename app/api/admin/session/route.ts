@@ -15,8 +15,12 @@ export async function POST(request: Request) {
     return Response.redirect(adminRedirectUrl(request, `/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`), 303);
   }
 
-  await createAdminSession(request);
-  return Response.redirect(adminRedirectUrl(request, returnTo), 303);
+  try {
+    await createAdminSession(request);
+    return Response.redirect(adminRedirectUrl(request, returnTo), 303);
+  } catch {
+    return Response.redirect(adminRedirectUrl(request, `/admin/login?error=configuration&return_to=${encodeURIComponent(returnTo)}`), 303);
+  }
 }
 
 export async function DELETE(request: Request) {

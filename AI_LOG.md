@@ -201,6 +201,15 @@ environment values must never be recorded here.
   be safely replaced by the local branch without a deliberate source-of-truth
   decision.
 
+## 2026-09-06 — Admin login resilience
+
+### Changes
+
+- Hardened admin session and sign-in handling so invalid cookies or missing
+  runtime configuration do not produce an unhandled server error.
+- Added a dedicated admin error boundary with safe retry, sign-in, and recovery
+  actions. Administrator authentication remains required.
+
 ## 2026-08-21 — Live administrator recovery deployed
 
 ### Changes
