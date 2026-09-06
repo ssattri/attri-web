@@ -211,6 +211,28 @@ environment values must never be recorded here.
 - First-login password setup rotates the session version and invalidates the
   temporary session.
 
+## 2026-09-06 — One-time administrator login
+
+### Request
+
+- Provide a clear place to enter the administrator one-time password and explain the first-login flow.
+
+### Changes
+
+- Added first-login OTP authentication and one-time consumption in `app/admin-auth.ts`.
+- Added a signed setup-session marker so successful OTP login redirects to permanent password creation.
+- Added first-login handling to the admin session, password, setup, and password form routes.
+- Updated the login form to label the field as accepting a password or OTP, prefill the configured owner email, and explain the next step.
+
+### Security notes
+
+- The OTP is read from the server-only `ADMIN_ONE_TIME_PASSWORD` environment variable and is never logged or rendered.
+- The OTP is invalidated after successful use; administrators must then create a permanent password.
+
+### Verification
+
+- Pending TypeScript, lint, and production build checks after the UI patch.
+
 ## 2026-09-06 — Recovery token validation
 
 ### Changes
