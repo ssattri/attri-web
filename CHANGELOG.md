@@ -13,8 +13,13 @@ changes are grouped under `Unreleased` until a release version is assigned.
 - Added `AI_LOG.md` to record AI-assisted work, decisions, verification, and known
   follow-up items.
 - Added a branded Open Graph and X social preview image.
+- Added a first-login one-time-password path that leads administrators directly to
+  secure permanent-password setup.
 
 ### Changed
+
+- Clarified the admin login field and help text so administrators know where to
+  enter the one-time password and what happens after successful verification.
 
 - Replaced internal document anchors with Next.js navigation throughout public,
   admin, client, consultant, course, and shop interfaces.
