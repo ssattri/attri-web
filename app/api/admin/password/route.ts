@@ -27,6 +27,10 @@ export async function POST(request: Request) {
     await createAdminSession(request);
     return Response.json({ success: true });
   } catch (error) {
-    return Response.json({ error: error instanceof Error ? error.message : "Unable to update the password." }, { status: 400 });
+    const message = error instanceof Error ? error.message : "";
+    if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|connection|postgres/i.test(message)) {
+      return Response.json({ error: "The administrator database is unavailable. Check the production database connection settings and redeploy." }, { status: 503 });
+    }
+    return Response.json({ error: message || "Unable to update the password." }, { status: 400 });
   }
 }

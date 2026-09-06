@@ -20,6 +20,8 @@ changes are grouped under `Unreleased` until a release version is assigned.
 
 - Clarified the admin login field and help text so administrators know where to
   enter the one-time password and what happens after successful verification.
+- Masked production database connection failures in password recovery responses
+  and replaced them with an actionable configuration message.
 
 - Replaced internal document anchors with Next.js navigation throughout public,
   admin, client, consultant, course, and shop interfaces.

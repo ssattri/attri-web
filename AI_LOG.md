@@ -233,6 +233,16 @@ environment values must never be recorded here.
 
 - Pending TypeScript, lint, and production build checks after the UI patch.
 
+## 2026-09-06 — Recovery database error handling
+
+### Finding
+
+- Live recovery returned `ENOTFOUND` for the PostgreSQL host, indicating an invalid or unavailable production database connection rather than an invalid recovery token.
+
+### Change
+
+- Password recovery now returns a safe 503 configuration message for database connection failures instead of exposing raw infrastructure details.
+
 ## 2026-09-06 — Recovery token validation
 
 ### Changes
