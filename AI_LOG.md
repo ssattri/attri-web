@@ -201,6 +201,15 @@ environment values must never be recorded here.
   be safely replaced by the local branch without a deliberate source-of-truth
   decision.
 
+## 2026-09-06 — Recovery token validation
+
+### Changes
+
+- Normalized surrounding whitespace on supplied and configured recovery tokens
+  while retaining exact, case-sensitive comparison.
+- Copy/paste whitespace no longer causes a false invalid-token error; an
+  incorrect token remains rejected.
+
 ## 2026-09-06 — Admin login resilience
 
 ### Changes
