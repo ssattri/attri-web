@@ -1,4 +1,4 @@
-import { getAdminUser, safeAdminPath } from "../../admin-auth";
+import { adminEmail, getAdminUser, safeAdminPath } from "../../admin-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -24,7 +24,7 @@ export default async function AdminLogin({
         <p>ADMIN LOGIN</p><h2>Welcome<br/>back.</h2><span className="admin-login-subtitle" id="login-help">Enter your administrator credentials to continue.</span>
         <input type="hidden" name="returnTo" value={returnTo}/>
         {hasError ? <div className="admin-login-error" role="alert">{query.error === "configuration" ? "Admin sign-in is not configured correctly yet. Use the secure recovery flow or contact the site owner." : "We could not verify those credentials. Check your email and password, then try again."}</div> : null}
-        <label>Administrator email<input name="email" type="email" autoComplete="username" inputMode="email" defaultValue="attriassociates99@gmail.com" placeholder="admin@example.com" aria-invalid={hasError} required autoFocus/></label>
+        <label>Administrator email<input name="email" type="email" autoComplete="username" inputMode="email" defaultValue={adminEmail()} placeholder="admin@example.com" aria-invalid={hasError} required autoFocus/></label>
         <label>Password<input name="password" type="password" autoComplete="current-password" placeholder="Enter your password" aria-invalid={hasError} required/></label>
         <button type="submit">Enter control centre →</button>
         <div className="admin-login-links"><Link href="/admin/reset-password">Need to reset your password?</Link><Link href="/">← Return to website</Link></div>
