@@ -9,6 +9,7 @@ import RolePermissions from "./RolePermissions";
 import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import MonitoringCenter from "./MonitoringCenter";
+import SettingsCenter from "./SettingsCenter";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["monitoring","Live Monitoring","◉"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
@@ -17,7 +18,7 @@ export const adminModules = [
   ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["commerce","Orders","□"],
   ["courses","Courses","△"],["learning","Students & LMS","♢"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
   ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
-  ["vault","File Vault","⌘"]
+  ["vault","File Vault","⌘"],["settings","Settings","⚙"]
 ] as const;
 
 const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
@@ -42,7 +43,8 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   reports:{eyebrow:"CONSULTATION INTELLIGENCE",title:"Client reports"},
   operations:{eyebrow:"ENTERPRISE OPERATIONS",title:"Certificates & payments"},
   automation:{eyebrow:"AUTOMATION",title:"Workflows & follow-ups"},
-  vault:{eyebrow:"SECURE STORAGE",title:"Client file vault"}
+  vault:{eyebrow:"SECURE STORAGE",title:"Client file vault"},
+  settings:{eyebrow:"CONTROL CENTRE",title:"Settings & access"}
 };
 
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};
@@ -174,7 +176,8 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       </section>
       <GrowthCenter/>
       {module==="monitoring"&&<MonitoringCenter leads={leads} orders={orders} tickets={tickets} appointments={appointments} database={database} busy={busy} onRefresh={refresh}/>} 
-      <RolePermissions/>
+      {module==="permissions"&&<RolePermissions/>}
+      {module==="settings"&&<SettingsCenter/>}
 
       <NotificationCenter/>
 

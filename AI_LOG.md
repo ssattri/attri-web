@@ -5,6 +5,30 @@ the changelog summarizes what changed, while this file preserves the request,
 technical decisions, checks performed, and unresolved risks. Secrets and raw
 environment values must never be recorded here.
 
+## 2026-09-12 — Admin settings centre
+
+### Request
+
+- Add a professional, tabbed admin settings workspace for business details,
+  Razorpay credentials, and team roles and permissions.
+
+### Changes
+
+- Added the Settings module with Business profile, Razorpay, and Team access tabs.
+- Stored business details and Razorpay values in server-side `site_settings`.
+  Razorpay secrets are never returned in full to the browser and are masked on
+  subsequent reads.
+- Added an editable administrative team roster backed by `staff_members`, with
+  per-module permission selections and audit-log entries.
+- Kept the existing environment-only owner authentication unchanged. Team
+  roster permissions are intentionally labelled as pending enforcement until a
+  dedicated multi-user admin sign-in flow is approved and implemented.
+
+### Verification
+
+- `next build` completed successfully, including TypeScript validation and all
+  37 generated routes.
+
 ## 2026-08-20 — Repository baseline and logging setup
 
 ### Request
