@@ -5,6 +5,56 @@ the changelog summarizes what changed, while this file preserves the request,
 technical decisions, checks performed, and unresolved risks. Secrets and raw
 environment values must never be recorded here.
 
+## 2026-09-12 — Settings reference layout and sidebar hierarchy
+
+### Changes
+
+- Reworked Settings into the reference-inspired Settings & integrations layout
+  with Business Information and Keys & Integrations tabs.
+- Added completion cards for identity/contact, addresses, hours/availability,
+  and social profiles, with editable dynamic frontend fields.
+- Reorganised the admin sidebar labels and groups to reflect Media Manager, SEO,
+  and System & Administration responsibilities.
+
+## 2026-09-12 — Dedicated course catalogue
+
+### Changes
+
+- Added a separate course catalogue workspace with search, category filtering,
+  programme metrics, publishing control, and direct editing.
+- Extended tabbed course forms with language, learner access period, available
+  seats, short description, and featured-course controls.
+- Updated the learning API to store the additional dynamic course attributes
+  and use the environment-managed admin session.
+
+## 2026-09-12 — Dedicated product catalogue
+
+### Changes
+
+- Replaced the embedded product list with a dedicated product catalogue
+  workspace featuring search, category filtering, stock visibility, GST and
+  HSN summaries, status control, and direct editing.
+- Added database-backed product categories, including category creation,
+  ordering, and safe deletion that prevents removal while products still use a
+  category.
+- Updated product create/edit forms to load the managed category taxonomy.
+- Aligned the commerce API with the environment-managed admin session.
+
+### Verification
+
+- TypeScript validation passed. The production build compiled the application
+  and completed its type-check phase; its server-side route phase waits on
+  configured database runtime calls in this environment.
+
+## 2026-09-12 — Categorised admin navigation
+
+### Changes
+
+- Organised every existing admin module into Workspace, Growth & content,
+  Commerce & learning, Client operations, and System sidebar groups.
+- Preserved the existing module routes, selected-state behavior, and compact
+  icon-only mobile navigation.
+
 ## 2026-09-12 — Admin settings centre
 
 ### Request
@@ -28,6 +78,26 @@ environment values must never be recorded here.
 
 - `next build` completed successfully, including TypeScript validation and all
   37 generated routes.
+
+## 2026-09-12 — Settings resilience and admin session persistence
+
+### Findings
+
+- A failed settings-data request could leave the client settings view without
+  actionable controls.
+- The administrator session needed an explicit persistent expiration and a
+  cookie domain that works consistently across the apex and `www` domains.
+
+### Changes
+
+- Settings now renders its complete tabbed form immediately using safe empty
+  defaults, with a clear error message if saved values cannot be loaded.
+- The session cookie now includes both `maxAge` and a concrete expiry date,
+  and is shared across official site hostnames without affecting local hosts.
+
+### Verification
+
+- `next build` completed successfully after the resilience and session changes.
 
 ## 2026-08-20 — Repository baseline and logging setup
 

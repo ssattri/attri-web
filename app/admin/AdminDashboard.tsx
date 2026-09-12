@@ -10,15 +10,25 @@ import NotificationCenter from "./NotificationCenter";
 import OrdersManager from "./OrdersManager";
 import MonitoringCenter from "./MonitoringCenter";
 import SettingsCenter from "./SettingsCenter";
+import ProductCatalogue from "./products/ProductCatalogue";
+import CourseCatalogue from "./courses/CourseCatalogue";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["monitoring","Live Monitoring","◉"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
   ["seo-manager","SEO Manager","↗"],["database","Database","◫"],["data-managers","Data Managers","⌗"],
-  ["permissions","Team Access","♙"],["pages","Pages & CMS","▤"],["projects","Projects","◇"],
+  ["permissions","Team Access","♙"],["pages","Frontend Modules","▤"],["projects","Projects","◇"],
   ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["commerce","Orders","□"],
   ["courses","Courses","△"],["learning","Students & LMS","♢"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
   ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
-  ["vault","File Vault","⌘"],["settings","Settings","⚙"]
+  ["vault","Media Manager","⌘"],["settings","Settings & Integrations","⚙"]
+] as const;
+
+const adminNavigation = [
+  { label: "Workspace", items: ["overview", "monitoring", "analytics", "notifications"] },
+  { label: "Growth & content", items: ["seo-manager", "leads", "projects", "appointments"] },
+  { label: "Commerce & learning", items: ["products", "commerce", "courses", "learning", "finance"] },
+  { label: "Client operations", items: ["support", "reports"] },
+  { label: "System & administration", items: ["operations", "automation", "pages", "data-managers", "database", "vault", "permissions", "settings"] },
 ] as const;
 
 const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
@@ -152,7 +162,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   return <div className={`admin-shell admin-module-${module}`}>
     <aside className="admin-sidebar">
       <Link className="admin-logo" href="/"><span>A</span><div><b>ATTRI</b><small>CONTROL CENTRE</small></div></Link>
-      <nav aria-label="Admin sections">{adminModules.map(([key,label,icon])=><a className={module===key?"selected":""} href={key==="overview"?"/admin":`/admin?module=${encodeURIComponent(key)}`} onClick={event=>navigateModule(key,event)} aria-current={module===key?"page":undefined} aria-label={label} title={label} key={key}><i className="admin-nav-icon" aria-hidden="true">{icon}</i><span>{label}</span></a>)}</nav>
+      <nav aria-label="Admin sections">{adminNavigation.map(group=><section className="admin-nav-group" key={group.label}><p>{group.label}</p>{group.items.map(key=>{const item=adminModules.find(([moduleKey])=>moduleKey===key);if(!item)return null;const[moduleKey,label,icon]=item;return <a className={module===moduleKey?"selected":""} href={moduleKey==="overview"?"/admin":`/admin?module=${encodeURIComponent(moduleKey)}`} onClick={event=>navigateModule(moduleKey,event)} aria-current={module===moduleKey?"page":undefined} aria-label={label} title={label} key={moduleKey}><i className="admin-nav-icon" aria-hidden="true">{icon}</i><span>{label}</span></a>})}</section>)}</nav>
       <div className="admin-profile"><span>{displayName.slice(0,1).toUpperCase()}</span><div><b>{displayName}</b><small>Super Administrator · <Link href="/admin/logout">Sign out</Link></small></div></div>
     </aside>
     <main className="admin-main">
@@ -226,7 +236,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
         <OrdersManager initialOrders={orders}/>
       </section>
 
-      <section className="admin-panel split-module product-admin" id="products">
+      {module==="products"&&<ProductCatalogue initialProducts={products}/>} {false&&<section className="admin-panel split-module product-admin" id="products">
         <div className="panel-title"><div><p>STORE CATALOGUE</p><h2>Products</h2></div><Link className="panel-add-action" href="/admin/products/new">＋ Add product</Link></div>
           <div className="product-admin-list full-catalog-list">
             {products.length===0?<p className="empty-row">No products yet. Use Add Product to create your catalogue.</p>:products.map((x,i)=><article key={x.id}>
@@ -236,9 +246,9 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
               <div className="course-row-actions"><Link href={`/admin/products/${x.id}/edit`}>Edit</Link><button className="danger-action product-delete" onClick={()=>removeProduct(x.id)}>Delete</button></div>
             </article>)}
           </div>
-      </section>
+      </section>}
 
-      <section className="admin-panel split-module course-admin" id="courses">
+      {module==="courses"&&<CourseCatalogue initialCourses={courses}/>} {false&&<section className="admin-panel split-module course-admin" id="courses">
         <div className="panel-title"><div><p>COURSE CATALOGUE</p><h2>Courses</h2></div><Link className="panel-add-action" href="/admin/courses/new">＋ Add course</Link></div>
           <div className="product-admin-list course-admin-list">
             {courses.length===0?<p className="empty-row">No courses yet. Create your first programme.</p>:courses.map((x,i)=><article key={x.id}>
@@ -248,7 +258,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
               <div className="course-row-actions"><Link href={`/admin/courses/${x.id}/edit`}>Edit</Link><button className="danger-action" onClick={()=>removeCourse(x.id)}>Delete</button></div>
             </article>)}
           </div>
-      </section>
+      </section>}
 
       <section className="admin-panel split-module" id="learning">
         <div className="panel-title"><div><p>STUDENT MANAGEMENT</p><h2>Enrollments</h2></div><span>{enrollments.length} enrollments</span></div>

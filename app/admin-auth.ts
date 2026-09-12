@@ -59,9 +59,9 @@ export function safeAdminPath(value: string | null | undefined) { if (!value?.st
 function sessionCookieOptions(request: Request | undefined, maxAge: number) {
   const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
   const secure = isProduction() || forwarded === "https" || (!forwarded && request ? new URL(request.url).protocol === "https:" : false);
-  const hostname = new URL(canonicalSiteUrl()).hostname.replace(/^www\./, "");
-  const domain = isProduction() && hostname === "attriassociates.com" ? hostname : undefined;
-  return { httpOnly: true, sameSite: "lax" as const, secure, path: "/", maxAge, ...(domain ? { domain } : {}) };
+  const hostname = request ? new URL(request.url).hostname.replace(/^www\./, "") : "";
+  const domain = hostname === "attriassociates.com" ? hostname : undefined;
+  return { httpOnly: true, sameSite: "lax" as const, secure, path: "/", maxAge, expires: new Date(maxAge ? Date.now() + maxAge * 1000 : 0), ...(domain ? { domain } : {}) };
 }
 
 async function sign(payload: string) {

@@ -1,7 +1,7 @@
-import{getChatGPTUser}from"../../../chatgpt-auth";
+import{getAdminUser}from"../../../admin-auth";
 import { env as runtimeEnv } from "@server";
 const db = () => runtimeEnv.DB;
-async function ok(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function ok(){return Boolean(await getAdminUser())}
 async function ensureCourses(d:Awaited<ReturnType<typeof db>>){
   await d.prepare(`CREATE TABLE IF NOT EXISTS courses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,slug TEXT NOT NULL UNIQUE,category TEXT NOT NULL,
@@ -16,13 +16,18 @@ async function ensureCourses(d:Awaited<ReturnType<typeof db>>){
     ["show_in_shop","ALTER TABLE courses ADD COLUMN show_in_shop INTEGER NOT NULL DEFAULT 1"],
     ["meta_title","ALTER TABLE courses ADD COLUMN meta_title TEXT NOT NULL DEFAULT ''"],
     ["meta_keywords","ALTER TABLE courses ADD COLUMN meta_keywords TEXT NOT NULL DEFAULT ''"],
-    ["meta_description","ALTER TABLE courses ADD COLUMN meta_description TEXT NOT NULL DEFAULT ''"]
+    ["meta_description","ALTER TABLE courses ADD COLUMN meta_description TEXT NOT NULL DEFAULT ''"],
+    ["short_description","ALTER TABLE courses ADD COLUMN short_description TEXT NOT NULL DEFAULT ''"],
+    ["language","ALTER TABLE courses ADD COLUMN language TEXT NOT NULL DEFAULT 'English'"],
+    ["access_period","ALTER TABLE courses ADD COLUMN access_period TEXT NOT NULL DEFAULT 'Lifetime access'"],
+    ["seats","ALTER TABLE courses ADD COLUMN seats INTEGER NOT NULL DEFAULT 0"],
+    ["featured","ALTER TABLE courses ADD COLUMN featured INTEGER NOT NULL DEFAULT 0"]
   ])if(!columns.results.some(x=>x.name===name))await d.prepare(sql).run();
 }
 function slugify(value:string){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,90)}
 export async function GET(){
   if(!await ok())return Response.json({error:"Unauthorized"},{status:401});const d=await db();await ensureCourses(d);
-  const courses=await d.prepare("SELECT id,title,slug,category,level,mode,duration,description,price,lessons,status,image_url AS imageUrl,instructor,certificate,show_in_shop AS showInShop,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,created_at AS createdAt FROM courses ORDER BY id DESC").all();
+  const courses=await d.prepare("SELECT id,title,slug,category,level,mode,duration,description,price,lessons,status,image_url AS imageUrl,instructor,certificate,show_in_shop AS showInShop,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,short_description AS shortDescription,language,access_period AS accessPeriod,seats,featured,created_at AS createdAt FROM courses ORDER BY featured DESC,id DESC").all();
   const enrollments=await d.prepare("SELECT e.id,e.reference,e.student_name AS studentName,e.email,e.phone,e.status,e.payment_status AS paymentStatus,e.progress,e.created_at AS createdAt,c.title AS courseTitle FROM enrollments e JOIN courses c ON c.id=e.course_id ORDER BY e.created_at DESC").all();
   return Response.json({courses:courses.results,enrollments:enrollments.results})
 }
@@ -32,8 +37,8 @@ export async function POST(request:Request){
   const price=Math.round(Number(b.price||0)*100),lessons=Math.max(0,Math.floor(Number(b.lessons||0)));
   if(!Number.isFinite(price)||price<0||!Number.isFinite(lessons))return Response.json({error:"Enter a valid price and lesson count."},{status:400});
   const d=await db();await ensureCourses(d);
-  try{await d.prepare("INSERT INTO courses (title,slug,category,level,mode,duration,description,price,lessons,status,image_url,instructor,certificate,show_in_shop,meta_title,meta_keywords,meta_description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
-    .bind(b.title.trim(),slugify(b.slug||b.title),b.category,b.level||"Beginner",b.mode||"Recorded",b.duration||"",b.description||"",price,lessons,b.status==="published"?"published":"draft",b.imageUrl||"",b.instructor||"Attri Academy Faculty",b.certificate==="yes"?1:0,b.showInShop==="yes"?1:0,b.metaTitle?.trim()||b.title.trim(),b.metaKeywords?.trim()||"",b.metaDescription?.trim()||b.description?.trim()||"").run()}
+  try{await d.prepare("INSERT INTO courses (title,slug,category,level,mode,duration,description,price,lessons,status,image_url,instructor,certificate,show_in_shop,meta_title,meta_keywords,meta_description,short_description,language,access_period,seats,featured) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+    .bind(b.title.trim(),slugify(b.slug||b.title),b.category,b.level||"Beginner",b.mode||"Recorded",b.duration||"",b.description||"",price,lessons,b.status==="published"?"published":"draft",b.imageUrl||"",b.instructor||"Attri Academy Faculty",b.certificate==="yes"?1:0,b.showInShop==="yes"?1:0,b.metaTitle?.trim()||b.title.trim(),b.metaKeywords?.trim()||"",b.metaDescription?.trim()||b.description?.trim()||"",b.shortDescription?.trim()||"",b.language||"English",b.accessPeriod||"Lifetime access",Math.max(0,Math.floor(Number(b.seats||0))),b.featured==="yes"?1:0).run()}
   catch{return Response.json({error:"That course URL slug already exists."},{status:409})}
   return Response.json({success:true},{status:201})
 }
@@ -45,8 +50,8 @@ export async function PATCH(request:Request){
     if(b.title){
       const price=Math.round(Number(b.price||0)*100),lessons=Math.max(0,Math.floor(Number(b.lessons||0)));
       if(!b.category||!Number.isFinite(price)||price<0||!Number.isFinite(lessons))return Response.json({error:"Enter valid course details."},{status:400});
-      try{await d.prepare("UPDATE courses SET title=?,slug=?,category=?,level=?,mode=?,duration=?,description=?,price=?,lessons=?,status=?,image_url=?,instructor=?,certificate=?,show_in_shop=?,meta_title=?,meta_keywords=?,meta_description=? WHERE id=?")
-        .bind(b.title.trim(),slugify(b.slug||b.title),b.category,b.level||"Beginner",b.mode||"Recorded",b.duration||"",b.description||"",price,lessons,b.status==="published"?"published":"draft",b.imageUrl||"",b.instructor||"Attri Academy Faculty",b.certificate==="yes"?1:0,b.showInShop==="yes"?1:0,b.metaTitle?.trim()||b.title.trim(),b.metaKeywords?.trim()||"",b.metaDescription?.trim()||b.description?.trim()||"",b.id).run()}
+      try{await d.prepare("UPDATE courses SET title=?,slug=?,category=?,level=?,mode=?,duration=?,description=?,price=?,lessons=?,status=?,image_url=?,instructor=?,certificate=?,show_in_shop=?,meta_title=?,meta_keywords=?,meta_description=?,short_description=?,language=?,access_period=?,seats=?,featured=? WHERE id=?")
+        .bind(b.title.trim(),slugify(b.slug||b.title),b.category,b.level||"Beginner",b.mode||"Recorded",b.duration||"",b.description||"",price,lessons,b.status==="published"?"published":"draft",b.imageUrl||"",b.instructor||"Attri Academy Faculty",b.certificate==="yes"?1:0,b.showInShop==="yes"?1:0,b.metaTitle?.trim()||b.title.trim(),b.metaKeywords?.trim()||"",b.metaDescription?.trim()||b.description?.trim()||"",b.shortDescription?.trim()||"",b.language||"English",b.accessPeriod||"Lifetime access",Math.max(0,Math.floor(Number(b.seats||0))),b.featured==="yes"?1:0,b.id).run()}
       catch{return Response.json({error:"That course URL slug already exists."},{status:409})}
     }else{
       if(!["published","draft"].includes(b.status??""))return Response.json({error:"Invalid course status."},{status:400});

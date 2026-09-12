@@ -1,7 +1,7 @@
 import { getAdminUser } from "../../../admin-auth";
 import { env } from "@server";
 
-const businessKeys = ["business_name", "business_legal_name", "business_phone", "business_email", "business_address", "business_city", "business_state", "business_pincode", "business_country", "business_gstin", "business_hours", "business_currency"] as const;
+const businessKeys = ["business_name", "business_legal_name", "tagline", "business_phone", "business_email", "primary_email", "secondary_email", "primary_phone", "secondary_phone", "whatsapp_number", "emergency_phone", "business_address", "business_city", "business_state", "business_pincode", "business_country", "business_gstin", "business_hours", "support_hours", "business_currency", "instagram", "facebook", "youtube", "linkedin"] as const;
 const razorpayKeys = ["razorpay_key_id", "razorpay_key_secret", "razorpay_webhook_secret"] as const;
 const permissionKeys = ["dashboard", "crm", "projects", "appointments", "commerce", "courses", "finance", "reports", "content", "files", "analytics", "settings"] as const;
 type Permission = typeof permissionKeys[number];

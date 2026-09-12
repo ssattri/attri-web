@@ -1,7 +1,7 @@
-import {getChatGPTUser} from "../../../chatgpt-auth";
+import {getAdminUser} from "../../../admin-auth";
 import { env as runtimeEnv } from "@server";
 const db = () => runtimeEnv.DB;
-async function allowed(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function allowed(){return Boolean(await getAdminUser())}
 async function ensureProducts(database:Awaited<ReturnType<typeof db>>){
   await database.prepare(`CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,slug TEXT NOT NULL UNIQUE,category TEXT NOT NULL,
@@ -37,6 +37,11 @@ async function ensureProducts(database:Awaited<ReturnType<typeof db>>){
     ["hsn_code","ALTER TABLE products ADD COLUMN hsn_code TEXT NOT NULL DEFAULT ''"]
   ])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
 }
+async function ensureCategories(database:Awaited<ReturnType<typeof db>>){
+  await database.prepare("CREATE TABLE IF NOT EXISTS product_categories (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL UNIQUE,slug TEXT NOT NULL UNIQUE,status TEXT NOT NULL DEFAULT 'active',sort_order INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+  const existing=await database.prepare("SELECT COUNT(*) AS count FROM product_categories").first<{count:number}>();
+  if(Number(existing?.count||0)===0){const rows=await database.prepare("SELECT DISTINCT category FROM products WHERE category<>'' ORDER BY category").all<{category:string}>();if(rows.results.length)await database.batch(rows.results.map((row,index)=>database.prepare("INSERT INTO product_categories(name,slug,sort_order) VALUES (?,?,?)").bind(row.category,slugify(row.category),index)));}
+}
 async function ensureOrders(database:Awaited<ReturnType<typeof db>>){
  const columns=await database.prepare("PRAGMA table_info(orders)").all<{name:string}>();
  for(const[name,sql]of[["shipping_amount","ALTER TABLE orders ADD COLUMN shipping_amount INTEGER NOT NULL DEFAULT 0"],["total","ALTER TABLE orders ADD COLUMN total INTEGER NOT NULL DEFAULT 0"],["payment_method","ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'pay-after-confirmation'"],["tracking_number","ALTER TABLE orders ADD COLUMN tracking_number TEXT NOT NULL DEFAULT ''"],["admin_notes","ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''"],["updated_at","ALTER TABLE orders ADD COLUMN updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP"]])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
@@ -47,19 +52,23 @@ export async function GET(){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
   const database=await db();
   await ensureProducts(database);
+  await ensureCategories(database);
   await ensureOrders(database);
   const orders=await database.prepare("SELECT id,reference,customer_name AS customerName,email,phone,address,city,state,pincode,items_json AS itemsJson,subtotal,shipping_amount AS shippingAmount,total,payment_method AS paymentMethod,status,payment_status AS paymentStatus,tracking_number AS trackingNumber,admin_notes AS adminNotes,created_at AS createdAt,updated_at AS updatedAt FROM orders ORDER BY created_at DESC LIMIT 200").all();
   const products=await database.prepare("SELECT id,name,slug,category,description,price,stock,status,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,special_price AS specialPrice,special_from AS specialFrom,special_to AS specialTo,duration,classes,sort_order AS sortOrder,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,service_type AS serviceType,fulfillment_mode AS fulfillmentMode,sku,short_description AS shortDescription,material,colour,dimensions,weight,placement,benefits,usage_instructions AS usageInstructions,care_instructions AS careInstructions,gst_rate AS gstRate,hsn_code AS hsnCode,created_at AS createdAt FROM products ORDER BY sort_order,id DESC").all();
-  return Response.json({orders:orders.results,products:products.results});
+  const categories=await database.prepare("SELECT id,name,slug,status,sort_order AS sortOrder FROM product_categories ORDER BY sort_order,name").all();
+  return Response.json({orders:orders.results,products:products.results,categories:categories.results});
 }
 export async function POST(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
-  const body=await request.json() as {name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;status?:string;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string;serviceType?:string;fulfillmentMode?:string;sku?:string;shortDescription?:string;material?:string;colour?:string;dimensions?:string;weight?:string;placement?:string;benefits?:string;usageInstructions?:string;careInstructions?:string;gstRate?:string|number;hsnCode?:string};
+  const body=await request.json() as {kind?:string;name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;status?:string;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string;serviceType?:string;fulfillmentMode?:string;sku?:string;shortDescription?:string;material?:string;colour?:string;dimensions?:string;weight?:string;placement?:string;benefits?:string;usageInstructions?:string;careInstructions?:string;gstRate?:string|number;hsnCode?:string};
+  const database=await db();await ensureProducts(database);await ensureCategories(database);
+  if(body.kind==="category"){const name=body.name?.trim()||"";if(!name)return Response.json({error:"Enter a category name."},{status:400});try{await database.prepare("INSERT INTO product_categories(name,slug,sort_order) VALUES (?,?,?)").bind(name,slugify(name),Number(body.sortOrder||0));return Response.json({success:true},{status:201})}catch{return Response.json({error:"That category already exists."},{status:409})}}
   const name=body.name?.trim()??"",slug=slugify(body.slug?.trim()||name),category=body.category?.trim()??"";
   const price=Math.round(Number(body.price)*100),specialPrice=Math.round(Number(body.specialPrice||0)*100),stock=Math.max(0,Math.floor(Number(body.stock))),classes=Math.max(0,Math.floor(Number(body.classes||0))),sortOrder=Math.floor(Number(body.sortOrder||0));
   if(!name||!slug||!category||!Number.isFinite(price)||price<0||!Number.isFinite(specialPrice)||specialPrice<0||!Number.isFinite(stock)||!Number.isFinite(classes)||!Number.isFinite(sortOrder))return Response.json({error:"Complete the product name, category, valid pricing, stock and order."},{status:400});
   if(specialPrice>0&&specialPrice>=price)return Response.json({error:"Special price must be lower than the regular price."},{status:400});
-  const status=body.status==="draft"?"draft":"active";const database=await db();await ensureProducts(database);
+  const status=body.status==="draft"?"draft":"active";
   try{
     const result=await database.prepare("INSERT INTO products (name,slug,category,description,price,stock,status,image_url,item_type,delivery_mode,special_price,special_from,special_to,duration,classes,sort_order,meta_title,meta_keywords,meta_description,service_type,fulfillment_mode,sku,short_description,material,colour,dimensions,weight,placement,benefits,usage_instructions,care_instructions,gst_rate,hsn_code) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
       .bind(name,slug,category,body.description?.trim()??"",price,stock,status,body.imageUrl?.trim()??"",["physical","digital","course","service"].includes(body.itemType??"")?body.itemType:"physical",body.deliveryMode==="Offline"?"Offline":body.deliveryMode==="Online + Offline"?"Online + Offline":"Online",specialPrice,body.specialFrom||"",body.specialTo||"",body.itemType==="course"?body.duration||"":"",body.itemType==="course"?classes:0,sortOrder,body.metaTitle?.trim()||name,body.metaKeywords?.trim()||"",body.metaDescription?.trim()||body.description?.trim()||"",body.itemType==="service"&&(body.serviceType==="consultation"||body.serviceType==="virtual")?body.serviceType:"",body.itemType==="service"?body.fulfillmentMode||"Email":"",body.sku?.trim()||"",body.shortDescription?.trim()||"",body.material?.trim()||"",body.colour?.trim()||"",body.dimensions?.trim()||"",body.weight?.trim()||"",body.placement?.trim()||"",body.benefits?.trim()||"",body.usageInstructions?.trim()||"",body.careInstructions?.trim()||"",Math.max(0,Math.floor(Number(body.gstRate||18))),body.hsnCode?.trim()||"").run();
@@ -71,6 +80,7 @@ export async function PATCH(request:Request){
   const body=await request.json() as {id?:number;kind?:string;status?:string;paymentStatus?:string;trackingNumber?:string;adminNotes?:string;name?:string;slug?:string;category?:string;description?:string;price?:string|number;stock?:string|number;imageUrl?:string;itemType?:string;deliveryMode?:string;specialPrice?:string|number;specialFrom?:string;specialTo?:string;duration?:string;classes?:string|number;sortOrder?:string|number;metaTitle?:string;metaKeywords?:string;metaDescription?:string;serviceType?:string;fulfillmentMode?:string;sku?:string;shortDescription?:string;material?:string;colour?:string;dimensions?:string;weight?:string;placement?:string;benefits?:string;usageInstructions?:string;careInstructions?:string;gstRate?:string|number;hsnCode?:string};
   if(!body.id)return Response.json({error:"A record is required."},{status:400});
   const database=await db();
+  if(body.kind==="category"){await ensureCategories(database);if(!body.name?.trim())return Response.json({error:"Enter a category name."},{status:400});try{await database.prepare("UPDATE product_categories SET name=?,slug=?,status=?,sort_order=? WHERE id=?").bind(body.name.trim(),slugify(body.name),body.status==="inactive"?"inactive":"active",Number(body.sortOrder||0),body.id).run();return Response.json({success:true})}catch{return Response.json({error:"That category already exists."},{status:409})}}
   if(body.kind==="product"){
     await ensureProducts(database);
     if(body.name){
@@ -99,7 +109,7 @@ export async function PATCH(request:Request){
 export async function DELETE(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
   const id=Number(new URL(request.url).searchParams.get("id"));
-  if(!id)return Response.json({error:"A product is required."},{status:400});
-  const database=await db();await ensureProducts(database);await database.prepare("DELETE FROM products WHERE id=?").bind(id).run();
+  if(!id)return Response.json({error:"A product or category is required."},{status:400});
+  const database=await db();const kind=new URL(request.url).searchParams.get("kind");if(kind==="category"){await ensureCategories(database);const category=await database.prepare("SELECT name FROM product_categories WHERE id=?").bind(id).first<{name:string}>();if(!category)return Response.json({error:"Category not found."},{status:404});const products=await database.prepare("SELECT COUNT(*) AS count FROM products WHERE category=?").bind(category.name).first<{count:number}>();if(Number(products?.count||0)>0)return Response.json({error:"Move or edit products in this category before deleting it."},{status:409});await database.prepare("DELETE FROM product_categories WHERE id=?").bind(id).run()}else{await ensureProducts(database);await database.prepare("DELETE FROM products WHERE id=?").bind(id).run();}
   return Response.json({success:true});
 }
