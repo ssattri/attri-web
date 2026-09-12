@@ -28,12 +28,13 @@ Required production values:
 - `SUPABASE_DB_URL`: server-only Supabase transaction-pooler URL
 - `NEXT_PUBLIC_SITE_URL`: canonical HTTPS website URL
 - `ADMIN_EMAIL`: administrator email address
-- `ADMIN_PASSWORD`: strong administrator password
+- `ADMIN_PASSWORD`: strong administrator password; this is the only password accepted by the admin login
 - `ADMIN_SESSION_SECRET`: random value of at least 32 characters
 
-Production admin access intentionally fails closed when its credentials or
-session secret are missing. Never expose database credentials or admin secrets
-through a `NEXT_PUBLIC_` variable.
+Production admin access intentionally fails closed when its environment-managed
+credentials or session secret are missing. Changing either admin credential
+requires updating the server environment and redeploying. Never expose database
+credentials or admin secrets through a `NEXT_PUBLIC_` variable.
 
 ## Quality checks
 

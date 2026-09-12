@@ -25,8 +25,7 @@ export default async function AdminLogin({
         <input type="hidden" name="returnTo" value={returnTo}/>
         {hasError ? <div className="admin-login-error" role="alert">{query.error === "configuration" ? "Admin sign-in is not configured correctly yet. Use the secure recovery flow or contact the site owner." : "We could not verify those credentials. Check your email and password, then try again."}</div> : null}
         <label>Administrator email<input name="email" type="email" autoComplete="username" inputMode="email" defaultValue="attriassociates99@gmail.com" placeholder="admin@example.com" aria-invalid={hasError} required autoFocus/></label>
-        <label>Password or one-time password<input name="password" type="password" autoComplete="current-password" placeholder="Enter your password or OTP" aria-describedby="admin-password-help" aria-invalid={hasError} required/></label>
-        <p className="admin-login-help" id="admin-password-help">For first access, enter the server-configured one-time password here. After you sign in, you’ll create your permanent password.</p>
+        <label>Password<input name="password" type="password" autoComplete="current-password" placeholder="Enter your password" aria-invalid={hasError} required/></label>
         <button type="submit">Enter control centre →</button>
         <div className="admin-login-links"><Link href="/admin/reset-password">Need to reset your password?</Link><Link href="/">← Return to website</Link></div>
         <p className="admin-login-footnote">For authorised administrators only. Your session expires automatically.</p>

@@ -18,6 +18,9 @@ changes are grouped under `Unreleased` until a release version is assigned.
 
 ### Changed
 
+- Admin authentication now reads only `ADMIN_EMAIL` and `ADMIN_PASSWORD` from
+  the server environment; database password hashes and one-time-password
+  fallbacks are no longer used.
 - Clarified the admin login field and help text so administrators know where to
   enter the one-time password and what happens after successful verification.
 - Masked production database connection failures in password recovery responses
