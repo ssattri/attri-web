@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const ADMIN_SESSION_COOKIE = "attri_admin_session";
+const ADMIN_SESSION_COOKIE = "attri_admin_session_v2";
 const SESSION_LIFETIME_SECONDS = 60 * 60 * 8;
 
 function isProduction() { return process.env.NODE_ENV === "production"; }
@@ -32,15 +32,11 @@ export async function authenticateAdmin(email: string, password: string) {
 export async function createAdminSession(request?: Request) {
   const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS;
   const payload = `${adminEmail()}.${expires}`;
-  const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
-  const secure = forwarded ? forwarded === "https" : request ? new URL(request.url).protocol === "https:" : isProduction();
-  (await cookies()).set(ADMIN_SESSION_COOKIE, `${payload}.${await sign(payload)}`, { httpOnly: true, sameSite: "lax", secure, path: "/", maxAge: SESSION_LIFETIME_SECONDS });
+  (await cookies()).set(ADMIN_SESSION_COOKIE, `${payload}.${await sign(payload)}`, sessionCookieOptions(request, SESSION_LIFETIME_SECONDS));
 }
 
 export async function clearAdminSession(request?: Request) {
-  const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
-  const secure = forwarded ? forwarded === "https" : request ? new URL(request.url).protocol === "https:" : isProduction();
-  (await cookies()).set(ADMIN_SESSION_COOKIE, "", { httpOnly: true, sameSite: "lax", secure, path: "/", maxAge: 0 });
+  (await cookies()).set(ADMIN_SESSION_COOKIE, "", sessionCookieOptions(request, 0));
 }
 
 export async function getAdminUser(): Promise<AdminUser | null> {
@@ -49,9 +45,9 @@ export async function getAdminUser(): Promise<AdminUser | null> {
     if (!session) return null;
     const index = session.lastIndexOf(".");
     if (index < 0) return null;
-    const payload = session.slice(0, index), signature = session.slice(index + 1), parts = payload.split(".");
-    if (parts.length !== 2) return null;
-    const [email, expiry] = parts, expires = Number(expiry);
+    const payload = session.slice(0, index), signature = session.slice(index + 1), separator = payload.lastIndexOf(".");
+    if (separator < 1) return null;
+    const email = payload.slice(0, separator), expires = Number(payload.slice(separator + 1));
     if (email !== adminEmail() || !Number.isInteger(expires) || expires <= Math.floor(Date.now() / 1000) || !safeEqual(signature, await sign(payload))) return null;
     return { displayName: "SS Attri", email, fullName: "SS Attri" };
   } catch { return null; }
@@ -59,6 +55,14 @@ export async function getAdminUser(): Promise<AdminUser | null> {
 
 export async function requireAdminUser(returnTo: string): Promise<AdminUser> { const user = await getAdminUser(); if (user) return user; redirect(`/admin/login?return_to=${encodeURIComponent(safeAdminPath(returnTo))}`); }
 export function safeAdminPath(value: string | null | undefined) { if (!value?.startsWith("/admin") || value.startsWith("//")) return "/admin"; try { const url = new URL(value, "https://app.local"); return url.origin === "https://app.local" && url.pathname !== "/admin/login" ? `${url.pathname}${url.search}${url.hash}` : "/admin"; } catch { return "/admin"; } }
+
+function sessionCookieOptions(request: Request | undefined, maxAge: number) {
+  const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const secure = isProduction() || forwarded === "https" || (!forwarded && request ? new URL(request.url).protocol === "https:" : false);
+  const hostname = new URL(canonicalSiteUrl()).hostname.replace(/^www\./, "");
+  const domain = isProduction() && hostname === "attriassociates.com" ? hostname : undefined;
+  return { httpOnly: true, sameSite: "lax" as const, secure, path: "/", maxAge, ...(domain ? { domain } : {}) };
+}
 
 async function sign(payload: string) {
   const configured = process.env.ADMIN_SESSION_SECRET;
