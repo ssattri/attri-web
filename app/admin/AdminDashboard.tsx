@@ -54,7 +54,7 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   operations:{eyebrow:"ENTERPRISE OPERATIONS",title:"Certificates & payments"},
   automation:{eyebrow:"AUTOMATION",title:"Workflows & follow-ups"},
   vault:{eyebrow:"SECURE STORAGE",title:"Client file vault"},
-  settings:{eyebrow:"CONTROL CENTRE",title:"Settings & access"}
+  settings:{eyebrow:"SYSTEM / CONFIGURATION",title:"Settings & integrations"}
 };
 
 type PageRow={id:number;title:string;slug:string;status:string;excerpt:string;updatedAt:string};

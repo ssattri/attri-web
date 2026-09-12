@@ -264,7 +264,7 @@ footer>small{justify-self:end;color:rgba(255,255,255,.35);font-size:12px}
 .admin-header-action{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f59e0b,#f97316)!important;color:#111827!important;border:0;border-radius:7px;padding:11px 16px;font-weight:600;box-shadow:0 8px 18px rgba(245,158,11,.18)}
 .admin-main>section{display:none}
 .admin-module-overview #overview,.admin-module-overview #roadmap,.admin-module-analytics #analytics,.admin-module-notifications #notifications,.admin-module-seo-manager #seo-manager,.admin-module-database #database,.admin-module-data-managers #data-managers,.admin-module-permissions #permissions,.admin-module-pages #pages,.admin-module-projects #projects,.admin-module-leads #leads,.admin-module-appointments #appointments,.admin-module-products #products,.admin-module-commerce #commerce,.admin-module-courses #courses,.admin-module-learning #learning,.admin-module-support #support,.admin-module-finance #finance,.admin-module-reports #reports,.admin-module-operations #operations,.admin-module-automation #automation,.admin-module-vault #vault{display:grid}
-.admin-module-analytics #analytics,.admin-module-database #database,.admin-module-permissions #permissions{display:block}
+.admin-module-analytics #analytics,.admin-module-database #database,.admin-module-permissions #permissions,.admin-module-settings #settings{display:block}
 .admin-main>section.admin-stats{margin-top:0}
 .admin-main>header p,.panel-title p,.module-roadmap>div p{font-size:11px!important}.admin-main>header h1{font-size:27px!important}.admin-main>header a,.admin-main>header button{font-size:11px;padding:12px 16px}
 

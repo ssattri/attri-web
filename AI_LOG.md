@@ -363,3 +363,13 @@ environment values must never be recorded here.
   D1-based production source.
 - Recovery requires a 14-character password with uppercase, lowercase, number,
   and symbol characters, and invalidates all existing administrator sessions.
+# 2026-09-12 — Settings module blank-page fix
+- Diagnosed the empty Settings & Integrations view: the admin CSS hides all module sections by default (`.admin-main>section{display:none}`), but the settings module had no corresponding visibility selector.
+- Added `.admin-module-settings #settings{display:block}` and updated the module header to `SYSTEM / CONFIGURATION` / `Settings & integrations`.
+- Verified the settings component is mounted by `AdminDashboard` and its reference-layout markup remains intact.
+
+# 2026-09-12 — Admin refresh session persistence
+- Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
+- Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
+- This prevents hosting/proxy response handling from dropping the cookie between the login POST and dashboard redirect.
+- Cookie domain detection now honors `x-forwarded-host`, covering reverse-proxy deployments where the app process sees an internal host.

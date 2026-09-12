@@ -1,4 +1,5 @@
-import { adminRedirectUrl, authenticateAdmin, clearAdminSession, createAdminSession, safeAdminPath } from "../../../admin-auth";
+import { adminRedirectUrl, adminSessionCookie, authenticateAdmin, expiredAdminSessionCookie, safeAdminPath } from "../../../admin-auth";
+import { NextResponse } from "next/server";
 
 // Never expose the auth endpoint as a browser page if a proxy or user follows it.
 export async function GET(request: Request) {
@@ -16,14 +17,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    await createAdminSession(request);
-    return Response.redirect(adminRedirectUrl(request, returnTo), 303);
+    const response = NextResponse.redirect(adminRedirectUrl(request, returnTo), 303);
+    const cookie = await adminSessionCookie(request);
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
+    return response;
   } catch {
     return Response.redirect(adminRedirectUrl(request, `/admin/login?error=configuration&return_to=${encodeURIComponent(returnTo)}`), 303);
   }
 }
 
 export async function DELETE(request: Request) {
-  await clearAdminSession(request);
-  return Response.redirect(adminRedirectUrl(request, "/admin/login"), 303);
+  const response = NextResponse.redirect(adminRedirectUrl(request, "/admin/login"), 303);
+  const cookie = expiredAdminSessionCookie(request);
+  response.cookies.set(cookie.name, cookie.value, cookie.options);
+  return response;
 }

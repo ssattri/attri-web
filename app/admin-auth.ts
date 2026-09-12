@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const ADMIN_SESSION_COOKIE = "attri_admin_session_v2";
+export const ADMIN_SESSION_COOKIE = "attri_admin_session_v2";
 const SESSION_LIFETIME_SECONDS = 60 * 60 * 8;
 
 function isProduction() { return process.env.NODE_ENV === "production"; }
@@ -30,13 +30,23 @@ export async function authenticateAdmin(email: string, password: string) {
 }
 
 export async function createAdminSession(request?: Request) {
-  const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS;
-  const payload = `${adminEmail()}.${expires}`;
-  (await cookies()).set(ADMIN_SESSION_COOKIE, `${payload}.${await sign(payload)}`, sessionCookieOptions(request, SESSION_LIFETIME_SECONDS));
+  const cookie = await adminSessionCookie(request);
+  (await cookies()).set(cookie.name, cookie.value, cookie.options);
 }
 
 export async function clearAdminSession(request?: Request) {
   (await cookies()).set(ADMIN_SESSION_COOKIE, "", sessionCookieOptions(request, 0));
+}
+
+/** Build the signed cookie without relying on an implicit response mutation. */
+export async function adminSessionCookie(request?: Request) {
+  const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS;
+  const payload = `${adminEmail()}.${expires}`;
+  return { name: ADMIN_SESSION_COOKIE, value: `${payload}.${await sign(payload)}`, options: sessionCookieOptions(request, SESSION_LIFETIME_SECONDS) };
+}
+
+export function expiredAdminSessionCookie(request?: Request) {
+  return { name: ADMIN_SESSION_COOKIE, value: "", options: sessionCookieOptions(request, 0) };
 }
 
 export async function getAdminUser(): Promise<AdminUser | null> {
@@ -59,7 +69,9 @@ export function safeAdminPath(value: string | null | undefined) { if (!value?.st
 function sessionCookieOptions(request: Request | undefined, maxAge: number) {
   const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();
   const secure = isProduction() || forwarded === "https" || (!forwarded && request ? new URL(request.url).protocol === "https:" : false);
-  const hostname = request ? new URL(request.url).hostname.replace(/^www\./, "") : "";
+  const forwardedHost = request?.headers.get("x-forwarded-host")?.split(",")[0].trim();
+  const requestHost = forwardedHost || (request ? new URL(request.url).hostname : "");
+  const hostname = requestHost.replace(/^https?:\/\//, "").split(":")[0].replace(/^www\./, "").toLowerCase();
   const domain = hostname === "attriassociates.com" ? hostname : undefined;
   return { httpOnly: true, sameSite: "lax" as const, secure, path: "/", maxAge, expires: new Date(maxAge ? Date.now() + maxAge * 1000 : 0), ...(domain ? { domain } : {}) };
 }
