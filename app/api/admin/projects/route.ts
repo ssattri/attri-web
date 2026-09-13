@@ -1,8 +1,8 @@
-import { getChatGPTUser } from "../../../chatgpt-auth";
+import { getAdminUser } from "../../../admin-auth";
 import { env as runtimeEnv } from "@server";
 
 async function db() { return runtimeEnv.DB; }
-async function allowed() { const user = await getChatGPTUser(); return user?.email.toLowerCase() === "attriassociates99@gmail.com"; }
+async function allowed() { return Boolean(await getAdminUser()); }
 async function init() {
   const database = await db();
   await database.prepare(`CREATE TABLE IF NOT EXISTS projects (

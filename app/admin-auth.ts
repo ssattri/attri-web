@@ -6,7 +6,15 @@ const SESSION_LIFETIME_SECONDS = 60 * 60 * 8;
 
 function isProduction() { return process.env.NODE_ENV === "production"; }
 export function canonicalSiteUrl() { return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.attriassociates.com").replace(/\/$/, ""); }
-export function adminRedirectUrl(request: Request, path: string) { const incoming = new URL(request.url); return new URL(path, !isProduction() && ["localhost", "127.0.0.1", "0.0.0.0"].includes(incoming.hostname) ? incoming.origin : canonicalSiteUrl()); }
+export function adminRedirectUrl(request: Request, path: string) {
+  const incoming = new URL(request.url);
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0].trim();
+  const incomingHost = (forwardedHost || incoming.hostname).replace(/^https?:\/\//, "").split(":")[0].replace(/^www\./, "").toLowerCase();
+  const canonicalHost = new URL(canonicalSiteUrl()).hostname.replace(/^www\./, "").toLowerCase();
+  // Preview/review hosts must keep their own origin or the freshly-issued cookie is lost on redirect.
+  const useCanonical = incomingHost === canonicalHost || incomingHost === "attriassociates.com";
+  return new URL(path, useCanonical ? canonicalSiteUrl() : incoming.origin);
+}
 export type AdminUser = { displayName: string; email: string; fullName: string };
 
 export function adminEmail() {

@@ -388,6 +388,20 @@ environment values must never be recorded here.
 - Added a dedicated Product Categories module with reusable name, description, icon URL, display order, status, edit, and delete functionality.
 - Extended the commerce schema/API to persist category descriptions and icon URLs while preserving existing products, pricing, inventory, HSN, GST, media, SEO, course, and service fields.
 
+# 2026-09-13 — Admin platform authorization audit
+- Audited admin modules against the ENV-based signed admin session and found legacy ChatGPT identity checks in leads, projects, appointments, finance, permissions, data managers, database, growth, notifications, operations, and support APIs.
+- Replaced those checks with `getAdminUser()` so one authenticated admin session consistently powers every backend module.
+- Preserved audit logging with the signed admin email and verified the complete TypeScript surface after the authorization migration.
+
+# 2026-09-13 — Consultancy booking workflow fields
+- Extended appointment persistence with consultant preference, booking type (`now` or `scheduled`), meeting URL, and admin notes.
+- Added public booking choices for phone, chat, and video modes plus consultant preference and immediate/scheduled requests.
+- Kept existing appointment references, validation, confirmation statuses, and legacy records compatible through additive schema migration.
+
+# 2026-09-13 — Admin refresh-session redirect fix
+- Fixed preview/staging authentication persistence: login redirects now remain on the host that issued the session cookie instead of forcing a canonical production host.
+- Canonical redirects remain active for the real `attriassociates.com` / `www.attriassociates.com` hosts, while review hosts keep host-only cookies and survive refresh.
+
 # 2026-09-12 — Admin refresh session persistence
 - Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.

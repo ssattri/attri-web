@@ -1,7 +1,7 @@
-import{getChatGPTUser}from"../../../chatgpt-auth";
+import{getAdminUser}from"../../../admin-auth";
 import { env as runtimeEnv } from "@server";
 const db = () => runtimeEnv.DB;
-async function owner(){return(await getChatGPTUser())?.email.toLowerCase()==="attriassociates99@gmail.com"}
+async function owner(){return Boolean(await getAdminUser())}
 const core=[
  ["cms_pages","CMS Pages"],["leads","CRM Leads"],["customer_profiles","Customers"],["projects","Projects"],["project_milestones","Milestones"],
  ["appointments","Appointments"],["products","Products"],["orders","Orders"],["courses","Courses"],["enrollments","Enrollments"],
