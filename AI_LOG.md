@@ -1,5 +1,10 @@
 # AI Work Log
 
+# 2026-09-13 — Frontend email/password account authentication
+- Replaced the public client login’s ChatGPT sign-in dependency with Supabase email/password sign-in and account creation.
+- Added a secure HTTP-only session cookie, server-side Supabase user lookup, sign-out handling, and preserved user/consultant registration gates.
+- Replaced the public header “Client login” text with an accessible person/account icon and documented required public Supabase Auth environment variables.
+
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,
 technical decisions, checks performed, and unresolved risks. Secrets and raw

@@ -1,7 +1,7 @@
-import { headers } from "next/headers";
 import { env as runtimeEnv } from "@server";
 import { redirect } from "next/navigation";
 import { getAdminUser } from "./admin-auth";
+import { getAppUser } from "./user-auth";
 
 export type ChatGPTUser = {
   displayName: string;
@@ -22,22 +22,7 @@ const CALLBACK_PATH = "/callback";
 export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
   const admin = await getAdminUser();
   if (admin) return admin;
-  const requestHeaders = await headers();
-  const email = requestHeaders.get(USER_EMAIL_HEADER);
-  if (!email) return null;
-
-  const encodedFullName = requestHeaders.get(USER_FULL_NAME_HEADER);
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get(USER_FULL_NAME_ENCODING_HEADER) === PERCENT_ENCODED_UTF8
-      ? safeDecodeURIComponent(encodedFullName)
-      : null;
-
-  return {
-    displayName: fullName ?? email,
-    email,
-    fullName,
-  };
+  return getAppUser();
 }
 
 export async function requireChatGPTUser(
@@ -46,7 +31,7 @@ export async function requireChatGPTUser(
   const user = await getChatGPTUser();
   if (user) return user;
 
-  redirect(chatGPTSignInPath(returnTo));
+  redirect(`/client/login?returnTo=${encodeURIComponent(returnTo)}`);
 }
 
 export async function getRegisteredAccount():Promise<RegisteredAccount|null>{
