@@ -407,6 +407,10 @@ environment values must never be recorded here.
 - Confirmed `/client/login`, onboarding, `/client`, and `/consultant` use the shared Attri visual system and preserve the registration gate before dashboard access.
 - Added the host-preserving auth redirect fix so this same frontend account flow remains stable on the supplied review domain.
 
+# 2026-09-13 — Admin breadcrumb cleanup
+- Removed duplicate page-level breadcrumb/eyebrow labels from admin module panels while retaining the single breadcrumb in the sticky admin header.
+- Applied the cleanup to catalogue, categories, settings, and standard admin panel titles for consistent navigation hierarchy.
+
 # 2026-09-12 — Admin refresh session persistence
 - Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
