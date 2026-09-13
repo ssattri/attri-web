@@ -368,6 +368,15 @@ environment values must never be recorded here.
 - Added `.admin-module-settings #settings{display:block}` and updated the module header to `SYSTEM / CONFIGURATION` / `Settings & integrations`.
 - Verified the settings component is mounted by `AdminDashboard` and its reference-layout markup remains intact.
 
+# 2026-09-13 — Unified typography and admin session hardening
+- Switched the shared font import to Poppins and added a final typography layer so public pages, admin pages, headings, controls, and forms use one consistent type system.
+- Added responsive admin spacing, card surfaces, focus-visible states, and mobile grid refinements.
+- Confirmed the refresh-safe admin cookie implementation remains type-safe after the auth response-cookie changes.
+
+# 2026-09-13 — Reference-aligned admin login
+- Inspected the supplied deployed login page and matched its two-column secure-administration composition, deep blue architectural panel, trust badges, centered white login article, field styling, and responsive breakpoints.
+- Kept the existing environment-only credential validation and direct response cookie session flow intact.
+
 # 2026-09-12 — Admin refresh session persistence
 - Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
