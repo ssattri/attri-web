@@ -5,6 +5,10 @@
 - Added a secure HTTP-only session cookie, server-side Supabase user lookup, sign-out handling, and preserved user/consultant registration gates.
 - Replaced the public header “Client login” text with an accessible person/account icon and documented required public Supabase Auth environment variables.
 
+# 2026-09-13 — Store & Academy navigation modules
+- Added dedicated backend navigation for Shipping Rules, GST & Tax, and Course Categories under Store & Academy.
+- Added authenticated CRUD storage for these configuration records with matching admin forms, list views, validation, delete actions, and responsive styling.
+
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,
 technical decisions, checks performed, and unresolved risks. Secrets and raw

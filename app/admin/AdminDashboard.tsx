@@ -13,13 +13,14 @@ import SettingsCenter from "./SettingsCenter";
 import ProductCatalogue from "./products/ProductCatalogue";
 import ProductCategories from "./products/ProductCategories";
 import CourseCatalogue from "./courses/CourseCatalogue";
+import StoreAcademyModules from "./StoreAcademyModules";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["monitoring","Live Monitoring","◉"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
   ["seo-manager","SEO Manager","↗"],["database","Database","◫"],["data-managers","Data Managers","⌗"],
   ["permissions","Team Access","♙"],["pages","Frontend Modules","▤"],["projects","Projects","◇"],
   ["leads","Leads & CRM","◎"],["appointments","Appointments","◷"],["products","Products","＋"],["product-categories","Product Categories","◇"],["commerce","Orders","□"],
-  ["courses","Courses","△"],["learning","Students & LMS","♢"],["support","Support Tickets","◉"],["finance","Invoices","₹"],
+  ["courses","Courses","△"],["course-categories","Course Categories","▤"],["learning","Students & LMS","♢"],["support","Support Tickets","◉"],["finance","Invoices","₹"],["shipping-rules","Shipping Rules","▱"],["gst-tax","GST & Tax","¤"],
   ["reports","Reports","▥"],["operations","Operations","⚙"],["automation","Workflows","↻"],
   ["vault","Media Manager","⌘"],["settings","Settings & Integrations","⚙"]
 ] as const;
@@ -27,7 +28,7 @@ export const adminModules = [
 const adminNavigation = [
   { label: "Workspace", items: ["overview", "monitoring", "analytics", "notifications"] },
   { label: "Growth & content", items: ["seo-manager", "leads", "projects", "appointments"] },
-  { label: "Commerce & learning", items: ["products", "product-categories", "commerce", "courses", "learning", "finance"] },
+  { label: "Store & Academy", items: ["products", "product-categories", "commerce", "shipping-rules", "gst-tax", "courses", "course-categories", "learning", "finance"] },
   { label: "Client operations", items: ["support", "reports"] },
   { label: "System & administration", items: ["operations", "automation", "pages", "data-managers", "database", "vault", "permissions", "settings"] },
 ] as const;
@@ -52,6 +53,9 @@ const moduleTitles:Record<string,{eyebrow:string;title:string}> = {
   learning:{eyebrow:"ATTRI ACADEMY",title:"Students & enrollments"},
   support:{eyebrow:"CLIENT SUCCESS",title:"Support tickets"},
   finance:{eyebrow:"FINANCE",title:"Invoices & receivables"},
+  "shipping-rules":{eyebrow:"STORE / FULFILMENT",title:"Shipping rules"},
+  "gst-tax":{eyebrow:"STORE / COMPLIANCE",title:"GST & Tax"},
+  "course-categories":{eyebrow:"ATTRI ACADEMY / CATALOGUE",title:"Course categories"},
   reports:{eyebrow:"CONSULTATION INTELLIGENCE",title:"Client reports"},
   operations:{eyebrow:"ENTERPRISE OPERATIONS",title:"Certificates & payments"},
   automation:{eyebrow:"AUTOMATION",title:"Workflows & follow-ups"},
@@ -262,6 +266,10 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
             </article>)}
           </div>
       </section>}
+
+      {module==="shipping-rules"&&<StoreAcademyModules kind="shipping"/>}
+      {module==="gst-tax"&&<StoreAcademyModules kind="tax"/>}
+      {module==="course-categories"&&<StoreAcademyModules kind="course-category"/>}
 
       <section className="admin-panel split-module" id="learning">
         <div className="panel-title"><div><p>STUDENT MANAGEMENT</p><h2>Enrollments</h2></div><span>{enrollments.length} enrollments</span></div>
