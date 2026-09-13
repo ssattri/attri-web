@@ -402,6 +402,11 @@ environment values must never be recorded here.
 - Fixed preview/staging authentication persistence: login redirects now remain on the host that issued the session cookie instead of forcing a canonical production host.
 - Canonical redirects remain active for the real `attriassociates.com` / `www.attriassociates.com` hosts, while review hosts keep host-only cookies and survive refresh.
 
+# 2026-09-13 — Frontend account-flow alignment
+- Reviewed the previous-domain account flow and retained the secure split between verified sign-in, user/consultant registration, and role-based dashboard routing.
+- Confirmed `/client/login`, onboarding, `/client`, and `/consultant` use the shared Attri visual system and preserve the registration gate before dashboard access.
+- Added the host-preserving auth redirect fix so this same frontend account flow remains stable on the supplied review domain.
+
 # 2026-09-12 — Admin refresh session persistence
 - Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
