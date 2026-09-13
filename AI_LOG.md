@@ -383,6 +383,11 @@ environment values must never be recorded here.
 - Added working Security and Sign out actions to the admin header/sidebar. Sign-out clears the signed admin cookie through a direct redirect response.
 - Preserved the ENV-only password model: actual password changes require updating `ADMIN_PASSWORD` and redeploying.
 
+# 2026-09-13 — Reference-aligned product catalogue
+- Reworked the admin product listing into the supplied catalogue layout with a clean heading/action bar, search and category filters, dynamic product rows, status controls, edit links, and delete confirmation.
+- Added a dedicated Product Categories module with reusable name, description, icon URL, display order, status, edit, and delete functionality.
+- Extended the commerce schema/API to persist category descriptions and icon URLs while preserving existing products, pricing, inventory, HSN, GST, media, SEO, course, and service fields.
+
 # 2026-09-12 — Admin refresh session persistence
 - Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
