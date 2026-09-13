@@ -377,6 +377,12 @@ environment values must never be recorded here.
 - Inspected the supplied deployed login page and matched its two-column secure-administration composition, deep blue architectural panel, trust badges, centered white login article, field styling, and responsive breakpoints.
 - Kept the existing environment-only credential validation and direct response cookie session flow intact.
 
+# 2026-09-13 — Account security and sign-out centre
+- Added `/admin/security` with the supplied security-centre layout: account summary, active-session information, password form, environment-managed credential notice, and responsive styling.
+- Added server-side current-password verification at `/api/admin/security`; incorrect passwords are rejected without changing session state.
+- Added working Security and Sign out actions to the admin header/sidebar. Sign-out clears the signed admin cookie through a direct redirect response.
+- Preserved the ENV-only password model: actual password changes require updating `ADMIN_PASSWORD` and redeploying.
+
 # 2026-09-12 — Admin refresh session persistence
 - Changed admin login and logout redirects to attach the session cookie directly to the returned `NextResponse`.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
