@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 // Never expose the auth endpoint as a browser page if a proxy or user follows it.
 export async function GET(request: Request) {
-  return Response.redirect(adminRedirectUrl(request, "/admin/login"), 303);
+  return Response.redirect(adminRedirectUrl(request, "/ss_attri/admin/login"), 303);
 }
 
 export async function POST(request: Request) {
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const returnTo = safeAdminPath(String(form.get("returnTo") || "/admin"));
 
   if (!await authenticateAdmin(email, password)) {
-    return Response.redirect(adminRedirectUrl(request, `/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`), 303);
+    return Response.redirect(adminRedirectUrl(request, `/ss_attri/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`), 303);
   }
 
   try {
@@ -22,12 +22,12 @@ export async function POST(request: Request) {
     response.cookies.set(cookie.name, cookie.value, cookie.options);
     return response;
   } catch {
-    return Response.redirect(adminRedirectUrl(request, `/admin/login?error=configuration&return_to=${encodeURIComponent(returnTo)}`), 303);
+    return Response.redirect(adminRedirectUrl(request, `/ss_attri/admin/login?error=configuration&return_to=${encodeURIComponent(returnTo)}`), 303);
   }
 }
 
 export async function DELETE(request: Request) {
-  const response = NextResponse.redirect(adminRedirectUrl(request, "/admin/login"), 303);
+  const response = NextResponse.redirect(adminRedirectUrl(request, "/ss_attri/admin/login"), 303);
   const cookie = expiredAdminSessionCookie(request);
   response.cookies.set(cookie.name, cookie.value, cookie.options);
   return response;

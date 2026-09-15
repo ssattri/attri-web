@@ -71,8 +71,8 @@ export async function getAdminUser(): Promise<AdminUser | null> {
   } catch { return null; }
 }
 
-export async function requireAdminUser(returnTo: string): Promise<AdminUser> { const user = await getAdminUser(); if (user) return user; redirect(`/admin/login?return_to=${encodeURIComponent(safeAdminPath(returnTo))}`); }
-export function safeAdminPath(value: string | null | undefined) { if (!value?.startsWith("/admin") || value.startsWith("//")) return "/admin"; try { const url = new URL(value, "https://app.local"); return url.origin === "https://app.local" && url.pathname !== "/admin/login" ? `${url.pathname}${url.search}${url.hash}` : "/admin"; } catch { return "/admin"; } }
+export async function requireAdminUser(returnTo: string): Promise<AdminUser> { const user = await getAdminUser(); if (user) return user; redirect(`/ss_attri/admin/login?return_to=${encodeURIComponent(safeAdminPath(returnTo))}`); }
+export function safeAdminPath(value: string | null | undefined) { if (!value?.startsWith("/ss_attri/admin") || value.startsWith("//")) return "/ss_attri/admin"; try { const url = new URL(value, "https://app.local"); return url.origin === "https://app.local" && url.pathname !== "/ss_attri/admin/login" ? `${url.pathname}${url.search}${url.hash}` : "/ss_attri/admin"; } catch { return "/ss_attri/admin"; } }
 
 function sessionCookieOptions(request: Request | undefined, maxAge: number) {
   const forwarded = request?.headers.get("x-forwarded-proto")?.split(",")[0].trim();

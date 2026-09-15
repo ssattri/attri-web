@@ -9,6 +9,10 @@
 - Added dedicated backend navigation for Shipping Rules, GST & Tax, and Course Categories under Store & Academy.
 - Added authenticated CRUD storage for these configuration records with matching admin forms, list views, validation, delete actions, and responsive styling.
 
+# 2026-09-13 — Admin URL namespace
+- Added `/ss_attri/admin` as the canonical admin entry path with rewrites to the existing protected admin implementation.
+- Updated authentication redirects and protected-page return paths to use the new namespace while preserving existing API routes and session cookies.
+
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,
 technical decisions, checks performed, and unresolved risks. Secrets and raw

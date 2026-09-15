@@ -6,5 +6,5 @@ const modules=["overview","analytics","notifications","seo-manager","database","
 export default async function AdminModulePage({params}:{params:Promise<{module:string}>}) {
   const {module}=await params;
   if(!modules.includes(module)) notFound();
-  redirect(module==="overview"?"/admin":`/admin?module=${encodeURIComponent(module)}`);
+  redirect(module==="overview"?"/ss_attri/admin":`/ss_attri/admin?module=${encodeURIComponent(module)}`);
 }

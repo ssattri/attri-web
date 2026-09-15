@@ -3,6 +3,9 @@ import path from "node:path";
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  async rewrites() {
+    return [{ source: "/ss_attri/admin", destination: "/admin" }, { source: "/ss_attri/admin/:path*", destination: "/admin/:path*" }];
+  },
   webpack(config) {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
