@@ -22,6 +22,7 @@
 - Updated the public checkout drawer with GST/shipping breakdowns and a Razorpay payment choice that launches checkout and verifies the payment before confirmation.
 - Added a signed Razorpay webhook endpoint for captured, failed, paid, and refund events, including order timeline entries and idempotent status reconciliation.
 - Added admin payment timelines with GST, shipping, payment status, and webhook event visibility for each order.
+- Applied the final-sale policy: checkout discloses that products, digital goods, courses, consultations, and services are non-returnable/non-refundable; refund status changes are rejected and refund webhooks are logged for manual review.
 
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,

@@ -15,7 +15,7 @@ export async function POST(request:Request){
   const paid=["payment.captured","order.paid"].includes(event),failed=event==="payment.failed",refunded=event.startsWith("refund.");
   if(paid)await env.DB.prepare("UPDATE orders SET payment_status='paid',status='confirmed',updated_at=CURRENT_TIMESTAMP,admin_notes=? WHERE id=?").bind(`Razorpay webhook ${payment?.id||event}`,order.id).run();
   else if(failed)await env.DB.prepare("UPDATE orders SET payment_status='failed',status='pending',updated_at=CURRENT_TIMESTAMP,admin_notes=? WHERE id=?").bind(`Razorpay payment failed ${payment?.id||""}`,order.id).run();
-  else if(refunded)await env.DB.prepare("UPDATE orders SET payment_status='refunded',status='cancelled',updated_at=CURRENT_TIMESTAMP,admin_notes=? WHERE id=?").bind(`Razorpay refund ${payload.payload?.refund?.entity?.id||""}`,order.id).run();
+  else if(refunded)await env.DB.prepare("UPDATE orders SET admin_notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(`Refund event received (${payload.payload?.refund?.entity?.id||""}) — non-refundable policy requires manual review`,order.id).run();
   const eventStatus=paid?"paid":failed?"payment-failed":refunded?"refunded":event;const eventNote=`Razorpay webhook: ${event}`;const seen=await env.DB.prepare("SELECT id FROM order_events WHERE order_id=? AND status=? AND note=? LIMIT 1").bind(order.id,eventStatus,eventNote).first<{id:number}>();if(!seen)await env.DB.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(order.id,eventStatus,eventNote).run();
   return Response.json({received:true});
 }

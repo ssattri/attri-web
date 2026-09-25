@@ -72,7 +72,7 @@ export async function POST(request:Request){
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(reference,body.name.trim(),body.email.trim().toLowerCase(),body.phone.trim(),body.address.trim(),body.city.trim(),body.state.trim(),body.pincode.trim(),JSON.stringify(items),subtotal,shippingAmount,taxAmount,total,paymentMethod).run();
   await database.batch([
     ...items.map(x=>database.prepare("UPDATE products SET stock=stock-? WHERE id=? AND stock>=?").bind(x.quantity,x.id,x.quantity)),
-    database.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(inserted.meta.last_row_id,"pending","Order placed by customer")
+    database.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(inserted.meta.last_row_id,"pending","Order placed by customer — final sale, no returns or refunds")
   ]);
   if(paymentMethod==="razorpay"){
     const credentials=await razorpayCredentials(database);

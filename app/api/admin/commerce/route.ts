@@ -102,7 +102,7 @@ export async function PATCH(request:Request){
     }
   }else{
     if(!["pending","confirmed","processing","shipped","completed","cancelled"].includes(body.status??""))return Response.json({error:"Invalid order status"},{status:400});
-    if(body.paymentStatus&&!['pending','paid','failed','refunded'].includes(body.paymentStatus))return Response.json({error:"Invalid payment status"},{status:400});
+    if(body.paymentStatus&&!['pending','created','paid','failed'].includes(body.paymentStatus))return Response.json({error:"Refunds are not applicable to Attri products and services."},{status:400});
     await ensureOrders(database);
     await database.batch([
       database.prepare("UPDATE orders SET status=?,payment_status=COALESCE(?,payment_status),tracking_number=COALESCE(?,tracking_number),admin_notes=COALESCE(?,admin_notes),updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(body.status,body.paymentStatus??null,body.trackingNumber?.trim()??null,body.adminNotes?.trim()??null,body.id),
