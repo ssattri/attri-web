@@ -540,3 +540,23 @@ environment values must never be recorded here.
 - Kept the signed, 8-hour, HTTP-only cookie and apex-domain coverage for both `attriassociates.com` and `www.attriassociates.com`.
 - This prevents hosting/proxy response handling from dropping the cookie between the login POST and dashboard redirect.
 - Cookie domain detection now honors `x-forwarded-host`, covering reverse-proxy deployments where the app process sees an internal host.
+
+# 2026-09-25 - Consultation slot contract
+- Added server-side allow-lists for consultation time slots and consultant preferences so crafted requests cannot bypass the options shown in the booking form.
+- Normalized dash and encoding variants in submitted time labels to keep the API compatible with existing frontend and stored appointment values.
+
+# 2026-09-25 - Dynamic consultation availability
+- Connected the public booking picker to appointment availability that reads pending and confirmed bookings from the backend.
+- Added consultant-aware capacity logic: a named consultant blocks only their own slot, while an any-consultant booking or all named consultants being booked closes the slot for everyone.
+
+# 2026-09-25 - Order status notifications
+- Connected admin order fulfilment updates to individual client portal notifications.
+- Every valid status change now creates an order timeline event and notifies the customer with a direct link to order history, while preserving the no-refund policy.
+
+# 2026-09-25 - Client notification loop verification
+- Verified the existing client notification centre consumes the same portal notification records created by order fulfilment and consultation actions.
+- Confirmed unread counts, mark-as-read behavior, role targeting, expiry filtering, and action links remain shared across user and consultant workspaces.
+
+# 2026-09-25 - Order lifecycle safeguards
+- Added backend transition guards so completed and cancelled orders cannot be moved back into active fulfilment states.
+- Kept the admin order controls and client timeline consistent with the final-sale, no-refund workflow.

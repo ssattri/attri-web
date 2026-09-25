@@ -105,10 +105,18 @@ export async function PATCH(request:Request){
     if(!["pending","confirmed","processing","shipped","completed","cancelled"].includes(body.status??""))return Response.json({error:"Invalid order status"},{status:400});
     if(body.paymentStatus&&!['pending','created','paid','failed'].includes(body.paymentStatus))return Response.json({error:"Refunds are not applicable to Attri products and services."},{status:400});
     await ensureOrders(database);
+    const order=await database.prepare("SELECT reference,email FROM orders WHERE id=?").bind(body.id).first<{reference:string;email:string}>();
+    const current=await database.prepare("SELECT status FROM orders WHERE id=?").bind(body.id).first<{status:string}>();
+    if(!current)return Response.json({error:"Order not found."},{status:404});
+    if(["completed","cancelled"].includes(current.status)&&body.status!==current.status)return Response.json({error:`A ${current.status} order cannot be moved back to another status.`},{status:409});
     await database.batch([
       database.prepare("UPDATE orders SET status=?,payment_status=COALESCE(?,payment_status),tracking_number=COALESCE(?,tracking_number),admin_notes=COALESCE(?,admin_notes),updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(body.status,body.paymentStatus??null,body.trackingNumber?.trim()??null,body.adminNotes?.trim()??null,body.id),
       database.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(body.id,body.status,body.adminNotes?.trim()||`Order moved to ${body.status}`)
     ]);
+    if(order){
+      await database.prepare("CREATE TABLE IF NOT EXISTS portal_notifications (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,message TEXT NOT NULL,audience TEXT NOT NULL DEFAULT 'all',recipient_email TEXT NOT NULL DEFAULT '',severity TEXT NOT NULL DEFAULT 'info',action_url TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'published',expires_at TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+      await database.prepare("INSERT INTO portal_notifications(title,message,audience,recipient_email,severity,action_url) VALUES (?,?,?,?,?,?)").bind(`Order ${body.status}`,`Your order ${order.reference} is now ${body.status}. Check your client portal for the latest fulfilment details.`,`individual`,order.email.toLowerCase(),body.status==="completed"?"success":"info","/client/orders").run();
+    }
   }
   return Response.json({success:true});
 }
