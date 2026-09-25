@@ -29,6 +29,8 @@
 - Added consultant-aware availability and conflict checks so preferred consultant slots are reconciled consistently on the frontend and backend.
 - Bound the consultant selector to live availability refreshes in the public booking form.
 - Added an admin consultation calendar workspace for consultant assignment, meeting links, notes, and booking status updates.
+- Exposed assigned consultant and meeting-link readiness in the authenticated client consultation history data.
+- Added secure client-facing Join meeting actions for confirmed bookings with an administrator-provided meeting URL.
 
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,
