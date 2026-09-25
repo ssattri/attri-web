@@ -1,5 +1,31 @@
 # AI Work Log
 
+# 2026-09-25 - Consultation date validation
+- Added server-side validation that rejects malformed or past consultation dates, complementing the frontend date picker and availability checks.
+
+# 2026-09-25 - Consultation service structured data
+- Added Service JSON-LD to the consultation booking page for Vastu, architecture, structural, and interior consultation offerings.
+
+# 2026-09-25 - Public catalogue search
+- Added `/shop/search` using the shop search API with responsive results and direct links to product and course detail pages.
+
+# 2026-09-25 - CMS admin authorization alignment
+- Replaced the hard-coded CMS owner email check with the signed admin session, allowing the configured admin account to manage pages securely.
+
+# 2026-09-25 - CMS page creation workflow
+- Added `/ss_attri/admin/pages/new` for creating draft pages with content and complete SEO metadata from the initial form.
+
+# 2026-09-25 - Organization structured data
+- Added site-wide Organization JSON-LD structured data with the configured public URL and logo for richer search understanding.
+
+# 2026-09-25 - CMS page editor and SEO fields
+- Added a dedicated admin page editor with content, publishing, slug, meta title, keywords, and description controls.
+- Extended the CMS PATCH API to persist page content and SEO metadata.
+
+# 2026-09-25 - Dynamic sitemap and robots
+- Added database-backed sitemap generation for products, courses, and published CMS pages.
+- Added robots rules that keep admin, API, client, consultant, and sign-out routes out of search indexing.
+
 # 2026-09-25 - SEO audit editor links
 - Added direct editor links to SEO audit issues for products, courses, and CMS-managed pages.
 

@@ -2,6 +2,9 @@ import { getAdminUser } from "../../admin-auth";
 import { env as runtimeEnv } from "@server";
 
 const db = () => runtimeEnv.DB;
+const normalizeSlot=(value:string)=>value.replace(/â€“|–|-/g,"-").replace(/\s+/g," ").trim();
+const approvedTimes=["10:00 AM - 11:00 AM","11:30 AM - 12:30 PM","2:00 PM - 3:00 PM","3:30 PM - 4:30 PM","5:00 PM - 6:00 PM"];
+const approvedConsultants=["Any available consultant","Senior Vastu Consultant","Architecture Consultant","Interior & Design Consultant"];
 async function owner(){return Boolean(await getAdminUser())}
 async function init(){
   const database=await db();
@@ -25,6 +28,9 @@ export async function POST(request:Request){
   if(required.some(k=>!body[k]?.trim()))return Response.json({error:"Please complete all required fields."},{status:400});
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))return Response.json({error:"Enter a valid email address."},{status:400});
   if(!/^[+0-9 ()-]{8,18}$/.test(body.phone))return Response.json({error:"Enter a valid phone number."},{status:400});
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(body.preferredDate)||Number.isNaN(Date.parse(`${body.preferredDate}T00:00:00`))||body.preferredDate<new Date().toISOString().slice(0,10))return Response.json({error:"Choose a valid future consultation date."},{status:400});
+  if(!approvedTimes.includes(normalizeSlot(body.preferredTime)))return Response.json({error:"Choose an available consultation time."},{status:400});
+  if(body.consultantPreference&&!approvedConsultants.includes(body.consultantPreference))return Response.json({error:"Choose a valid consultant preference."},{status:400});
   const reference=`AA-${Date.now().toString(36).toUpperCase()}`;
   await init();const database=await db();
   const conflict=body.consultantPreference&&body.consultantPreference!=="Any available consultant"?await database.prepare("SELECT id FROM appointments WHERE preferred_date=? AND preferred_time=? AND consultant_preference=? AND status IN ('pending','confirmed') LIMIT 1").bind(body.preferredDate,body.preferredTime,body.consultantPreference).first<{id:number}>():await database.prepare("SELECT id FROM appointments WHERE preferred_date=? AND preferred_time=? AND status IN ('pending','confirmed') LIMIT 1").bind(body.preferredDate,body.preferredTime).first<{id:number}>();

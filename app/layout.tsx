@@ -41,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"Organization",name:"Attri Associates & Vastu Consultants",url:process.env.NEXT_PUBLIC_SITE_URL||"https://www.attriassociates.com",logo:`${process.env.NEXT_PUBLIC_SITE_URL||"https://www.attriassociates.com"}/favicon.svg`})}}/>{children}</body>
     </html>
   );
 }

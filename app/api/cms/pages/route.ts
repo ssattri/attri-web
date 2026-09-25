@@ -1,11 +1,8 @@
-import { getChatGPTUser } from "../../../chatgpt-auth";
+import { getAdminUser } from "../../../admin-auth";
 import { env as runtimeEnv } from "@server";
 
-const OWNER_EMAILS = new Set(["attriassociates99@gmail.com"]);
-
 async function authorize() {
-  const user = await getChatGPTUser();
-  return user && OWNER_EMAILS.has(user.email.toLowerCase()) ? user : null;
+  return await getAdminUser();
 }
 
 function getDatabase() {
@@ -40,7 +37,7 @@ export async function GET() {
   await ensureSchema();
   const db = await getDatabase();
   const rows = await db.prepare(
-      "SELECT id, title, slug, status, excerpt, seo_title AS seoTitle, seo_keywords AS seoKeywords, seo_description AS seoDescription, updated_at AS updatedAt FROM cms_pages ORDER BY updated_at DESC LIMIT 100",
+      "SELECT id, title, slug, status, excerpt, content, seo_title AS seoTitle, seo_keywords AS seoKeywords, seo_description AS seoDescription, updated_at AS updatedAt FROM cms_pages ORDER BY updated_at DESC LIMIT 100",
   ).all();
   return Response.json({ pages: rows.results });
 }
@@ -67,14 +64,13 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   const user = await authorize();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-  const body = (await request.json()) as { id?: number; status?: string };
-  if (!body.id || !["draft", "published", "archived"].includes(body.status ?? "")) {
-    return Response.json({ error: "Valid page and status are required" }, { status: 400 });
-  }
+  const body = (await request.json()) as { id?: number; status?: string; title?: string; slug?: string; excerpt?: string; content?: string; seoTitle?: string; seoKeywords?: string; seoDescription?: string };
+  if (!body.id) return Response.json({ error: "A page is required" }, { status: 400 });
   await ensureSchema();
   const db = await getDatabase();
-  await db.prepare("UPDATE cms_pages SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
-    .bind(body.status, body.id).run();
+  if (body.title?.trim()) { const slug = (body.slug?.trim() || body.title).toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, ""); await db.prepare("UPDATE cms_pages SET title=?,slug=?,excerpt=?,content=?,seo_title=?,seo_keywords=?,seo_description=?,status=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(body.title.trim(),slug,body.excerpt?.trim()||"",body.content||"",body.seoTitle?.trim()||body.title.trim(),body.seoKeywords?.trim()||"",body.seoDescription?.trim()||body.excerpt?.trim()||"",["draft","published","archived"].includes(body.status||"")?body.status:"draft",body.id).run(); }
+  else if (["draft", "published", "archived"].includes(body.status ?? "")) await db.prepare("UPDATE cms_pages SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(body.status, body.id).run();
+  else return Response.json({ error: "Valid page fields are required" }, { status: 400 });
   return Response.json({ success: true });
 }
 

@@ -1,0 +1,1 @@
+import{requireAdminUser}from"../../admin-auth";import PagesManager from"./PagesManager";export const dynamic="force-dynamic";export default async function AdminPages(){await requireAdminUser("/ss_attri/admin/pages");return <main className="admin-main"><PagesManager/></main>}
