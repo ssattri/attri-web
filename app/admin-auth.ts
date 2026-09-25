@@ -9,11 +9,11 @@ export function canonicalSiteUrl() { return (process.env.NEXT_PUBLIC_SITE_URL ||
 export function adminRedirectUrl(request: Request, path: string) {
   const incoming = new URL(request.url);
   const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0].trim();
-  const incomingHost = (forwardedHost || incoming.hostname).replace(/^https?:\/\//, "").split(":")[0].replace(/^www\./, "").toLowerCase();
-  const canonicalHost = new URL(canonicalSiteUrl()).hostname.replace(/^www\./, "").toLowerCase();
-  // Preview/review hosts must keep their own origin or the freshly-issued cookie is lost on redirect.
-  const useCanonical = incomingHost === canonicalHost || incomingHost === "attriassociates.com";
-  return new URL(path, useCanonical ? canonicalSiteUrl() : incoming.origin);
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  // Keep the login redirect on the exact host that issued the cookie. Redirecting
+  // from apex to www (or vice versa) can make a freshly-created session appear lost.
+  const origin = forwardedHost ? `${forwardedProto || incoming.protocol.replace(":", "")}://${forwardedHost}` : incoming.origin;
+  return new URL(path, origin);
 }
 export type AdminUser = { displayName: string; email: string; fullName: string };
 

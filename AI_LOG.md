@@ -1,5 +1,8 @@
 # AI Work Log
 
+# 2026-09-25 - Admin session host persistence fix
+- Updated admin login redirects to stay on the exact host that issued the session cookie, avoiding apex/www or proxy-origin changes that caused refreshes to lose authentication.
+
 # 2026-09-25 - Inventory alert UI
 - Added low-stock warning, filter controls, and highlighted stock values to the admin product catalogue.
 
