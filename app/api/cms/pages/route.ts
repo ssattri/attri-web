@@ -30,6 +30,8 @@ async function ensureSchema() {
     )`),
     db.prepare("CREATE INDEX IF NOT EXISTS cms_pages_status_idx ON cms_pages (status)"),
   ]);
+  const columns = await db.prepare("PRAGMA table_info(cms_pages)").all<{name:string}>();
+  if (!columns.results.some(column => column.name === "seo_keywords")) await db.prepare("ALTER TABLE cms_pages ADD COLUMN seo_keywords TEXT NOT NULL DEFAULT ''").run();
 }
 
 export async function GET() {
@@ -38,7 +40,7 @@ export async function GET() {
   await ensureSchema();
   const db = await getDatabase();
   const rows = await db.prepare(
-    "SELECT id, title, slug, status, excerpt, updated_at AS updatedAt FROM cms_pages ORDER BY updated_at DESC LIMIT 100",
+      "SELECT id, title, slug, status, excerpt, seo_title AS seoTitle, seo_keywords AS seoKeywords, seo_description AS seoDescription, updated_at AS updatedAt FROM cms_pages ORDER BY updated_at DESC LIMIT 100",
   ).all();
   return Response.json({ pages: rows.results });
 }
@@ -46,7 +48,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await authorize();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-  const body = (await request.json()) as { title?: string; slug?: string; excerpt?: string };
+  const body = (await request.json()) as { title?: string; slug?: string; excerpt?: string; seoTitle?: string; seoKeywords?: string; seoDescription?: string };
   const title = body.title?.trim();
   const slug = body.slug?.trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "");
   if (!title || !slug) return Response.json({ error: "Title and slug are required" }, { status: 400 });
@@ -54,8 +56,8 @@ export async function POST(request: Request) {
   const db = await getDatabase();
   try {
     const result = await db.prepare(
-      "INSERT INTO cms_pages (title, slug, excerpt, author_email) VALUES (?, ?, ?, ?)",
-    ).bind(title, slug, body.excerpt?.trim() ?? "", user.email).run();
+      "INSERT INTO cms_pages (title, slug, excerpt, seo_title, seo_keywords, seo_description, author_email) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    ).bind(title, slug, body.excerpt?.trim() ?? "", body.seoTitle?.trim() || title, body.seoKeywords?.trim() || "", body.seoDescription?.trim() || body.excerpt?.trim() || "", user.email).run();
     return Response.json({ id: result.meta.last_row_id, title, slug, status: "draft" }, { status: 201 });
   } catch {
     return Response.json({ error: "A page with this slug already exists" }, { status: 409 });

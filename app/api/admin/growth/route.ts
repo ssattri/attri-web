@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return Response.json({ success: true }, { status: 201 });
   }
   if (body.kind === "seo") {
-    const entries = [["seo_default_title", body.defaultTitle || ""], ["seo_default_description", body.defaultDescription || ""], ["seo_google_verification", body.googleVerification || ""], ["tracking_ga4_id", body.ga4Id || ""], ["tracking_meta_pixel_id", body.metaPixelId || ""], ["tracking_linkedin_id", body.linkedinId || ""]];
+    const entries = [["seo_default_title", body.defaultTitle || ""], ["seo_default_keywords", body.defaultKeywords || ""], ["seo_default_description", body.defaultDescription || ""], ["seo_google_verification", body.googleVerification || ""], ["tracking_ga4_id", body.ga4Id || ""], ["tracking_meta_pixel_id", body.metaPixelId || ""], ["tracking_linkedin_id", body.linkedinId || ""]];
     await d.batch(entries.map(([key, value]) => d.prepare("INSERT INTO site_settings (setting_key,setting_value,value_type,is_public,updated_by) VALUES (?,?,?,0,?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP").bind(key, value, "text", user.email)));
     return Response.json({ success: true });
   }

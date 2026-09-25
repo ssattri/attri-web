@@ -44,15 +44,15 @@ async function pricingConfig(database:any){
   return {shippingRate:Number(numbers[0]??199),freeAbove:Number(numbers[1]??5000)*100};
 }
 export async function GET(request:Request){
-  await init();const database=await db();const params=new URL(request.url).searchParams;const search=(params.get("q")||"").trim().toLowerCase();const category=(params.get("category")||"").trim();
-  const filters=["status='active'"];const values:string[]=[];if(search){filters.push("(lower(name) LIKE ? OR lower(description) LIKE ? OR lower(category) LIKE ?)");values.push(`%${search}%`,`%${search}%`,`%${search}%`)}if(category&&category!=="All"){filters.push("category=?");values.push(category)}
+  await init();const database=await db();const params=new URL(request.url).searchParams;const search=(params.get("q")||"").trim().toLowerCase();const slug=(params.get("slug")||"").trim().toLowerCase();const category=(params.get("category")||"").trim();
+  const filters=["status='active'"];const values:string[]=[];if(slug){filters.push("lower(slug)=?");values.push(slug)}else if(search){filters.push("(lower(name) LIKE ? OR lower(description) LIKE ? OR lower(category) LIKE ?)");values.push(`%${search}%`,`%${search}%`,`%${search}%`)}if(category&&category!=="All"){filters.push("category=?");values.push(category)}
   const rows=await database.prepare(`SELECT id,name,slug,category,description,price AS regularPrice,
     CASE WHEN special_price>0 AND (special_from='' OR date('now')>=special_from) AND (special_to='' OR date('now')<=special_to) THEN special_price ELSE price END AS price,
     stock,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,duration,classes,service_type AS serviceType,fulfillment_mode AS fulfillmentMode,
-    sku,short_description AS shortDescription,material,colour,dimensions,weight,placement,benefits,usage_instructions AS usageInstructions,care_instructions AS careInstructions,gst_rate AS gstRate,hsn_code AS hsnCode
+    sku,short_description AS shortDescription,material,colour,dimensions,weight,placement,benefits,usage_instructions AS usageInstructions,care_instructions AS careInstructions,gst_rate AS gstRate,hsn_code AS hsnCode,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription
     FROM products WHERE ${filters.join(" AND ")} ORDER BY sort_order,id DESC`).bind(...values).all();
   let courses:{results:unknown[]}={results:[]};
-  try{const courseFilters=["status='published'","show_in_shop=1"];const courseValues:string[]=[];if(search){courseFilters.push("(lower(title) LIKE ? OR lower(description) LIKE ? OR lower(category) LIKE ?)");courseValues.push(`%${search}%`,`%${search}%`,`%${search}%`)}if(!category||category==="All"||category==="Courses")courses=await database.prepare(`SELECT id,title AS name,slug,'Courses' AS category,description,price,999 AS stock,image_url AS imageUrl FROM courses WHERE ${courseFilters.join(" AND ")} ORDER BY id DESC`).bind(...courseValues).all();}
+  try{const courseFilters=["status='published'","show_in_shop=1"];const courseValues:string[]=[];if(slug){courseFilters.push("lower(slug)=?");courseValues.push(slug)}else if(search){courseFilters.push("(lower(title) LIKE ? OR lower(description) LIKE ? OR lower(category) LIKE ?)");courseValues.push(`%${search}%`,`%${search}%`,`%${search}%`)}if(!category||category==="All"||category==="Courses")courses=await database.prepare(`SELECT id,title AS name,slug,'Courses' AS category,description,price,999 AS stock,image_url AS imageUrl FROM courses WHERE ${courseFilters.join(" AND ")} ORDER BY id DESC`).bind(...courseValues).all();}
   catch{/* Courses are initialized by the academy workflow. */}
   return Response.json({products:rows.results,courses:courses.results});
 }

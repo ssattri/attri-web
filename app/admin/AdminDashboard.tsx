@@ -16,6 +16,7 @@ import CourseCatalogue from "./courses/CourseCatalogue";
 import StoreAcademyModules from "./StoreAcademyModules";
 import AppointmentManager from "./AppointmentManager";
 import EnrollmentManager from "./EnrollmentManager";
+import SeoAuditPanel from "./SeoAuditPanel";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["monitoring","Live Monitoring","◉"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
@@ -193,7 +194,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
           <article className="next"><span>→</span><div><b>Next: production activation</b><small>Connect payment gateways, analytics, messaging and final launch QA.</small></div><em>In progress</em></article>
         </div></div>
       </section>
-      <GrowthCenter/>
+      {module==="seo-manager"&&<SeoAuditPanel/>}<GrowthCenter/>
       {module==="monitoring"&&<MonitoringCenter leads={leads} orders={orders} tickets={tickets} appointments={appointments} database={database} busy={busy} onRefresh={refresh}/>} 
       {module==="permissions"&&<RolePermissions/>}
       {module==="settings"&&<SettingsCenter/>}

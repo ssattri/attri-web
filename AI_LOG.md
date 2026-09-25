@@ -1,5 +1,31 @@
 # AI Work Log
 
+# 2026-09-25 - SEO audit editor links
+- Added direct editor links to SEO audit issues for products, courses, and CMS-managed pages.
+
+# 2026-09-25 - SEO audit workspace
+- Added an authenticated SEO audit endpoint and admin panel that scans published products, courses, and CMS pages for missing or weak title, keyword, and description metadata.
+
+# 2026-09-25 - CMS page SEO and public rendering
+- Added CMS SEO keyword storage and public published-page API access.
+- Added `/pages/[slug]` rendering with server-side metadata, canonical URLs, Open Graph data, and styled content presentation.
+
+# 2026-09-25 - Academy course detail SEO
+- Added slug-aware public course API queries and server-rendered course detail pages with metadata, canonical URLs, Open Graph data, and SEO keywords.
+
+# 2026-09-25 - Per-product server SEO metadata
+- Split product detail rendering into a server route and client view so product pages emit server-side title, description, keywords, canonical, and Open Graph metadata.
+
+# 2026-09-25 - Dynamic global SEO metadata
+- Wired admin SEO defaults into the public root metadata with dynamic title, description, keywords, Open Graph, and Twitter card values.
+
+# 2026-09-25 - SEO metadata provisions
+- Added global default SEO keyword storage to the admin growth settings API.
+- Exposed product meta title, keywords, and description through the public shop API alongside existing product/course SEO editor fields.
+
+# 2026-09-25 - Public product detail pages
+- Added slug-aware shop API queries and responsive product detail pages with pricing, availability, GST, HSN, delivery, and specification details.
+
 # 2026-09-25 - Client order history workspace
 - Added an ownership-checked orders API with parsed line items and fulfillment events.
 - Added a responsive client order-history page showing payment, GST, shipping, tracking, totals, and timeline updates.
