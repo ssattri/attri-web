@@ -1,5 +1,8 @@
 # AI Work Log
 
+# 2026-09-25 - Inventory safety signal
+- Added a low-stock count to the admin commerce payload so catalog and dashboard surfaces can highlight active products at five units or fewer.
+
 # 2026-09-25 - Commerce catalogue query support
 - Added server-side shop filtering by search text and product category, preserving published course visibility and active product rules.
 

@@ -62,7 +62,8 @@ export async function GET(){
   const enrichedOrders=(orders.results as Array<{id:number}>).map(order=>({...order,events:eventMap.get(order.id)||[]}));
   const products=await database.prepare("SELECT id,name,slug,category,description,price,stock,status,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,special_price AS specialPrice,special_from AS specialFrom,special_to AS specialTo,duration,classes,sort_order AS sortOrder,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,service_type AS serviceType,fulfillment_mode AS fulfillmentMode,sku,short_description AS shortDescription,material,colour,dimensions,weight,placement,benefits,usage_instructions AS usageInstructions,care_instructions AS careInstructions,gst_rate AS gstRate,hsn_code AS hsnCode,created_at AS createdAt FROM products ORDER BY sort_order,id DESC").all();
   const categories=await database.prepare("SELECT id,name,slug,status,sort_order AS sortOrder,description,icon_url AS iconUrl FROM product_categories ORDER BY sort_order,name").all();
-  return Response.json({orders:enrichedOrders,products:products.results,categories:categories.results});
+  const lowStock=products.results.filter((item:any)=>Number(item.stock)<=5&&item.status==="active").length;
+  return Response.json({orders:enrichedOrders,products:products.results,categories:categories.results,lowStock});
 }
 export async function POST(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
