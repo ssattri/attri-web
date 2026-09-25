@@ -1,4 +1,5 @@
 import { env as runtimeEnv } from "@server";
+import { getRazorpayCredentials } from "../../razorpay-config";
 const db = () => runtimeEnv.DB;
 async function init(){
   const database=await db();
@@ -20,7 +21,7 @@ async function init(){
   ])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
   const orderColumns=await database.prepare("PRAGMA table_info(orders)").all<{name:string}>();
   for(const[name,sql]of[
-    ["shipping_amount","ALTER TABLE orders ADD COLUMN shipping_amount INTEGER NOT NULL DEFAULT 0"],["total","ALTER TABLE orders ADD COLUMN total INTEGER NOT NULL DEFAULT 0"],["payment_method","ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'pay-after-confirmation'"],["tracking_number","ALTER TABLE orders ADD COLUMN tracking_number TEXT NOT NULL DEFAULT ''"],["admin_notes","ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''"],["updated_at","ALTER TABLE orders ADD COLUMN updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP"]
+    ["shipping_amount","ALTER TABLE orders ADD COLUMN shipping_amount INTEGER NOT NULL DEFAULT 0"],["tax_amount","ALTER TABLE orders ADD COLUMN tax_amount INTEGER NOT NULL DEFAULT 0"],["total","ALTER TABLE orders ADD COLUMN total INTEGER NOT NULL DEFAULT 0"],["payment_method","ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'pay-after-confirmation'"],["tracking_number","ALTER TABLE orders ADD COLUMN tracking_number TEXT NOT NULL DEFAULT ''"],["admin_notes","ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''"],["updated_at","ALTER TABLE orders ADD COLUMN updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP"]
   ])if(!orderColumns.results.some(x=>x.name===name))await database.prepare(sql).run();
   await database.prepare("CREATE TABLE IF NOT EXISTS order_events (id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL,status TEXT NOT NULL,note TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
   const count=await database.prepare("SELECT COUNT(*) AS total FROM products").first<{total:number}>();
@@ -32,6 +33,15 @@ async function init(){
     database.prepare("INSERT INTO products (name,slug,category,description,price,stock) VALUES (?,?,?,?,?,?)").bind("Copper Energy Pyramids","copper-energy-pyramids","Remedies","Set of nine copper pyramids for guided corrective placement.",219900,30),
     database.prepare("INSERT INTO products (name,slug,category,description,price,stock) VALUES (?,?,?,?,?,?)").bind("Design OS Early Access","design-os-early-access","Software","Priority access to Attri Design OS beta and onboarding.",999900,100)
   ]);
+}
+async function razorpayCredentials(database:any){
+  return getRazorpayCredentials(database);
+}
+async function pricingConfig(database:any){
+  let rows:{results:unknown[]}={results:[]};try{rows=await database.prepare("SELECT name,value,details FROM catalog_settings WHERE kind='shipping' AND status='active' ORDER BY id DESC").all()}catch{/* Optional admin catalogue settings table is created on first admin use. */}
+  const first=(rows.results as Array<{name:string;value:string;details:string}>)[0];
+  const numbers=(first?.details||"").match(/[0-9]+(?:\.[0-9]+)?/g)?.map(Number)||[];
+  return {shippingRate:Number(numbers[0]??199),freeAbove:Number(numbers[1]??5000)*100};
 }
 export async function GET(){
   await init();const database=await db();
@@ -51,18 +61,27 @@ export async function POST(request:Request){
   await init();const database=await db();const ids=body.items.map(x=>x.id);
   if(ids.length>20)return Response.json({error:"Too many cart items."},{status:400});
   const placeholders=ids.map(()=>"?").join(",");
-  const found=await database.prepare(`SELECT id,name,CASE WHEN special_price>0 AND (special_from='' OR date('now')>=special_from) AND (special_to='' OR date('now')<=special_to) THEN special_price ELSE price END AS price,stock FROM products WHERE id IN (${placeholders}) AND status='active'`).bind(...ids).all<{id:number;name:string;price:number;stock:number}>();
+  const found=await database.prepare(`SELECT id,name,CASE WHEN special_price>0 AND (special_from='' OR date('now')>=special_from) AND (special_to='' OR date('now')<=special_to) THEN special_price ELSE price END AS price,stock,gst_rate AS gstRate FROM products WHERE id IN (${placeholders}) AND status='active'`).bind(...ids).all<{id:number;name:string;price:number;stock:number;gstRate:number}>();
   const map=new Map(found.results.map(x=>[x.id,x]));let subtotal=0;
-  let items;
-  try{items=body.items.map(x=>{const product=map.get(x.id);const quantity=Math.max(1,Math.min(10,Number(x.quantity)||1));if(!product||product.stock<quantity)throw new Error("Product unavailable");subtotal+=product.price*quantity;return{id:product.id,name:product.name,price:product.price,quantity}})}catch{return Response.json({error:"One or more products are unavailable in the requested quantity."},{status:409})}
-  const shippingAmount=subtotal>=500000?0:19900,total=subtotal+shippingAmount;
+  let items;let taxAmount=0;
+  try{items=body.items.map(x=>{const product=map.get(x.id);const quantity=Math.max(1,Math.min(10,Number(x.quantity)||1));if(!product||product.stock<quantity)throw new Error("Product unavailable");subtotal+=product.price*quantity;taxAmount+=Math.round(product.price*quantity*(Number(product.gstRate)||0)/100);return{id:product.id,name:product.name,price:product.price,quantity,gstRate:Number(product.gstRate)||0}})}catch{return Response.json({error:"One or more products are unavailable in the requested quantity."},{status:409})}
+  const pricing=await pricingConfig(database);const shippingAmount=subtotal>=pricing.freeAbove?0:Math.round(pricing.shippingRate*100);const total=subtotal+taxAmount+shippingAmount;
   const paymentMethod=["pay-after-confirmation","bank-upi-transfer"].includes(body.paymentMethod??"")?body.paymentMethod:"pay-after-confirmation";
   const reference=`ORD-${Date.now().toString(36).toUpperCase()}`;
-  const inserted=await database.prepare(`INSERT INTO orders (reference,customer_name,email,phone,address,city,state,pincode,items_json,subtotal,shipping_amount,total,payment_method)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(reference,body.name.trim(),body.email.trim().toLowerCase(),body.phone.trim(),body.address.trim(),body.city.trim(),body.state.trim(),body.pincode.trim(),JSON.stringify(items),subtotal,shippingAmount,total,paymentMethod).run();
+  const inserted=await database.prepare(`INSERT INTO orders (reference,customer_name,email,phone,address,city,state,pincode,items_json,subtotal,shipping_amount,tax_amount,total,payment_method)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(reference,body.name.trim(),body.email.trim().toLowerCase(),body.phone.trim(),body.address.trim(),body.city.trim(),body.state.trim(),body.pincode.trim(),JSON.stringify(items),subtotal,shippingAmount,taxAmount,total,paymentMethod).run();
   await database.batch([
     ...items.map(x=>database.prepare("UPDATE products SET stock=stock-? WHERE id=? AND stock>=?").bind(x.quantity,x.id,x.quantity)),
     database.prepare("INSERT INTO order_events (order_id,status,note) VALUES (?,?,?)").bind(inserted.meta.last_row_id,"pending","Order placed by customer")
   ]);
-  return Response.json({success:true,reference,subtotal,shippingAmount,total,paymentMethod},{status:201});
+  if(paymentMethod==="razorpay"){
+    const credentials=await razorpayCredentials(database);
+    if(!credentials.keyId||!credentials.secret)return Response.json({error:"Razorpay is not configured yet. Add the Key ID and Key Secret in Admin → Settings & Integrations."},{status:503});
+    const razorpayResponse=await fetch("https://api.razorpay.com/v1/orders",{method:"POST",headers:{Authorization:`Basic ${btoa(`${credentials.keyId}:${credentials.secret}`)}`,"content-type":"application/json"},body:JSON.stringify({amount:total,currency:"INR",receipt:reference,payment_capture:1})});
+    const razorpayOrder=await razorpayResponse.json() as {id?:string;error?:{description?:string}};
+    if(!razorpayResponse.ok||!razorpayOrder.id)return Response.json({error:razorpayOrder.error?.description||"Unable to initialize Razorpay checkout."},{status:502});
+    await database.prepare("UPDATE orders SET payment_status='created',admin_notes=? WHERE id=?").bind(`Razorpay order ${razorpayOrder.id}`,inserted.meta.last_row_id).run();
+    return Response.json({success:true,reference,subtotal,shippingAmount,taxAmount,total,paymentMethod,razorpay:{keyId:credentials.keyId,orderId:razorpayOrder.id}},{status:201});
+  }
+  return Response.json({success:true,reference,subtotal,shippingAmount,taxAmount,total,paymentMethod},{status:201});
 }

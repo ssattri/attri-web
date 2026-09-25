@@ -13,6 +13,16 @@
 - Added `/ss_attri/admin` as the canonical admin entry path with rewrites to the existing protected admin implementation.
 - Updated authentication redirects and protected-page return paths to use the new namespace while preserving existing API routes and session cookies.
 
+# 2026-09-25 — Razorpay checkout foundation
+- Added server-side Razorpay order creation using credentials stored in admin settings.
+- Added HMAC-SHA256 payment signature verification and order/payment status updates.
+- Added Razorpay checkout initialization support to the shop order flow while keeping existing offline payment options available.
+- Added server-only `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `RAZORPAY_WEBHOOK_SECRET` configuration with environment-first resolution and masked status in Admin settings.
+- Wired configured Shipping Rules and product GST rates into server-side checkout totals, storing tax and shipping amounts on each order.
+- Updated the public checkout drawer with GST/shipping breakdowns and a Razorpay payment choice that launches checkout and verifies the payment before confirmation.
+- Added a signed Razorpay webhook endpoint for captured, failed, paid, and refund events, including order timeline entries and idempotent status reconciliation.
+- Added admin payment timelines with GST, shipping, payment status, and webhook event visibility for each order.
+
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,
 technical decisions, checks performed, and unresolved risks. Secrets and raw

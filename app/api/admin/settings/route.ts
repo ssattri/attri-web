@@ -1,5 +1,6 @@
 import { getAdminUser } from "../../../admin-auth";
 import { env } from "@server";
+import { getRazorpayCredentials } from "../../../razorpay-config";
 
 const businessKeys = ["business_name", "business_legal_name", "tagline", "business_phone", "business_email", "primary_email", "secondary_email", "primary_phone", "secondary_phone", "whatsapp_number", "emergency_phone", "business_address", "business_city", "business_state", "business_pincode", "business_country", "business_gstin", "business_hours", "support_hours", "business_currency", "instagram", "facebook", "youtube", "linkedin"] as const;
 const razorpayKeys = ["razorpay_key_id", "razorpay_key_secret", "razorpay_webhook_secret"] as const;
@@ -21,7 +22,8 @@ export async function GET() {
   const keys = [...businessKeys, ...razorpayKeys];
   const settings = await env.DB.prepare(`SELECT setting_key AS key, setting_value AS value FROM site_settings WHERE setting_key IN (${keys.map(() => "?").join(",")})`).bind(...keys).all<{ key: string; value: string }>();
   const values = Object.fromEntries(settings.results.filter(item => !razorpayKeys.includes(item.key as typeof razorpayKeys[number])).map(item => [item.key, item.value]));
-  const secretValues = Object.fromEntries(settings.results.filter(item => razorpayKeys.includes(item.key as typeof razorpayKeys[number])).map(item => [item.key, masked(item.value)]));
+  const razorpay = await getRazorpayCredentials(env.DB);
+  const secretValues = { razorpay_key_id: masked(razorpay.keyId), razorpay_key_secret: masked(razorpay.secret), razorpay_webhook_secret: masked(razorpay.webhookSecret), source: razorpay.source };
   const staff = await env.DB.prepare("SELECT id,email,full_name AS fullName,phone,role,department,permissions_json AS permissionsJson,status FROM staff_members ORDER BY full_name").all();
   return Response.json({ business: values, razorpay: secretValues, staff: staff.results, permissions: permissionKeys });
 }

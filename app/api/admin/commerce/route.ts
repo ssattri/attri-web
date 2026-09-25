@@ -46,7 +46,7 @@ async function ensureCategories(database:Awaited<ReturnType<typeof db>>){
 }
 async function ensureOrders(database:Awaited<ReturnType<typeof db>>){
  const columns=await database.prepare("PRAGMA table_info(orders)").all<{name:string}>();
- for(const[name,sql]of[["shipping_amount","ALTER TABLE orders ADD COLUMN shipping_amount INTEGER NOT NULL DEFAULT 0"],["total","ALTER TABLE orders ADD COLUMN total INTEGER NOT NULL DEFAULT 0"],["payment_method","ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'pay-after-confirmation'"],["tracking_number","ALTER TABLE orders ADD COLUMN tracking_number TEXT NOT NULL DEFAULT ''"],["admin_notes","ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''"],["updated_at","ALTER TABLE orders ADD COLUMN updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP"]])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
+  for(const[name,sql]of[["shipping_amount","ALTER TABLE orders ADD COLUMN shipping_amount INTEGER NOT NULL DEFAULT 0"],["tax_amount","ALTER TABLE orders ADD COLUMN tax_amount INTEGER NOT NULL DEFAULT 0"],["total","ALTER TABLE orders ADD COLUMN total INTEGER NOT NULL DEFAULT 0"],["payment_method","ALTER TABLE orders ADD COLUMN payment_method TEXT NOT NULL DEFAULT 'pay-after-confirmation'"],["tracking_number","ALTER TABLE orders ADD COLUMN tracking_number TEXT NOT NULL DEFAULT ''"],["admin_notes","ALTER TABLE orders ADD COLUMN admin_notes TEXT NOT NULL DEFAULT ''"],["updated_at","ALTER TABLE orders ADD COLUMN updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP"]])if(!columns.results.some(x=>x.name===name))await database.prepare(sql).run();
  await database.prepare("CREATE TABLE IF NOT EXISTS order_events (id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL,status TEXT NOT NULL,note TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
 }
 function slugify(value:string){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80)}
@@ -56,10 +56,13 @@ export async function GET(){
   await ensureProducts(database);
   await ensureCategories(database);
   await ensureOrders(database);
-  const orders=await database.prepare("SELECT id,reference,customer_name AS customerName,email,phone,address,city,state,pincode,items_json AS itemsJson,subtotal,shipping_amount AS shippingAmount,total,payment_method AS paymentMethod,status,payment_status AS paymentStatus,tracking_number AS trackingNumber,admin_notes AS adminNotes,created_at AS createdAt,updated_at AS updatedAt FROM orders ORDER BY created_at DESC LIMIT 200").all();
+  const orders=await database.prepare("SELECT id,reference,customer_name AS customerName,email,phone,address,city,state,pincode,items_json AS itemsJson,subtotal,shipping_amount AS shippingAmount,tax_amount AS taxAmount,total,payment_method AS paymentMethod,status,payment_status AS paymentStatus,tracking_number AS trackingNumber,admin_notes AS adminNotes,created_at AS createdAt,updated_at AS updatedAt FROM orders ORDER BY created_at DESC LIMIT 200").all();
+  const events=await database.prepare("SELECT id,order_id AS orderId,status,note,created_at AS createdAt FROM order_events ORDER BY created_at DESC").all();
+  const eventMap=new Map<number,unknown[]>();for(const event of events.results as Array<{orderId:number}>){const list=eventMap.get(event.orderId)||[];list.push(event);eventMap.set(event.orderId,list)}
+  const enrichedOrders=(orders.results as Array<{id:number}>).map(order=>({...order,events:eventMap.get(order.id)||[]}));
   const products=await database.prepare("SELECT id,name,slug,category,description,price,stock,status,image_url AS imageUrl,item_type AS itemType,delivery_mode AS deliveryMode,special_price AS specialPrice,special_from AS specialFrom,special_to AS specialTo,duration,classes,sort_order AS sortOrder,meta_title AS metaTitle,meta_keywords AS metaKeywords,meta_description AS metaDescription,service_type AS serviceType,fulfillment_mode AS fulfillmentMode,sku,short_description AS shortDescription,material,colour,dimensions,weight,placement,benefits,usage_instructions AS usageInstructions,care_instructions AS careInstructions,gst_rate AS gstRate,hsn_code AS hsnCode,created_at AS createdAt FROM products ORDER BY sort_order,id DESC").all();
   const categories=await database.prepare("SELECT id,name,slug,status,sort_order AS sortOrder,description,icon_url AS iconUrl FROM product_categories ORDER BY sort_order,name").all();
-  return Response.json({orders:orders.results,products:products.results,categories:categories.results});
+  return Response.json({orders:enrichedOrders,products:products.results,categories:categories.results});
 }
 export async function POST(request:Request){
   if(!await allowed())return Response.json({error:"Unauthorized"},{status:401});
