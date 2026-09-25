@@ -59,7 +59,11 @@ export async function PATCH(request:Request){
     }
   }else{
     if(!["pending","confirmed","active","completed","cancelled"].includes(b.status??""))return Response.json({error:"Invalid enrollment status."},{status:400});
-    await d.prepare("UPDATE enrollments SET status=? WHERE id=?").bind(b.status,b.id).run();
+    const enrollment=await d.prepare("SELECT e.reference,e.email,c.title AS courseTitle FROM enrollments e JOIN courses c ON c.id=e.course_id WHERE e.id=?").bind(b.id).first<{reference:string;email:string;courseTitle:string}>();
+    const progress=Math.max(0,Math.min(100,Math.floor(Number(b.progress??0))));
+    if(!Number.isFinite(progress))return Response.json({error:"Progress must be between 0 and 100."},{status:400});
+    await d.prepare("UPDATE enrollments SET status=?,progress=? WHERE id=?").bind(b.status,progress,b.id).run();
+    if(enrollment){await d.prepare("CREATE TABLE IF NOT EXISTS portal_notifications (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,message TEXT NOT NULL,audience TEXT NOT NULL DEFAULT 'all',recipient_email TEXT NOT NULL DEFAULT '',severity TEXT NOT NULL DEFAULT 'info',action_url TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'published',expires_at TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();await d.prepare("INSERT INTO portal_notifications(title,message,audience,recipient_email,severity,action_url) VALUES (?,?,?,?,?,?)").bind(`Course enrollment ${b.status}`,`Your enrollment ${enrollment.reference} for ${enrollment.courseTitle} is now ${b.status}. Open your client portal for updates.`,`individual`,enrollment.email.toLowerCase(),b.status==="active"||b.status==="confirmed"?"success":"info","/client").run();}
   }
   return Response.json({success:true})
 }

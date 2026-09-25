@@ -14,6 +14,7 @@ async function init(){
   ["meta_title","ALTER TABLE courses ADD COLUMN meta_title TEXT NOT NULL DEFAULT ''"],
   ["meta_keywords","ALTER TABLE courses ADD COLUMN meta_keywords TEXT NOT NULL DEFAULT ''"],
   ["meta_description","ALTER TABLE courses ADD COLUMN meta_description TEXT NOT NULL DEFAULT ''"]
+  , ["seats","ALTER TABLE courses ADD COLUMN seats INTEGER NOT NULL DEFAULT 0"]
  ])if(!columns.results.some(x=>x.name===name))await d.prepare(sql).run();
  const c=await d.prepare("SELECT COUNT(*) AS total FROM courses").first<{total:number}>();if(!c?.total)await d.batch([
   d.prepare("INSERT INTO courses (title,slug,category,level,mode,duration,description,price,lessons) VALUES (?,?,?,?,?,?,?,?,?)").bind("Scientific Vastu Foundations","scientific-vastu-foundations","Vastu Shastra","Beginner","Recorded","8 weeks","Understand directions, elements, zones and practical residential analysis.",1499900,32),
@@ -22,9 +23,9 @@ async function init(){
   d.prepare("INSERT INTO courses (title,slug,category,level,mode,duration,description,price,lessons) VALUES (?,?,?,?,?,?,?,?,?)").bind("Free Vastu Orientation","free-vastu-orientation","Vastu Shastra","Beginner","Recorded","90 minutes","A concise introduction to scientific Vastu and responsible practice.",0,6)
  ])
 }
-export async function GET(){await init();const d=await db();const r=await d.prepare("SELECT id,title,slug,category,level,mode,duration,description,price,lessons,image_url AS imageUrl,instructor,certificate FROM courses WHERE status='published' ORDER BY id DESC").all();return Response.json({courses:r.results})}
+export async function GET(){await init();const d=await db();const r=await d.prepare("SELECT c.id,c.title,c.slug,c.category,c.level,c.mode,c.duration,c.description,c.price,c.lessons,c.image_url AS imageUrl,c.instructor,c.certificate,c.seats,(SELECT COUNT(*) FROM enrollments e WHERE e.course_id=c.id AND e.status NOT IN ('cancelled')) AS enrolled FROM courses c WHERE c.status='published' ORDER BY c.id DESC").all();return Response.json({courses:r.results})}
 export async function POST(request:Request){
  const b=await request.json() as Record<string,string>;if(!b.courseId||!b.name||!b.email||!b.phone)return Response.json({error:"Complete all required enrollment details."},{status:400});
  await init();const d=await db();const course=await d.prepare("SELECT id FROM courses WHERE id=? AND status='published'").bind(Number(b.courseId)).first();if(!course)return Response.json({error:"Course is unavailable."},{status:404});
- const reference=`ENR-${Date.now().toString(36).toUpperCase()}`;await d.prepare("INSERT INTO enrollments (reference,course_id,student_name,email,phone,experience) VALUES (?,?,?,?,?,?)").bind(reference,Number(b.courseId),b.name.trim(),b.email.trim(),b.phone.trim(),b.experience??"").run();return Response.json({success:true,reference},{status:201})
+ const capacity=await d.prepare("SELECT seats,(SELECT COUNT(*) FROM enrollments e WHERE e.course_id=courses.id AND e.status NOT IN ('cancelled')) AS enrolled FROM courses WHERE id=?").bind(Number(b.courseId)).first<{seats:number;enrolled:number}>();if(capacity&&capacity.seats>0&&capacity.enrolled>=capacity.seats)return Response.json({error:"This course is currently full. Please choose another programme."},{status:409});const reference=`ENR-${Date.now().toString(36).toUpperCase()}`;await d.prepare("INSERT INTO enrollments (reference,course_id,student_name,email,phone,experience) VALUES (?,?,?,?,?,?)").bind(reference,Number(b.courseId),b.name.trim(),b.email.trim(),b.phone.trim(),b.experience??"").run();return Response.json({success:true,reference},{status:201})
 }

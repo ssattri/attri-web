@@ -1,5 +1,16 @@
 # AI Work Log
 
+# 2026-09-25 - Commerce catalogue query support
+- Added server-side shop filtering by search text and product category, preserving published course visibility and active product rules.
+
+# 2026-09-25 - Client consultation cancellation workflow
+- Added an authenticated client endpoint to cancel owned pending or confirmed consultation bookings.
+- Cancellation updates the shared appointment record and creates a client portal notification without initiating refunds.
+
+# 2026-09-25 - Academy enrollment progress management
+- Added an admin enrollment workspace for updating learner status and 0-100% progress.
+- Persisted progress in the enrollment API so client learning records can reflect operational updates.
+
 # 2026-09-13 — Frontend email/password account authentication
 - Replaced the public client login’s ChatGPT sign-in dependency with Supabase email/password sign-in and account creation.
 - Added a secure HTTP-only session cookie, server-side Supabase user lookup, sign-out handling, and preserved user/consultant registration gates.
@@ -31,6 +42,10 @@
 - Added an admin consultation calendar workspace for consultant assignment, meeting links, notes, and booking status updates.
 - Exposed assigned consultant and meeting-link readiness in the authenticated client consultation history data.
 - Added secure client-facing Join meeting actions for confirmed bookings with an administrator-provided meeting URL.
+- Added course seat-capacity enforcement and public enrolled/seat counts so full programmes cannot accept additional enrolments.
+- Added public course seat availability and full-course states to prevent customers starting unavailable enrollment flows.
+- Added automatic client-portal notifications when administrators update consultation status or details.
+- Added targeted student notifications when administrators update course enrollment status.
 
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,
