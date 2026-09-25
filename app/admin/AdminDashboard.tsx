@@ -119,6 +119,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
   }
   useEffect(()=>{const timer=window.setTimeout(()=>void refresh(),0);return()=>window.clearTimeout(timer)},[]);
   useEffect(()=>{const timer=window.setInterval(()=>{void refresh()},30000);return()=>window.clearInterval(timer)},[]);
+  useEffect(()=>{const renew=()=>{void fetch("/api/admin/session/refresh",{cache:"no-store"}).then(response=>{if(response.status===401)window.location.assign("/ss_attri/admin/login?return_to=%2Fss_attri%2Fadmin")})};renew();const timer=window.setInterval(renew,15*60*1000);return()=>window.clearInterval(timer)},[]);
   useEffect(()=>{
     const syncFromUrl=()=>{
       const requested=new URLSearchParams(window.location.search).get("module")||"overview";

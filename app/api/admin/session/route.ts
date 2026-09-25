@@ -13,12 +13,14 @@ export async function POST(request: Request) {
   const returnTo = safeAdminPath(String(form.get("returnTo") || "/admin"));
 
   if (!await authenticateAdmin(email, password)) {
+    if (request.headers.get("x-admin-login") === "1") return NextResponse.json({ error: "We could not verify those credentials." }, { status: 401 });
     return Response.redirect(adminRedirectUrl(request, `/ss_attri/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`), 303);
   }
 
   try {
-    const response = NextResponse.redirect(adminRedirectUrl(request, returnTo), 303);
     const cookie = await adminSessionCookie(request);
+    if (request.headers.get("x-admin-login") === "1") { const response = NextResponse.json({ success: true }); response.cookies.set(cookie.name, cookie.value, cookie.options); return response; }
+    const response = NextResponse.redirect(adminRedirectUrl(request, returnTo), 303);
     response.cookies.set(cookie.name, cookie.value, cookie.options);
     return response;
   } catch {

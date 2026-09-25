@@ -1,5 +1,21 @@
 # AI Work Log
 
+# 2026-09-25 - Client order history workspace
+- Added an ownership-checked orders API with parsed line items and fulfillment events.
+- Added a responsive client order-history page showing payment, GST, shipping, tracking, totals, and timeline updates.
+
+# 2026-09-25 - Client profile and billing details
+- Added protected profile GET/PATCH APIs and a responsive client profile page for contact, company, address, PIN, and GSTIN details.
+
+# 2026-09-25 - Client booking route alias
+- Added `/client/bookings` as a stable alias to the consultation management workspace for simpler navigation and future booking-related expansion.
+
+# 2026-09-25 - Sliding admin session renewal
+- Added a protected session refresh endpoint and a dashboard keep-alive that renews the HTTP-only admin cookie every 15 minutes while the panel is open.
+
+# 2026-09-25 - Admin login cookie delivery hardening
+- Replaced native redirect-only admin sign-in with a same-origin client submission that receives a JSON response carrying the HTTP-only session cookie before navigating to the dashboard.
+
 # 2026-09-25 - Admin session host persistence fix
 - Updated admin login redirects to stay on the exact host that issued the session cookie, avoiding apex/www or proxy-origin changes that caused refreshes to lose authentication.
 
