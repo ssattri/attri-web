@@ -1,5 +1,8 @@
 # AI Work Log
 
+# 2026-09-25 - Inventory alert UI
+- Added low-stock warning, filter controls, and highlighted stock values to the admin product catalogue.
+
 # 2026-09-25 - Inventory safety signal
 - Added a low-stock count to the admin commerce payload so catalog and dashboard surfaces can highlight active products at five units or fewer.
 
