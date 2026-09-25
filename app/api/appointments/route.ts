@@ -27,6 +27,8 @@ export async function POST(request:Request){
   if(!/^[+0-9 ()-]{8,18}$/.test(body.phone))return Response.json({error:"Enter a valid phone number."},{status:400});
   const reference=`AA-${Date.now().toString(36).toUpperCase()}`;
   await init();const database=await db();
+  const conflict=body.consultantPreference&&body.consultantPreference!=="Any available consultant"?await database.prepare("SELECT id FROM appointments WHERE preferred_date=? AND preferred_time=? AND consultant_preference=? AND status IN ('pending','confirmed') LIMIT 1").bind(body.preferredDate,body.preferredTime,body.consultantPreference).first<{id:number}>():await database.prepare("SELECT id FROM appointments WHERE preferred_date=? AND preferred_time=? AND status IN ('pending','confirmed') LIMIT 1").bind(body.preferredDate,body.preferredTime).first<{id:number}>();
+  if(conflict)return Response.json({error:"That time slot was just booked. Please choose another available time."},{status:409});
   await database.prepare(`INSERT INTO appointments
     (reference,name,email,phone,service,consultation_mode,preferred_date,preferred_time,project_type,message,consultant_preference,booking_type)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).bind(reference,body.name.trim(),body.email.trim(),body.phone.trim(),body.service,body.consultationMode,body.preferredDate,body.preferredTime,body.projectType??"",body.message?.trim()??"",body.consultantPreference?.trim()||"Any available consultant",body.bookingType==="now"?"now":"scheduled").run();

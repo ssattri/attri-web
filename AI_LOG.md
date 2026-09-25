@@ -23,6 +23,12 @@
 - Added a signed Razorpay webhook endpoint for captured, failed, paid, and refund events, including order timeline entries and idempotent status reconciliation.
 - Added admin payment timelines with GST, shipping, payment status, and webhook event visibility for each order.
 - Applied the final-sale policy: checkout discloses that products, digital goods, courses, consultations, and services are non-returnable/non-refundable; refund status changes are rejected and refund webhooks are logged for manual review.
+- Added customer-visible order timeline counts and secure event loading in the client portal, alongside the admin payment timeline.
+- Added a public consultation availability endpoint that hides pending and confirmed time slots for a selected date from future booking integrations.
+- Connected the availability selector to the public booking form and added server-side conflict protection for race-safe appointment booking.
+- Added consultant-aware availability and conflict checks so preferred consultant slots are reconciled consistently on the frontend and backend.
+- Bound the consultant selector to live availability refreshes in the public booking form.
+- Added an admin consultation calendar workspace for consultant assignment, meeting links, notes, and booking status updates.
 
 This log records AI-assisted repository work. It complements `CHANGELOG.md`:
 the changelog summarizes what changed, while this file preserves the request,

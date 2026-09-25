@@ -14,6 +14,7 @@ import ProductCatalogue from "./products/ProductCatalogue";
 import ProductCategories from "./products/ProductCategories";
 import CourseCatalogue from "./courses/CourseCatalogue";
 import StoreAcademyModules from "./StoreAcademyModules";
+import AppointmentManager from "./AppointmentManager";
 
 export const adminModules = [
   ["overview","Overview","⌂"],["monitoring","Live Monitoring","◉"],["analytics","Analytics","⌁"],["notifications","Notifications","✦"],
@@ -195,6 +196,7 @@ export default function AdminDashboard({displayName,module:initialModule="overvi
       {module==="permissions"&&<RolePermissions/>}
       {module==="settings"&&<SettingsCenter/>}
       {module==="product-categories"&&<ProductCategories/>}
+      {module==="appointments"&&<AppointmentManager/>}
 
       <NotificationCenter/>
 
