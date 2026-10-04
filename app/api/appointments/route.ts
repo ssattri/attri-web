@@ -3,8 +3,10 @@ import { env as runtimeEnv } from "@server";
 
 const db = () => runtimeEnv.DB;
 const normalizeSlot=(value:string)=>value.replace(/â€“|–|-/g,"-").replace(/\s+/g," ").trim();
-const approvedTimes=["10:00 AM - 11:00 AM","11:30 AM - 12:30 PM","2:00 PM - 3:00 PM","3:30 PM - 4:30 PM","5:00 PM - 6:00 PM"];
-const approvedConsultants=["Any available consultant","Senior Vastu Consultant","Architecture Consultant","Interior & Design Consultant"];
+const defaultTimes=["10:00 AM - 11:00 AM","11:30 AM - 12:30 PM","2:00 PM - 3:00 PM","3:30 PM - 4:30 PM","5:00 PM - 6:00 PM"];
+const defaultConsultants=["Any available consultant","Senior Vastu Consultant","Architecture Consultant","Interior & Design Consultant"];
+const indiaToday=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+async function configuredList(key:string,fallback:string[]){try{const row=await db().prepare("SELECT setting_value AS value FROM site_settings WHERE setting_key=?").bind(key).first<{value:string}>();const values=(row?.value||"").split(/[\n,]+/).map(value=>value.trim()).filter(Boolean);return values.length?values:fallback}catch{return fallback}}
 async function owner(){return Boolean(await getAdminUser())}
 async function init(){
   const database=await db();
@@ -28,11 +30,14 @@ export async function POST(request:Request){
   if(required.some(k=>!body[k]?.trim()))return Response.json({error:"Please complete all required fields."},{status:400});
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))return Response.json({error:"Enter a valid email address."},{status:400});
   if(!/^[+0-9 ()-]{8,18}$/.test(body.phone))return Response.json({error:"Enter a valid phone number."},{status:400});
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(body.preferredDate)||Number.isNaN(Date.parse(`${body.preferredDate}T00:00:00`))||body.preferredDate<new Date().toISOString().slice(0,10))return Response.json({error:"Choose a valid future consultation date."},{status:400});
+  const approvedTimes=await configuredList("consultation_slots",defaultTimes);const approvedConsultants=["Any available consultant",...(await configuredList("consultation_consultants",defaultConsultants.slice(1)))];
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(body.preferredDate)||Number.isNaN(Date.parse(`${body.preferredDate}T00:00:00`))||body.preferredDate<indiaToday())return Response.json({error:"Choose a valid future consultation date."},{status:400});
   if(!approvedTimes.includes(normalizeSlot(body.preferredTime)))return Response.json({error:"Choose an available consultation time."},{status:400});
   if(body.consultantPreference&&!approvedConsultants.includes(body.consultantPreference))return Response.json({error:"Choose a valid consultant preference."},{status:400});
   const reference=`AA-${Date.now().toString(36).toUpperCase()}`;
   await init();const database=await db();
+  const duplicate=await database.prepare("SELECT reference FROM appointments WHERE lower(email)=? AND preferred_date=? AND preferred_time=? AND status IN ('pending','confirmed') AND created_at>=datetime('now','-5 minutes') LIMIT 1").bind(body.email.trim().toLowerCase(),body.preferredDate,body.preferredTime).first<{reference:string}>();
+  if(duplicate)return Response.json({error:`This consultation request was already received (${duplicate.reference}). Please wait for confirmation.`},{status:409});
   const conflict=body.consultantPreference&&body.consultantPreference!=="Any available consultant"?await database.prepare("SELECT id FROM appointments WHERE preferred_date=? AND preferred_time=? AND consultant_preference=? AND status IN ('pending','confirmed') LIMIT 1").bind(body.preferredDate,body.preferredTime,body.consultantPreference).first<{id:number}>():await database.prepare("SELECT id FROM appointments WHERE preferred_date=? AND preferred_time=? AND status IN ('pending','confirmed') LIMIT 1").bind(body.preferredDate,body.preferredTime).first<{id:number}>();
   if(conflict)return Response.json({error:"That time slot was just booked. Please choose another available time."},{status:409});
   await database.prepare(`INSERT INTO appointments

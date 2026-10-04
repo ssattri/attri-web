@@ -560,3 +560,33 @@ environment values must never be recorded here.
 # 2026-09-25 - Order lifecycle safeguards
 - Added backend transition guards so completed and cancelled orders cannot be moved back into active fulfilment states.
 - Kept the admin order controls and client timeline consistent with the final-sale, no-refund workflow.
+
+# 2026-10-04 - Booking date consistency
+- Updated the availability API to reject malformed, invalid, or past consultation dates, matching the frontend date picker constraints.
+- Standardized the server-side “today” calculation to Asia/Kolkata so midnight boundaries match the business operating timezone instead of UTC.
+
+# 2026-10-04 - Consultation duplicate protection
+- Added a short-window duplicate guard for identical customer, date, and time submissions so retries and double-clicks do not create duplicate consultation requests.
+
+# 2026-10-04 - Configurable consultation availability
+- Added consultation slots and consultant options to Settings & Integrations under Hours & availability.
+- Availability lookup and booking validation now read those saved values with safe defaults, allowing administrators to adjust schedules without code changes.
+- Updated the public booking form to load the saved slots and consultant options dynamically before date selection.
+
+# 2026-10-04 - Product detail cart handoff
+- Connected product detail pages to the shared cart storage so customers can add an available product directly from its detail view.
+- Cart updates dispatch the existing portal/cart refresh event and preserve backend stock validation at checkout.
+
+# 2026-10-04 - Product and course detail separation
+- Prevented course detail pages from placing course IDs into the physical-product cart.
+- Course details now link to the course enrollment flow, while product details retain direct cart actions.
+
+# 2026-10-04 - Course enrollment conversion flow
+- Added an inline enrollment form to course detail pages using the existing course enrollment API.
+- The form surfaces enrollment references and capacity/validation errors without sending learners back to the catalogue.
+
+# 2026-10-04 - Course enrollment duplicate protection
+- Added backend protection against multiple active enrollment requests for the same email and course.
+
+# 2026-10-04 - Enrollment notification handoff
+- Successful course enrollment requests now create an individual portal notification containing the enrollment reference and next-step message.

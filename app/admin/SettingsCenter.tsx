@@ -7,10 +7,10 @@ const tabs = ["Business Information", "Keys & Integrations"] as const;
 const sections = [
   ["identity", "Identity & contact", ["business_name", "tagline", "primary_email", "secondary_email", "primary_phone", "secondary_phone", "whatsapp_number", "emergency_phone"]],
   ["addresses", "Addresses", ["business_address", "business_city", "business_state", "business_pincode", "business_country", "business_gstin"]],
-  ["hours", "Hours & availability", ["business_hours", "support_hours"]],
+  ["hours", "Hours & availability", ["business_hours", "support_hours", "consultation_slots", "consultation_consultants"]],
   ["social", "Social profiles", ["instagram", "facebook", "youtube", "linkedin"]],
 ] as const;
-const labels: Record<string, string> = { business_name: "Business name", tagline: "Tagline", primary_email: "Primary email", secondary_email: "Secondary email", primary_phone: "Primary mobile", secondary_phone: "Secondary mobile", whatsapp_number: "WhatsApp number", emergency_phone: "Emergency consultation number", business_address: "Registered address", business_city: "City", business_state: "State", business_pincode: "PIN code", business_country: "Country", business_gstin: "GSTIN", business_hours: "Business hours", support_hours: "Support hours", instagram: "Instagram profile", facebook: "Facebook profile", youtube: "YouTube channel", linkedin: "LinkedIn profile" };
+const labels: Record<string, string> = { business_name: "Business name", tagline: "Tagline", primary_email: "Primary email", secondary_email: "Secondary email", primary_phone: "Primary mobile", secondary_phone: "Secondary mobile", whatsapp_number: "WhatsApp number", emergency_phone: "Emergency consultation number", business_address: "Registered address", business_city: "City", business_state: "State", business_pincode: "PIN code", business_country: "Country", business_gstin: "GSTIN", business_hours: "Business hours", support_hours: "Support hours", consultation_slots: "Consultation slots", consultation_consultants: "Consultant options", instagram: "Instagram profile", facebook: "Facebook profile", youtube: "YouTube channel", linkedin: "LinkedIn profile" };
 
 export default function SettingsCenter() {
   const [tab, setTab] = useState<(typeof tabs)[number]>("Business Information");
