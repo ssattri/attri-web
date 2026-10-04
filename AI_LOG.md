@@ -600,6 +600,30 @@ environment values must never be recorded here.
 - Added service API output and consultation CTAs so frontend service discovery connects to the booking flow.
 - Booking requests now preserve the selected service context from the service CTA query parameter.
 
+# 2026-10-04 - Service detail routes
+- Added SEO-friendly `/services/[slug]` pages with dynamic service details, delivery mode, pricing, and consultation actions.
+
+# 2026-10-04 - Services sitemap indexing
+- Added the services landing page and active service detail URLs to the dynamic sitemap for search discovery.
+
+# 2026-10-04 - Service booking preselection
+- Updated the booking form to visibly preselect a service passed from the public services catalogue while keeping the field editable.
+
+# 2026-10-04 - Service catalogue freshness
+- Marked the public services API as no-store so admin service status changes appear immediately on the frontend.
+
+# 2026-10-04 - Service structured data
+- Added JSON-LD Service schema to dynamic service detail pages with provider, category, URL, and INR offer data when a base price exists.
+
+# 2026-10-04 - Course structured data
+- Added JSON-LD Course schema to course detail pages with provider, instructor, delivery mode, duration, pricing, and seat availability.
+
+# 2026-10-04 - Product structured data
+- Added JSON-LD Product schema to product detail pages with category, image, SKU, INR price, and stock availability.
+
+# 2026-10-04 - Availability settings validation
+- Added backend validation for saved consultation slots and consultant options before publishing them to the booking flow.
+
 # 2026-10-04 - Learning progress notifications
 - Admin enrollment status and progress updates now include the learner's current percentage in the portal notification.
 
