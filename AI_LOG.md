@@ -590,3 +590,18 @@ environment values must never be recorded here.
 
 # 2026-10-04 - Enrollment notification handoff
 - Successful course enrollment requests now create an individual portal notification containing the enrollment reference and next-step message.
+
+# 2026-10-04 - Course capacity transparency
+- Course detail pages now read backend seat capacity and active enrollment counts and show remaining seats before enrollment.
+- Full courses no longer render the enrollment form, matching backend capacity enforcement.
+
+# 2026-10-04 - Public services catalogue
+- Added a public `/services` page backed by active admin-managed service records with a safe fallback catalogue.
+- Added service API output and consultation CTAs so frontend service discovery connects to the booking flow.
+- Booking requests now preserve the selected service context from the service CTA query parameter.
+
+# 2026-10-04 - Learning progress notifications
+- Admin enrollment status and progress updates now include the learner's current percentage in the portal notification.
+
+# 2026-10-04 - Support ticket notifications
+- Admin support status changes now notify the ticket owner with the reference, subject, and updated state in the client portal.
