@@ -618,14 +618,30 @@ environment values must never be recorded here.
 # 2026-10-04 - Course structured data
 - Added JSON-LD Course schema to course detail pages with provider, instructor, delivery mode, duration, pricing, and seat availability.
 
+# 2026-10-04 - Enrollment form UX
+- Added responsive styling for the course enrollment form with clear input hierarchy, action state, and inline feedback.
+
 # 2026-10-04 - Product structured data
 - Added JSON-LD Product schema to product detail pages with category, image, SKU, INR price, and stock availability.
 
 # 2026-10-04 - Availability settings validation
 - Added backend validation for saved consultation slots and consultant options before publishing them to the booking flow.
 
+# 2026-10-04 - Services landing SEO settings
+- Connected the public services landing metadata to the configured site SEO defaults with a safe fallback.
+
+# 2026-10-04 - Services catalogue UX
+- Added a responsive services catalogue layout with Attri theme styling, clear hierarchy, and separate detail/booking actions.
+
+# 2026-10-04 - Service detail UX
+- Added responsive detail-page styling for dynamic services with clear metadata pills and consultation CTA.
+
 # 2026-10-04 - Learning progress notifications
 - Admin enrollment status and progress updates now include the learner's current percentage in the portal notification.
 
 # 2026-10-04 - Support ticket notifications
 - Admin support status changes now notify the ticket owner with the reference, subject, and updated state in the client portal.
+
+# 2026-10-04 - Dynamic consultation service selector
+- Public consultation booking now loads active admin-managed services while retaining safe default options.
+- Service links can preselect a custom service from the query string, and the selected value is submitted to the appointment API.

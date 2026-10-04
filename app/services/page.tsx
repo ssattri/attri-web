@@ -1,4 +1,4 @@
-import type{Metadata}from"next";
-import ServicesPage from"./ServicesPage";
-export const metadata:Metadata={title:"Services | Attri Associates",description:"Explore Attri Associates architecture, engineering, Vastu and consultation services."};
+import type{Metadata}from"next";import{env}from"@server";import ServicesPage from"./ServicesPage";
+export const dynamic="force-dynamic";
+export async function generateMetadata():Promise<Metadata>{try{const rows=await env.DB.prepare("SELECT setting_key AS key,setting_value AS value FROM site_settings WHERE setting_key IN ('seo_default_title','seo_default_description','seo_default_keywords')").all<{key:string;value:string}>();const values=Object.fromEntries(rows.results.map(row=>[row.key,row.value]));return{title:values.seo_default_title?`Services | ${values.seo_default_title}`:"Services | Attri Associates",description:values.seo_default_description||"Explore architecture, engineering, Vastu and consultation services from Attri Associates.",keywords:(values.seo_default_keywords||"Attri Associates services, architecture, Vastu consultation").split(",").map(value=>value.trim())}}catch{return{title:"Services | Attri Associates",description:"Explore architecture, engineering, Vastu and consultation services from Attri Associates."}}}
 export default function Services(){return <ServicesPage/>}
